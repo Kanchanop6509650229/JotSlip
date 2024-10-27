@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Final project</string>
+    <string name="date_format">dd/mm/yyyy</string>
+    <string name="time_format">HH:mm</string>
+    <string-array name="types_array">
+        <item>อื่นๆ</item>
+        <item>อาหาร/เครื่องดื่ม</item>
+        <item>ช็อปปิ้ง</item>
+        <item>ครอบครัว/ส่วนตัว</item>
+        <item>ออมเงิน/ลงทุน</item>
+        <item>ชำระบิล</item>
+        <item>บันเทิง</item>
+        <item>ของขวัญ/บริจาค</item>
+        <item>ค่าเดินทาง</item>
+        <item>การศึกษา</item>
+        <item>โรงแรม/ท่องเที่ยว</item>
+        <item>ประกัน</item>
+        <item>ถอนเงิน</item>
+        <item>สินเชื่อ/เช่าซื้อ</item>
+    </string-array>
+</resources>
