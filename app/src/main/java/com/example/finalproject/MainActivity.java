@@ -114,11 +114,12 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         // แยกวันที่และเวลา
                         String[] dateTimeParts = slip.getDateTime().split(" ");
-                        if (dateTimeParts.length >= 4) {
+                        if (dateTimeParts.length >= 3) {
                             // รวมส่วนวันที่ (วันที่ เดือน ปี)
-                            String date = dateTimeParts[0] + " " + dateTimeParts[1] + " " + dateTimeParts[2];
-                            // ส่วนเวลา
-                            String time = dateTimeParts[3] + " " + dateTimeParts[4];
+                            String date = String.join(" ", dateTimeParts[0], dateTimeParts[1], dateTimeParts[2]);
+                            
+                            // ส่วนเวลา (ถ้ามี)
+                            String time = dateTimeParts.length > 3 ? dateTimeParts[3] : "";
                             
                             // อัพเดทค่าใน TextView
                             TextView dateInput = findViewById(R.id.date_input);
