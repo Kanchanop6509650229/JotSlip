@@ -69,6 +69,27 @@
             android:gravity="center"
             android:layout_marginVertical="20dp">
 
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+                <RadioButton
+                    android:id="@+id/radio_income"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/income" />
+                <RadioButton
+                    android:id="@+id/radio_outcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/outcome" />
+            </RadioGroup>
+
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -191,30 +212,18 @@
                 </TableRow>
 
                 <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/date_input"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:text="@string/date_format" />
-                </TableRow>
-
-                <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="0">
+                    android:layout_weight="1">
 
                     <Button
                         android:id="@+id/date_btn"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginHorizontal="20dp"
-                        android:text="Button" />
+                        android:background="@android:color/transparent"
+                        android:textColor="@color/black"
+                        android:text="@string/date_format" />
                 </TableRow>
 
 
@@ -240,28 +249,16 @@
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/time_input"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:text="@string/time_format" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
+                    android:layout_weight="1">
 
                     <Button
                         android:id="@+id/time_btn"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginHorizontal="20dp"
-                        android:text="Button" />
+                        android:background="@android:color/transparent"
+                        android:textColor="@color/black"
+                        android:text="@string/time_format" />
                 </TableRow>
 
             </TableRow>

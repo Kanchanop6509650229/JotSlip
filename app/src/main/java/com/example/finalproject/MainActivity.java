@@ -1,6 +1,8 @@
 package com.example.finalproject;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,11 +13,14 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.VideoView;
 import android.widget.Toast;
 
@@ -31,7 +36,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView senderTextView;
     private TextView receiverTextView;
     private EditText moneyEditText;
+    Calendar myCalendar = Calendar.getInstance();
 
     ActivityResultLauncher<Intent> activityResultLauncher3 = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -104,6 +114,54 @@ public class MainActivity extends AppCompatActivity {
         });
 
         slipProcessor = new SlipProcessor();
+
+        Button btnDate = findViewById(R.id.date_btn);
+        btnDate.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                new DatePickerDialog(MainActivity.this, d,
+                        myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        Button btnTime = findViewById(R.id.time_btn);
+        btnTime.setOnClickListener(new View.OnClickListener() {
+            public  void onClick(View v) {
+                new TimePickerDialog(MainActivity.this, t,
+                        myCalendar.get(Calendar.HOUR_OF_DAY),
+                        myCalendar.get(Calendar.MINUTE), true).show();
+            }
+        });
+    }
+
+    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateDateLabel();
+        }
+    };
+
+    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            myCalendar.set(Calendar.MINUTE, minute);
+            updateTimeLabel();
+        }
+    };
+
+    private void updateTimeLabel() {
+        Button timeBtn = findViewById(R.id.time_btn);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        timeBtn.setText(timeFormat.format(myCalendar.getTime()));
+    }
+
+    private void updateDateLabel() {
+        Button dateBtn = findViewById(R.id.date_btn);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        dateBtn.setText(dateFormat.format(myCalendar.getTime()));
     }
 
     private void processSlipImage() {
@@ -114,18 +172,22 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         // แยกวันที่และเวลา
                         String[] dateTimeParts = slip.getDateTime().split(" ");
-                        if (dateTimeParts.length >= 3) {
-                            // รวมส่วนวันที่ (วันที่ เดือน ปี)
-                            String date = String.join(" ", dateTimeParts[0], dateTimeParts[1], dateTimeParts[2]);
-                            
-                            // ส่วนเวลา (ถ้ามี)
-                            String time = dateTimeParts.length > 3 ? dateTimeParts[3] : "";
-                            
-                            // อัพเดทค่าใน TextView
-                            TextView dateInput = findViewById(R.id.date_input);
-                            TextView timeInput = findViewById(R.id.time_input);
-                            dateInput.setText(date);
-                            timeInput.setText(time);
+                        if (dateTimeParts.length >= 2) {
+                            try {
+                                // แปลงรูปแบบวันที่
+                                String dateStr = dateTimeParts[0];
+                                String timeStr = dateTimeParts[1];
+                                
+                                // อัพเดทค่าใน Button
+                                Button dateInput = findViewById(R.id.date_btn);
+                                Button timeInput = findViewById(R.id.time_btn);
+                                
+                                dateInput.setText(dateStr);
+                                timeInput.setText(timeStr);
+                                
+                            } catch (Exception e) {
+                                Log.e("MainActivity", "Error formatting date: " + e.getMessage());
+                            }
                         }
 
                         // อัพเดทค่าผู้รับโอน

@@ -2,6 +2,9 @@
     <string name="app_name">Final project</string>
     <string name="date_format">dd/mm/yyyy</string>
     <string name="time_format">HH:mm</string>
+    <string name="income">รายรับ</string>
+    <string name="outcome">รายจ่าย</string>
+    <string name="cancel">X</string>
     <string-array name="types_array">
         <item>อื่นๆ</item>
         <item>อาหาร/เครื่องดื่ม</item>
