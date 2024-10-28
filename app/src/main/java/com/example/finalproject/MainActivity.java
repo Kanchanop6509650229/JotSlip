@@ -44,7 +44,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     DecimalFormat formatter = new DecimalFormat("#,###,###.##");
     private TextView dateTimeTextView;
@@ -132,6 +132,19 @@ public class MainActivity extends AppCompatActivity {
                         myCalendar.get(Calendar.MINUTE), true).show();
             }
         });
+
+        // Set click listeners for cancel buttons
+        TextView moneyCancel = findViewById(R.id.money_cancel);
+        TextView descriptionCancel = findViewById(R.id.description_cancel);
+        TextView dateCancel = findViewById(R.id.date_cancel);
+        TextView timeCancel = findViewById(R.id.time_cancel);
+        TextView receiverCancel = findViewById(R.id.receiver_cancel);
+
+        moneyCancel.setOnClickListener(this);
+        descriptionCancel.setOnClickListener(this);
+        dateCancel.setOnClickListener(this);
+        timeCancel.setOnClickListener(this);
+        receiverCancel.setOnClickListener(this);
     }
 
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
@@ -224,6 +237,28 @@ public class MainActivity extends AppCompatActivity {
             if (!matcher.matches())
                 return "";
             return null;
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        
+        if (id == R.id.money_cancel) {
+            EditText moneyInput = findViewById(R.id.add_money);
+            moneyInput.setText("");
+        } else if (id == R.id.description_cancel) {
+            EditText descriptionInput = findViewById(R.id.description);
+            descriptionInput.setText("");
+        } else if (id == R.id.date_cancel) {
+            Button dateBtn = findViewById(R.id.date_btn);
+            dateBtn.setText(R.string.date_format);
+        } else if (id == R.id.time_cancel) {
+            Button timeBtn = findViewById(R.id.time_btn);
+            timeBtn.setText(R.string.time_format);
+        } else if (id == R.id.receiver_cancel) {
+            EditText receiverInput = findViewById(R.id.receiver);
+            receiverInput.setText("");
         }
     }
 }

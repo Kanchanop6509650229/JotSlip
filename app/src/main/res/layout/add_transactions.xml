@@ -117,12 +117,30 @@
                         android:id="@+id/add_money"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="5dp"
                         android:ems="10"
                         android:inputType="numberDecimal" />
 
                 </TableRow>
 
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0">
+
+                    <TextView
+                        android:id="@+id/money_cancel"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="20dp"
+                        android:textColor="@color/red"
+                        android:onClick="onClick"
+                        android:clickable="true"
+                        android:text="@string/cancel" />
+
+                </TableRow>
             </TableRow>
 
             <TableRow
@@ -186,9 +204,28 @@
                         android:id="@+id/description"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="5dp"
                         android:ems="10"
                         android:inputType="text" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0">
+
+                    <TextView
+                        android:id="@+id/description_cancel"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="20dp"
+                        android:textColor="@color/red"
+                        android:onClick="onClick"
+                        android:clickable="true"
+                        android:text="@string/cancel" />
+
                 </TableRow>
 
             </TableRow>
@@ -220,12 +257,30 @@
                         android:id="@+id/date_btn"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="5dp"
                         android:background="@android:color/transparent"
                         android:textColor="@color/black"
                         android:text="@string/date_format" />
                 </TableRow>
 
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0">
+
+                    <TextView
+                        android:id="@+id/date_cancel"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="20dp"
+                        android:textColor="@color/red"
+                        android:onClick="onClick"
+                        android:clickable="true"
+                        android:text="@string/cancel" />
+
+                </TableRow>
 
             </TableRow>
 
@@ -255,10 +310,29 @@
                         android:id="@+id/time_btn"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="5dp"
                         android:background="@android:color/transparent"
                         android:textColor="@color/black"
                         android:text="@string/time_format" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0">
+
+                    <TextView
+                        android:id="@+id/time_cancel"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="20dp"
+                        android:textColor="@color/red"
+                        android:onClick="onClick"
+                        android:clickable="true"
+                        android:text="@string/cancel" />
+
                 </TableRow>
 
             </TableRow>
@@ -290,10 +364,29 @@
                         android:id="@+id/receiver"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:inputType="text" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0">
+
+                    <TextView
+                        android:id="@+id/receiver_cancel"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="20dp"
+                        android:textColor="@color/red"
+                        android:onClick="onClick"
+                        android:clickable="true"
+                        android:text="@string/cancel" />
+
                 </TableRow>
 
             </TableRow>
