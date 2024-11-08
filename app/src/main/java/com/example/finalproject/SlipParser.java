@@ -1,6 +1,10 @@
 package com.example.finalproject;
 
 import android.util.Log;
+
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
@@ -12,6 +16,7 @@ import java.time.Year;
 
 public class SlipParser {
     private static final Map<String, String> MONTH_MAP = new HashMap<>();
+    private static final Set<String> THAI_MONTHS = new HashSet<>();
     static {
         MONTH_MAP.put("Jan", "01");
         MONTH_MAP.put("Feb", "02");
@@ -25,6 +30,20 @@ public class SlipParser {
         MONTH_MAP.put("Oct", "10");
         MONTH_MAP.put("Nov", "11");
         MONTH_MAP.put("Dec", "12");
+
+        //Map ภาษาไทย
+        MONTH_MAP.put("U.A.", "01");
+        MONTH_MAP.put("n.W.", "02");
+        MONTH_MAP.put("Ū.A.", "03");
+        MONTH_MAP.put("IU.8.", "04");
+        MONTH_MAP.put("W.A.", "05");
+        MONTH_MAP.put("U.J.", "06");
+        MONTH_MAP.put("0.A.", "07");
+        MONTH_MAP.put("a.n.", "08");
+        MONTH_MAP.put("n.0.", "09");
+        MONTH_MAP.put("1.A.", "10");
+        MONTH_MAP.put("W.J.", "11");
+        MONTH_MAP.put("S.A.", "12");
     }
 
     public static TransferSlip parseSlip(String text) {
@@ -34,17 +53,58 @@ public class SlipParser {
         String sender = "";
         String receiver = "";
 
+        Calendar currentCalendar = Calendar.getInstance();
+        int currentYear = currentCalendar.get(Calendar.YEAR) + 543;
+
         Log.d("SlipParser", "Raw text: " + text);
         String[] lines = text.split("\n");
 
         // Pattern สำหรับวันที่
-        Pattern datePattern = Pattern.compile("(\\d{1,2})\\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s*(\\d{2})\\s*(\\d{1,2}:\\d{2})(?:\\s*(?:AM|PM))?");
+        Pattern datePattern = Pattern.compile(
+                "(\\d{1,2})\\s*" +                          // วันที่
+                        "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|" +
+                        "U\\.A\\.|n\\.W\\.|Ū\\.A\\.|IU\\.8\\.|W\\.A\\.|U\\.J\\.|" +
+                        "0\\.A\\.|a\\.n\\.|n\\.0\\.|1\\.A\\.|W\\.J\\.|S\\.A\\.)\\s*" +  // เดือน
+                        "(\\d{2}|\\d{4})\\s*" +                    // ปี (2 หรือ 4 หลัก)
+                        "(?:,\\s*)?"+                              // เครื่องหมายจุลภาคและช่องว่าง (อาจมีหรือไม่มีก็ได้)
+                        "(\\d{1,2}:\\d{2})\\s*" +                 // เวลา
+                        "(?:u\\.?)?",                             // u. ต่อท้าย (อาจมีหรือไม่มีก็ได้)
+                Pattern.CASE_INSENSITIVE                   // ไม่สนใจตัวพิมพ์เล็ก-ใหญ่
+        );
 
         // Pattern สำหรับจำนวนเงิน
         Pattern amountPattern = Pattern.compile("(\\d{1,3}(?:[.,]\\d{3})*[.]\\d{2})\\s*(?:Baht)?");
 
         // Pattern สำหรับชื่อที่มี MR. หรือขึ้นต้นด้วย MR
-        Pattern namePattern = Pattern.compile("(?:^|\\s+)(?:MR\\.|MRS\\.|MISS\\.|Mr\\.|Mrs\\.|Miss\\.|MR|MRS|MISS)\\s+([A-Za-z].+?)(?=\\s*$|\\s+(?:KBank|Bank|Transfer|Favorite|Banking|XXX|\\d))");
+        Pattern namePattern = Pattern.compile(
+                "(?:^|\\s+)" +
+                        "(?:" +
+                        "MR\\.|" +
+                        "MRS\\.|" +
+                        "MISS\\.|" +
+                        "MS\\.|" +
+                        "DR\\.|" +
+                        "PROF\\.|" +
+                        "REV\\.|" +
+                        "Mr\\.|" +
+                        "Mrs\\.|" +
+                        "Miss\\.|" +
+                        "Ms\\.|" +
+                        "Dr\\.|" +
+                        "Prof\\.|" +
+                        "Rev\\.|" +
+                        "MR|" +
+                        "MRS|" +
+                        "MISS|" +
+                        "MS|" +
+                        "DR|" +
+                        "PROF|" +
+                        "REV" +
+                        ")\\s+" +
+                        "([A-Za-z].+?)" +
+                        "(?=\\s*$|\\s+(?:KBank|Bank|Transfer|Favorite|Banking|XXX|\\d))",
+                Pattern.CASE_INSENSITIVE  // เพิ่ม flag เพื่อไม่สนใจตัวพิมพ์เล็ก-ใหญ่
+        );
 
         boolean foundValidAmount = false;
 
@@ -60,8 +120,16 @@ public class SlipParser {
                 String year = dateMatcher.group(3);
                 time = dateMatcher.group(4);
 
-                // แปลง 2 หลักเป็น 4 หลัก และบวก 543 สำหรับปีพุทธศักราช
-                int fullYear = 2000 + Integer.parseInt(year) + 543;
+                int fullYear;
+                if (year.length() == 2) {
+                    fullYear = 2000 + Integer.parseInt(year) + 543;
+                    if(fullYear > currentYear){
+                        fullYear -= 43;
+                    }
+                } else {
+                    // ถ้าเป็นปี 4 หลัก (เช่น 2567)
+                    fullYear = Integer.parseInt(year);
+                }
 
                 // จัดรูปแบบวันที่
                 dateTime = String.format("%02d/%s/%d",
