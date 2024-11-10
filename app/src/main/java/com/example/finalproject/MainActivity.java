@@ -13,8 +13,8 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.TableLayout;
-import android.widget.TableRow;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.widget.TextView;
 import android.view.Gravity;
 
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView remainAmount;
     private TextView income;
     private TextView outcome;
-    private TableLayout tableContent;
+    private RecyclerView recyclerView;
     private final String[] MONTHS = new String[]{"มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"};
 
@@ -69,10 +69,12 @@ public class MainActivity extends AppCompatActivity {
         income = findViewById(R.id.income);
         outcome = findViewById(R.id.outcome);
         
+        // Initialize RecyclerView
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        
         // Initialize database
         events = new EventsData(MainActivity.this);
-
-        tableContent = findViewById(R.id.tableContent);
         
         setupNavigation();
         setupChart();
@@ -286,9 +288,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateChartData() {
-        tableContent.removeAllViews();
-
         Cursor cursor = getEvents();
+        List<TransferSlip> slipList = new ArrayList<>();
         List<Entry> incomeEntries = new ArrayList<>();
         List<Entry> expenseEntries = new ArrayList<>();
         float maxMoney = 0f;
@@ -300,6 +301,11 @@ public class MainActivity extends AppCompatActivity {
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
+                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
                 
                 try {
                     String[] dateParts = dateStr.split("/");
@@ -307,17 +313,18 @@ public class MainActivity extends AppCompatActivity {
                     int month = Integer.parseInt(dateParts[1]);
                     int year = Integer.parseInt(dateParts[2]);
 
-                    // ตรวจสอบว่าข้อมูลตรงกับเดือนและปีที่เลือกหรือไม่
                     if (month == selectedMonth + 1 && year == selectedYear) {
-                        TableRow row = new TableRow(this);
-
-                        TextView dateView = createTextView(cursor.getString(3));
-                        TextView moneyView = createTextView(cursor.getString(2));
-
-                        row.addView(dateView);
-                        row.addView(moneyView);
-
-                        tableContent.addView(row);
+                        // Create TransferSlip object and add to list
+                        TransferSlip slip = new TransferSlip(
+                            dateStr + " " + timeStr,
+                            money,
+                            "",  // sender
+                            receiver,
+                            description,
+                            image,
+                            category
+                        );
+                        slipList.add(slip);
 
                         if (money > maxMoney) {
                             maxMoney = (float) money;
@@ -330,27 +337,32 @@ public class MainActivity extends AppCompatActivity {
                             expenseEntries.add(new Entry(day, (float) money));
                             expenseMoney += (float) money;
                         }
-
-                        Log.d("MainActivity", String.format("Added data point: Day %d, Month %d, Year %d, Money %.2f, Type %d", 
-                            day, month, year, money, type));
                     }
                 } catch (Exception e) {
                     Log.e("MainActivity", "Error parsing date: " + dateStr, e);
                 }
             } while (cursor.moveToNext());
             
-            // Format numbers with 2 decimal places
+            // Update UI
             income.setText(String.format("%.2f", incomeMoney) + " ฿");
             outcome.setText(String.format("%.2f", expenseMoney) + " ฿");
             remainAmount.setText(String.format("%.2f", incomeMoney - expenseMoney) + " ฿");
+            
+            // Set adapter
+            SlipAdapter adapter = new SlipAdapter(slipList);
+            recyclerView.setAdapter(adapter);
+            
             cursor.close();
         }
 
-        // Set Y-axis maximum
+        // Update chart
+        updateChartWithData(maxMoney, incomeEntries, expenseEntries);
+    }
+
+    private void updateChartWithData(float maxMoney, List<Entry> incomeEntries, List<Entry> expenseEntries) {
         chart.getAxisLeft().setAxisMaximum(maxMoney + 500f);
         chart.getAxisLeft().setAxisMinimum(0f);
 
-        // Set X-axis range
         Calendar calendar = Calendar.getInstance();
         calendar.set(selectedYear - 543, selectedMonth, 1);
         int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -378,24 +390,8 @@ public class MainActivity extends AppCompatActivity {
         chart.invalidate();
     }
 
-    private TextView createTextView(String text) {
-        TextView view = new TextView(this);
-        view.setText(text);
-        view.setGravity(Gravity.CENTER);
-        view.setPadding(8, 8, 8, 8);
-
-        TableRow.LayoutParams params = new TableRow.LayoutParams(
-                0,
-                TableRow.LayoutParams.MATCH_PARENT,
-                1f
-        );
-        view.setLayoutParams(params);
-
-        return view;
-    }
-
     private Cursor getEvents() {
-        String[] FROM = {_ID, TYPE, MONEY, DATE};
+        String[] FROM = {_ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE};
         String ORDER_BY = DATE + " ASC";
         SQLiteDatabase db = events.getReadableDatabase();
         
