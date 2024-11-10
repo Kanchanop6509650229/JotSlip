@@ -42,6 +42,8 @@ public class SlipParser {
         MONTH_MAP.put("0.A.", "07");
         MONTH_MAP.put("A.N.", "08");
         MONTH_MAP.put("N.0.", "09");
+        MONTH_MAP.put("N.8.", "09");
+        MONTH_MAP.put("C1.A.", "10");
         MONTH_MAP.put("1.A.", "10");
         MONTH_MAP.put("W.J.", "11");
         MONTH_MAP.put("S.A.", "12");
@@ -65,7 +67,7 @@ public class SlipParser {
                 "(\\d{1,2})\\s*" +                          // วันที่
                         "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|" +
                         "U\\.A\\.|N\\.W\\.|U\\.A\\.|IU\\.8\\.|W\\.A\\.|U\\.J\\.|" +
-                        "0\\.A\\.|A\\.N\\.|N\\.0\\.|1\\.A\\.|W\\.J\\.|S\\.A\\.)\\s*" +  // เดือน
+                        "0\\.A\\.|A\\.N\\.|N\\.0\\.|N\\.8\\.|1\\.A\\.|C1\\.A\\.|W\\.J\\.|S\\.A\\.)\\s*" +  // เดือน
                         "(\\d{2}|\\d{4})\\s*" +                    // ปี (2 หรือ 4 หลัก)
                         "(?:,\\s*)?"+                              // เครื่องหมายจุลภาคและช่องว่าง (อาจมีหรือไม่มีก็ได้)
                         "(\\d{1,2}:\\d{2})\\s*" +                 // เวลา

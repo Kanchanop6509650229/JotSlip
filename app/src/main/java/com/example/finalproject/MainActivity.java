@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setNestedScrollingEnabled(true);
         
         // Initialize database
         events = new EventsData(MainActivity.this);
