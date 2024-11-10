@@ -12,9 +12,14 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.view.Gravity;
 
@@ -28,6 +33,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -38,7 +44,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-    private Button changePage;
     private EventsData events;
     private LineChart chart;
     private TextView monthText;
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView remainAmount;
     private TextView income;
     private TextView outcome;
+    private ImageButton addbtn;
     private RecyclerView recyclerView;
     private final String[] MONTHS = new String[]{"มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"};
@@ -60,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.history);
 
         // Initialize views
-        changePage = findViewById(R.id.buttonTest);
         chart = findViewById(R.id.chart);
         monthText = findViewById(R.id.monthText);
         yearText = findViewById(R.id.yearText);
@@ -75,16 +80,35 @@ public class MainActivity extends AppCompatActivity {
         
         // Initialize database
         events = new EventsData(MainActivity.this);
+
+        addbtn = findViewById(R.id.add_btn);
+        addbtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddSlipActivity.class);
+            startActivity(intent);
+        });
         
         setupNavigation();
         setupChart();
-        
-        changePage.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, AddSlipActivity.class);
-            startActivity(intent);
-        });
 
         updateChartData();
+
+        ImageButton addBtn = findViewById(R.id.add_btn);
+        Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_button);
+        
+        addBtn.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.startAnimation(scaleAnimation);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    v.clearAnimation();
+                    v.setScaleX(1);
+                    v.setScaleY(1);
+                    break;
+            }
+            return false;
+        });
     }
 
     private void setupNavigation() {
