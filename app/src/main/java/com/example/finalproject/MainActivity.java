@@ -8,11 +8,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+import android.view.Gravity;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,13 +29,13 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private Button changePage;
@@ -41,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView yearText;
     private int selectedMonth;
     private int selectedYear;
+    private TextView remainAmountText;
+    private TextView remainAmount;
+    private TextView income;
+    private TextView outcome;
+    private TableLayout tableContent;
     private final String[] MONTHS = new String[]{"มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"};
 
@@ -48,16 +57,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.homepage);
+        setContentView(R.layout.history);
 
         // Initialize views
         changePage = findViewById(R.id.buttonTest);
         chart = findViewById(R.id.chart);
         monthText = findViewById(R.id.monthText);
         yearText = findViewById(R.id.yearText);
+        remainAmountText = findViewById(R.id.remainAmountText);
+        remainAmount = findViewById(R.id.remainAmount);
+        income = findViewById(R.id.income);
+        outcome = findViewById(R.id.outcome);
         
         // Initialize database
         events = new EventsData(MainActivity.this);
+
+        tableContent = findViewById(R.id.tableContent);
         
         setupNavigation();
         setupChart();
@@ -271,10 +286,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateChartData() {
+        tableContent.removeAllViews();
+
         Cursor cursor = getEvents();
         List<Entry> incomeEntries = new ArrayList<>();
         List<Entry> expenseEntries = new ArrayList<>();
         float maxMoney = 0f;
+        float incomeMoney = 0f;
+        float expenseMoney = 0f;
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -290,16 +309,28 @@ public class MainActivity extends AppCompatActivity {
 
                     // ตรวจสอบว่าข้อมูลตรงกับเดือนและปีที่เลือกหรือไม่
                     if (month == selectedMonth + 1 && year == selectedYear) {
+                        TableRow row = new TableRow(this);
+
+                        TextView dateView = createTextView(cursor.getString(3));
+                        TextView moneyView = createTextView(cursor.getString(2));
+
+                        row.addView(dateView);
+                        row.addView(moneyView);
+
+                        tableContent.addView(row);
+
                         if (money > maxMoney) {
                             maxMoney = (float) money;
                         }
 
                         if (type == 1) {
                             incomeEntries.add(new Entry(day, (float) money));
+                            incomeMoney += (float) money;
                         } else {
                             expenseEntries.add(new Entry(day, (float) money));
+                            expenseMoney += (float) money;
                         }
-                        
+
                         Log.d("MainActivity", String.format("Added data point: Day %d, Month %d, Year %d, Money %.2f, Type %d", 
                             day, month, year, money, type));
                     }
@@ -307,6 +338,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("MainActivity", "Error parsing date: " + dateStr, e);
                 }
             } while (cursor.moveToNext());
+            
+            // Format numbers with 2 decimal places
+            income.setText(String.format("%.2f", incomeMoney) + " ฿");
+            outcome.setText(String.format("%.2f", expenseMoney) + " ฿");
+            remainAmount.setText(String.format("%.2f", incomeMoney - expenseMoney) + " ฿");
             cursor.close();
         }
 
@@ -329,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
         incomeDataSet.setFillColor(Color.GREEN);
         incomeDataSet.setFillAlpha(50);
 
-        LineDataSet expenseDataSet = new LineDataSet(expenseEntries, "รายจ่��ย");
+        LineDataSet expenseDataSet = new LineDataSet(expenseEntries, "รายจ่าย");
         expenseDataSet.setColor(Color.RED);
         expenseDataSet.setCircleColor(Color.RED);
         expenseDataSet.setDrawValues(true);
@@ -340,6 +376,22 @@ public class MainActivity extends AppCompatActivity {
         LineData lineData = new LineData(incomeDataSet, expenseDataSet);
         chart.setData(lineData);
         chart.invalidate();
+    }
+
+    private TextView createTextView(String text) {
+        TextView view = new TextView(this);
+        view.setText(text);
+        view.setGravity(Gravity.CENTER);
+        view.setPadding(8, 8, 8, 8);
+
+        TableRow.LayoutParams params = new TableRow.LayoutParams(
+                0,
+                TableRow.LayoutParams.MATCH_PARENT,
+                1f
+        );
+        view.setLayoutParams(params);
+
+        return view;
     }
 
     private Cursor getEvents() {
@@ -368,5 +420,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateChartData();
+    }
+
+    class DecimalDigitsInputFilter implements InputFilter {
+        private Pattern mPattern;
+        DecimalDigitsInputFilter(int digits, int digitsAfterZero) {
+            mPattern = Pattern.compile("[0-9]{0," + (digits - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) +
+                    "})?)||(\\.)?");
+        }
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            Matcher matcher = mPattern.matcher(dest);
+            if (!matcher.matches())
+                return "";
+            return null;
+        }
+    }
+
+    // Add this utility method to help with number formatting
+    private String formatNumber(float number) {
+        DecimalFormat df = new DecimalFormat("###,###,###,###.##");
+        return df.format(number);
     }
 }
