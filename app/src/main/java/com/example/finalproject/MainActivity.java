@@ -322,7 +322,8 @@ public class MainActivity extends AppCompatActivity {
                             receiver,
                             description,
                             image,
-                            category
+                            category,
+                            type
                         );
                         slipList.add(slip);
 

@@ -2,7 +2,7 @@ package com.example.finalproject;
 
 public class TransferSlip {
     private String dateTime;
-    private String type;
+    private int type;
     private double amount;
     private String sender;
     private String receiver;
@@ -11,7 +11,7 @@ public class TransferSlip {
     private String category;
 
     // Constructor with all fields
-    public TransferSlip(String dateTime, double amount, String sender, String receiver, String description, String image, String category) {
+    public TransferSlip(String dateTime, double amount, String sender, String receiver, String description, String image, String category, int type) {
         this.dateTime = dateTime;
         this.amount = amount;
         this.sender = sender;
@@ -19,6 +19,7 @@ public class TransferSlip {
         this.description = description;
         this.image = image;
         this.category = category;
+        this.type = type;
     }
 
     // Minimal constructor used by SlipParser
@@ -37,7 +38,7 @@ public class TransferSlip {
         return dateTime;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
@@ -70,7 +71,7 @@ public class TransferSlip {
         this.dateTime = dateTime;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 
