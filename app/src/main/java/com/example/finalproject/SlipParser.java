@@ -13,9 +13,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.time.Year;
+import java.util.TreeMap;
 
 public class SlipParser {
-    private static final Map<String, String> MONTH_MAP = new HashMap<>();
+    private static final Map<String, String> MONTH_MAP = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private static final Set<String> THAI_MONTHS = new HashSet<>();
     static {
         MONTH_MAP.put("Jan", "01");
@@ -33,14 +34,16 @@ public class SlipParser {
 
         //Map ภาษาไทย
         MONTH_MAP.put("U.A.", "01");
-        MONTH_MAP.put("n.W.", "02");
+        MONTH_MAP.put("N.W.", "02");
         MONTH_MAP.put("Ū.A.", "03");
         MONTH_MAP.put("IU.8.", "04");
         MONTH_MAP.put("W.A.", "05");
         MONTH_MAP.put("U.J.", "06");
         MONTH_MAP.put("0.A.", "07");
-        MONTH_MAP.put("a.n.", "08");
-        MONTH_MAP.put("n.0.", "09");
+        MONTH_MAP.put("A.N.", "08");
+        MONTH_MAP.put("N.0.", "09");
+        MONTH_MAP.put("N.8.", "09");
+        MONTH_MAP.put("C1.A.", "10");
         MONTH_MAP.put("1.A.", "10");
         MONTH_MAP.put("W.J.", "11");
         MONTH_MAP.put("S.A.", "12");
@@ -63,8 +66,8 @@ public class SlipParser {
         Pattern datePattern = Pattern.compile(
                 "(\\d{1,2})\\s*" +                          // วันที่
                         "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|" +
-                        "U\\.A\\.|n\\.W\\.|Ū\\.A\\.|IU\\.8\\.|W\\.A\\.|U\\.J\\.|" +
-                        "0\\.A\\.|a\\.n\\.|n\\.0\\.|1\\.A\\.|W\\.J\\.|S\\.A\\.)\\s*" +  // เดือน
+                        "U\\.A\\.|N\\.W\\.|U\\.A\\.|IU\\.8\\.|W\\.A\\.|U\\.J\\.|" +
+                        "0\\.A\\.|A\\.N\\.|N\\.0\\.|N\\.8\\.|1\\.A\\.|C1\\.A\\.|W\\.J\\.|S\\.A\\.)\\s*" +  // เดือน
                         "(\\d{2}|\\d{4})\\s*" +                    // ปี (2 หรือ 4 หลัก)
                         "(?:,\\s*)?"+                              // เครื่องหมายจุลภาคและช่องว่าง (อาจมีหรือไม่มีก็ได้)
                         "(\\d{1,2}:\\d{2})\\s*" +                 // เวลา
