@@ -183,6 +183,7 @@
                     android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
                     android:nestedScrollingEnabled="true"
                     android:scrollbars="vertical" />
 
@@ -222,7 +223,7 @@
                 android:id="@+id/home_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="หน้าแรก"
+                android:text="ภาพรวม"
                 android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -263,12 +264,14 @@
                 android:id="@android:id/icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:tint="@color/white"
                 android:src="@drawable/ic_history" />
 
             <TextView
                 android:id="@android:id/text1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:text="ประวัติ"
                 android:textSize="12sp" />
         </LinearLayout>

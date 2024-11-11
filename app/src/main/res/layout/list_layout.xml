@@ -8,9 +8,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="?android:selectableItemBackground"
-    android:layout_margin="12dp"
+    android:layout_margin="5dp"
     cardview:cardCornerRadius="8dp"
-    cardview:cardBackgroundColor="#FEFEFE"
+    cardview:cardBackgroundColor="@color/dark_gray"
     cardview:cardElevation="2dp"
     cardview:contentPadding="3dp">
 
