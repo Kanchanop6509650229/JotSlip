@@ -10,7 +10,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"
+        android:layout_marginBottom="80dp"
         tools:context=".MainActivity">
 
         <LinearLayout
@@ -170,7 +170,8 @@
                     android:id="@+id/chart"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
-                    android:layout_margin="16dp" />
+                    android:layout_margin="16dp"
+                    android:backgroundTint="@color/gray" />
 
                 <TableLayout
                     android:id="@+id/tableContent"
@@ -257,15 +258,16 @@
             android:background="?attr/selectableItemBackground">
 
             <ImageView
+                android:id="@android:id/icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_history" />
 
             <TextView
+                android:id="@android:id/text1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ประวัติ"
-                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
 

@@ -13,6 +13,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.Gravity;
 
@@ -39,7 +41,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,6 +114,15 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        // Add after initializing views
+        View historyNav = findViewById(R.id.nav_history);
+        ImageView historyIcon = historyNav.findViewById(android.R.id.icon);
+        TextView historyText = historyNav.findViewById(android.R.id.text1);
+        
+        // Highlight history icon and text
+        historyIcon.setColorFilter(getColor(R.color.gray));
+        historyText.setTextColor(getColor(R.color.gray));
     }
 
     private void setupNavigation() {
@@ -179,16 +192,60 @@ public class MainActivity extends AppCompatActivity {
     private void findNearestData(int currentMonth, int currentYear) {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = {_ID, DATE};
-        String ORDER_BY = DATE + " DESC";
-        Cursor cursor = db.query(TABLE_NAME, FROM, null, null, null, null, ORDER_BY);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
-            String[] dateParts = dateStr.split("/");
-            selectedMonth = Integer.parseInt(dateParts[1]) - 1;
-            selectedYear = Integer.parseInt(dateParts[2]);
+        
+        // ตรวจสอบข้อมูลในเดือนปัจจุบันก่อน
+        String monthStr = String.format("%02d", currentMonth + 1);
+        String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ?";
+        String[] selectionArgs = {monthStr, String.valueOf(currentYear)};
+        Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // ถ้ามีข้อมูลในเดือนปัจจุบัน ใช้เดือนปัจจุบัน
+            selectedMonth = currentMonth;
+            selectedYear = currentYear;
             cursor.close();
+            return;
         }
+        
+        // ถ้าไม่มีข้อมูลในเดือนปัจจุบัน หาเดือนที่ใกล้เคียงที่สุด
+        int closestMonth = currentMonth;
+        int closestYear = currentYear;
+        int minDistance = Integer.MAX_VALUE;
+        
+        // ค้นหาในช่วง ±6 เดือนจากเดือนปัจจุบัน
+        for (int monthOffset = -6; monthOffset <= 6; monthOffset++) {
+            int targetMonth = currentMonth;
+            int targetYear = currentYear;
+            
+            // ปรับเดือนและปีตาม offset
+            targetMonth += monthOffset;
+            while (targetMonth < 0) {
+                targetMonth += 12;
+                targetYear--;
+            }
+            while (targetMonth >= 12) {
+                targetMonth -= 12;
+                targetYear++;
+            }
+            
+            monthStr = String.format("%02d", targetMonth + 1);
+            selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ?";
+            selectionArgs = new String[]{monthStr, String.valueOf(targetYear)};
+            cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
+            
+            if (cursor != null && cursor.getCount() > 0) {
+                int distance = Math.abs(monthOffset);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestMonth = targetMonth;
+                    closestYear = targetYear;
+                }
+                cursor.close();
+            }
+        }
+        
+        selectedMonth = closestMonth;
+        selectedYear = closestYear;
     }
 
     private int findPreviousYearWithData(int currentYear) {
@@ -315,8 +372,8 @@ public class MainActivity extends AppCompatActivity {
     private void updateChartData() {
         Cursor cursor = getEvents();
         List<TransferSlip> slipList = new ArrayList<>();
-        List<Entry> incomeEntries = new ArrayList<>();
-        List<Entry> expenseEntries = new ArrayList<>();
+        Map<Integer, Float> incomeDayMap = new HashMap<>();
+        Map<Integer, Float> expenseDayMap = new HashMap<>();
         float maxMoney = 0f;
         float incomeMoney = 0f;
         float expenseMoney = 0f;
@@ -343,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
                         TransferSlip slip = new TransferSlip(
                             dateStr + " " + timeStr,
                             money,
-                            "",  // sender
+                            "",
                             receiver,
                             description,
                             image,
@@ -352,16 +409,25 @@ public class MainActivity extends AppCompatActivity {
                         );
                         slipList.add(slip);
 
-                        if (money > maxMoney) {
-                            maxMoney = (float) money;
-                        }
-
+                        // Combine transactions of the same type on the same day
                         if (type == 1) {
-                            incomeEntries.add(new Entry(day, (float) money));
+                            float currentDayTotal = incomeDayMap.getOrDefault(day, 0f);
+                            currentDayTotal += (float) money;
+                            incomeDayMap.put(day, currentDayTotal);
                             incomeMoney += (float) money;
+                            
+                            if (currentDayTotal > maxMoney) {
+                                maxMoney = currentDayTotal;
+                            }
                         } else {
-                            expenseEntries.add(new Entry(day, (float) money));
+                            float currentDayTotal = expenseDayMap.getOrDefault(day, 0f);
+                            currentDayTotal += (float) money;
+                            expenseDayMap.put(day, currentDayTotal);
                             expenseMoney += (float) money;
+                            
+                            if (currentDayTotal > maxMoney) {
+                                maxMoney = currentDayTotal;
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -373,20 +439,37 @@ public class MainActivity extends AppCompatActivity {
             income.setText(String.format("%.2f", incomeMoney) + " ฿");
             outcome.setText(String.format("%.2f", expenseMoney) + " ฿");
             remainAmount.setText(String.format("%.2f", incomeMoney - expenseMoney) + " ฿");
+            if (incomeMoney - expenseMoney < 0) {
+                remainAmount.setTextColor(getColor(R.color.red));
+            } else {
+                remainAmount.setTextColor(getColor(R.color.green_500));
+            }
+            
+            // Convert maps to entry lists
+            List<Entry> incomeEntries = new ArrayList<>();
+            List<Entry> expenseEntries = new ArrayList<>();
+            
+            for (Map.Entry<Integer, Float> entry : incomeDayMap.entrySet()) {
+                incomeEntries.add(new Entry(entry.getKey(), entry.getValue()));
+            }
+            
+            for (Map.Entry<Integer, Float> entry : expenseDayMap.entrySet()) {
+                expenseEntries.add(new Entry(entry.getKey(), entry.getValue()));
+            }
             
             // Set adapter
             SlipAdapter adapter = new SlipAdapter(slipList);
             recyclerView.setAdapter(adapter);
             
             cursor.close();
+            
+            // Update chart
+            updateChartWithData(maxMoney, incomeEntries, expenseEntries);
         }
-
-        // Update chart
-        updateChartWithData(maxMoney, incomeEntries, expenseEntries);
     }
 
     private void updateChartWithData(float maxMoney, List<Entry> incomeEntries, List<Entry> expenseEntries) {
-        chart.getAxisLeft().setAxisMaximum(maxMoney + 500f);
+        chart.getAxisLeft().setAxisMaximum(maxMoney + 200f);
         chart.getAxisLeft().setAxisMinimum(0f);
 
         Calendar calendar = Calendar.getInstance();
