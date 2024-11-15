@@ -15,6 +15,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -32,10 +33,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Highlight history icon and text
         historyIcon.setColorFilter(getColor(R.color.gray));
         historyText.setTextColor(getColor(R.color.gray));
+
+        setupBarChart();
+        updateBarChartData();
     }
 
     private void getRemainMoney() {
@@ -215,5 +231,171 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             
             startActivity(intent, options);
         }
+    }
+
+    private void setupBarChart() {
+        BarChart barChart = findViewById(R.id.bar_chart);
+        barChart.getDescription().setEnabled(false);
+        barChart.setDrawGridBackground(false);
+        barChart.setDrawBarShadow(false);
+        barChart.setHighlightFullBarEnabled(false);
+        
+        // ตั้งค่าแกน X
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setCenterAxisLabels(true);  // จัดให้ label อยู่ตรงกลางของกลุ่มแท่ง
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, (int)value - 6);
+                return String.format("%d/%d", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1);
+            }
+        });
+        
+        // ตั้งค่าแกน Y ด้านซ้าย
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return formatNumber(value);
+            }
+        });
+        
+        // ปิดแกน Y ด้านขวา
+        barChart.getAxisRight().setEnabled(false);
+        
+        // ตั้งค่าตำนาน (Legend)
+        Legend legend = barChart.getLegend();
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(true);
+    }
+
+    private void updateBarChartData() {
+        BarChart barChart = findViewById(R.id.bar_chart);
+        ArrayList<BarEntry> incomeEntries = new ArrayList<>();
+        ArrayList<BarEntry> expenseEntries = new ArrayList<>();
+        
+        // สร้าง Map เพื่อเก็บข้อมูลรายรับ-รายจ่ายแต่ละวัน
+        Map<String, Double> incomeMap = new HashMap<>();
+        Map<String, Double> expenseMap = new HashMap<>();
+        
+        // ดึงข้อมูล 7 วันล่าสุด
+        Cursor cursor = getSevenDaysEvents();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String date = cursor.getString(cursor.getColumnIndex(DATE));
+                
+                if (type == 1) { // รายรับ
+                    incomeMap.put(date, incomeMap.getOrDefault(date, 0.0) + money);
+                } else { // รายจ่าย
+                    expenseMap.put(date, expenseMap.getOrDefault(date, 0.0) + money);
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        
+        // สร้างข้อมูลสำหรับกราฟแท่ง
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -6); // เริ่มจาก 6 วันย้อนหลัง
+        
+        for (int i = 0; i < 7; i++) {
+            String date = String.format("%02d/%02d/%d", 
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.YEAR) + 543);
+                
+            float income = incomeMap.getOrDefault(date, 0.0).floatValue();
+            float expense = expenseMap.getOrDefault(date, 0.0).floatValue();
+            
+            incomeEntries.add(new BarEntry(i, income));
+            expenseEntries.add(new BarEntry(i, expense));
+            
+            cal.add(Calendar.DAY_OF_MONTH, 1); // เพิ่มวันทีละ 1 วัน
+        }
+        
+        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "รายรับ");
+        incomeDataSet.setColor(Color.GREEN);
+        incomeDataSet.setDrawValues(true);
+        incomeDataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0) return ""; // ซ่อนค่า 0
+                return formatNumber(value);
+            }
+        });
+        
+        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, "รายจ่าย");
+        expenseDataSet.setColor(Color.RED);
+        expenseDataSet.setDrawValues(true);
+        expenseDataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0) return ""; // ซ่อนค่า 0
+                return formatNumber(value);
+            }
+        });
+        
+        // เพิ่มระยะห่างระหว่างกลุ่มแท่ง
+        float groupSpace = 0.3f;
+        float barSpace = 0.05f;
+        float barWidth = 0.3f;
+        
+        BarData barData = new BarData(incomeDataSet, expenseDataSet);
+        barData.setBarWidth(barWidth);
+        barData.setValueTextSize(10f);
+        
+        barChart.setData(barData);
+        barChart.groupBars(0, groupSpace, barSpace);
+        
+        // ปรับขอบเขตของแกน X
+        barChart.getXAxis().setAxisMinimum(0);
+        barChart.getXAxis().setAxisMaximum(7);
+        
+        // แก้ไข ValueFormatter สำหรับแกน X
+        barChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, -6 + (int)value); // ปรับสูตรการคำนวณวันที่
+                return String.format("%d/%d", 
+                    cal.get(Calendar.DAY_OF_MONTH), 
+                    cal.get(Calendar.MONTH) + 1);
+            }
+        });
+        
+        barChart.setVisibleXRangeMaximum(7);
+        barChart.invalidate();
+    }
+
+    private Cursor getSevenDaysEvents() {
+        String[] FROM = {_ID, TYPE, MONEY, DATE};
+        SQLiteDatabase db = events.getReadableDatabase();
+        
+        Calendar cal = Calendar.getInstance();
+        String endDate = String.format("%02d/%02d/%d", 
+            cal.get(Calendar.DAY_OF_MONTH),
+            cal.get(Calendar.MONTH) + 1,
+            cal.get(Calendar.YEAR) + 543);
+        
+        cal.add(Calendar.DAY_OF_MONTH, -6);
+        String startDate = String.format("%02d/%02d/%d", 
+            cal.get(Calendar.DAY_OF_MONTH),
+            cal.get(Calendar.MONTH) + 1,
+            cal.get(Calendar.YEAR) + 543);
+        
+        String selection = "date BETWEEN ? AND ?";
+        String[] selectionArgs = {startDate, endDate};
+        String orderBy = DATE + " ASC";
+        
+        return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, orderBy);
     }
 }

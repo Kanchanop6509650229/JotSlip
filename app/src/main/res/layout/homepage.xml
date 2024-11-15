@@ -24,10 +24,10 @@
                 android:layout_height="wrap_content"
                 android:text="0 ฿" />
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/pie_chart"
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/bar_chart"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="200dp"
                 android:layout_margin="16dp"
                 android:backgroundTint="@color/gray" />
 
