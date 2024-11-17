@@ -122,7 +122,7 @@ public class SlipAdapter extends RecyclerView.Adapter<SlipAdapter.ViewHolder> {
             }
         }
 
-        holder.listAdapter = new ListAdapter(dailySlips, false);
+        holder.listAdapter = new ListAdapter(dailySlips, false, holder.itemView.getContext());
         holder.listItemView.setAdapter(holder.listAdapter);
     }
 

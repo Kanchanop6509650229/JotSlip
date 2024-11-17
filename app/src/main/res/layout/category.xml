@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".HistoryActivity">
+    tools:context=".CategoryActivity">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -25,54 +25,93 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/totalText"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ยอดรวม" />
-                <TextView
-                    android:id="@+id/totalRemain"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="0 ฿" />
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
-                <com.github.mikephil.charting.charts.BarChart
-                    android:id="@+id/bar_chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_margin="16dp"
-                    android:backgroundTint="@color/gray" />
+                    <!-- Year Selection -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <ImageButton
+                            android:id="@+id/prevYear"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_media_previous" />
+
+                        <TextView
+                            android:id="@+id/yearText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="24dp"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/nextYear"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_media_next" />
+                    </LinearLayout>
+
+                    <!-- Month Selection -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <ImageButton
+                            android:id="@+id/prevMonth"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_media_previous" />
+
+                        <TextView
+                            android:id="@+id/monthText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="24dp"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/nextMonth"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_media_next" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <LinearLayout
+                    <!-- Add divider after statistics section -->
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal">
+                        android:layout_height="1dp"
+                        android:background="?android:attr/listDivider"/>
 
-                        <TextView
-                            android:id="@+id/ListHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="ยอดใช้จ่าย 7 วันล่าสุด" />
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_margin="16dp"
+                        android:backgroundTint="@color/gray" />
 
-                        <TextView
-                            android:id="@+id/seeAllText2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:textColor="@color/green_500"
-                            android:text="ดูทั้งหมด" />
-                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -83,57 +122,6 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/category_list_item_view"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@null"
-                            android:clipToPadding="false"
-                            android:overScrollMode="never"
-                            android:scrollbars="none" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/LastestHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="ธุรกรรมล่าสุด" />
-
-                        <TextView
-                            android:id="@+id/seeAllText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:textColor="@color/green_500"
-                            android:text="ดูทั้งหมด" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="10dp"
-                        android:background="@drawable/rounded_background"
-                        android:orientation="vertical">
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/list_item_view"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@null"
@@ -175,7 +163,6 @@
                 android:id="@+id/home_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:tint="@color/white"
                 android:src="@drawable/ic_home" />
 
             <TextView
@@ -183,7 +170,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ภาพรวม"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -223,12 +210,14 @@
                 android:id="@android:id/icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:tint="@color/white"
                 android:src="@drawable/ic_history" />
 
             <TextView
                 android:id="@android:id/text1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:text="ประวัติ"
                 android:textSize="12sp" />
         </LinearLayout>

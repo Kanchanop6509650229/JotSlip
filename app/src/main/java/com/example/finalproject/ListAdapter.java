@@ -1,5 +1,7 @@
 package com.example.finalproject;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +16,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private List<TransferSlip> dataSet;
     private MyClickListener mCallback;
     private boolean isFromMainActivity;
+    private Context context;
 
     public ListAdapter(List<TransferSlip> myDataSet) {
         this.dataSet = myDataSet;
         this.isFromMainActivity = true;
     }
 
-    public ListAdapter(List<TransferSlip> myDataSet, boolean isFromMainActivity) {
+    public ListAdapter(List<TransferSlip> myDataSet, boolean isFromMainActivity, Context context) {
         this.dataSet = myDataSet;
         this.isFromMainActivity = isFromMainActivity;
+        this.context = context;
     }
 
     @Override
@@ -97,6 +101,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 .getResources().getColor(android.R.color.holo_red_dark));
         }
         holder.transactionAmount.setText(amount);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (context != null) {
+                Intent intent = new Intent(context, SlipInfoActivity.class);
+                intent.putExtra("slip_id", slip.getId());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

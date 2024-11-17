@@ -53,7 +53,6 @@ public class SlipParser {
         String dateTime = "";
         String time = "";
         double amount = 0.0;
-        String sender = "";
         String receiver = "";
 
         Calendar currentCalendar = Calendar.getInstance();
@@ -178,19 +177,14 @@ public class SlipParser {
                 String foundName = nameMatcher.group(1).trim();
                 Log.d("SlipParser", "Found name: " + foundName);
 
-                if (sender.isEmpty()) {
-                    sender = foundName;
-                    Log.d("SlipParser", "Set sender: " + sender);
-                } else if (receiver.isEmpty() && !foundName.equals(sender)) {
-                    receiver = foundName;
-                    Log.d("SlipParser", "Set receiver: " + receiver);
-                }
+                receiver = foundName;
+                Log.d("SlipParser", "Set receiver: " + receiver);
             }
         }
 
-        Log.d("SlipParser", String.format("Parsed: Date=%s, Time=%s, Amount=%.2f, Sender=%s, Receiver=%s",
-                dateTime, time, amount, sender, receiver));
+        Log.d("SlipParser", String.format("Parsed: Date=%s, Time=%s, Amount=%.2f, Receiver=%s",
+                dateTime, time, amount, receiver));
 
-        return new TransferSlip(dateTime + " " + time, amount, sender, receiver);
+        return new TransferSlip(dateTime + " " + time, amount, receiver);
     }
 }

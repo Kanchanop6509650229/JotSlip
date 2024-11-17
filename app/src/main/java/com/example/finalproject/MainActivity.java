@@ -32,6 +32,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -46,6 +47,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ImageButton addbtn;
     private RecyclerView recyclerView;
+    private RecyclerView categoryRecyclerView;
     private View historyNav;
     private ImageView historyIcon;
     private TextView historyText;
@@ -64,19 +67,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EventsData events;
     private TextView remainAmount;
     private TextView seeAllTransaction;
+    private TextView seeAllTransaction2;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.homepage);
-        
+
         events = new EventsData(this);
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.green_500,  // สีหลัก
+            R.color.blue_500,   // สีรอง
+            R.color.orange_500  // สีที่สาม
+        );
+        
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
+        
+        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+        
+        swipeRefreshLayout.setSlingshotDistance(100);
+        
+        swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
+        
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            View contentView = findViewById(R.id.main);
+            contentView.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(200)
+                .withEndAction(() -> {
+                    updateBarChartData();
+                    updateCategoryData();
+                    getRemainMoney();
+                    
+                    contentView.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(200)
+                        .start();
+                    
+                    swipeRefreshLayout.setRefreshing(false);
+                })
+                .start();
+        });
 
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.list_item_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setNestedScrollingEnabled(true);
+
+        categoryRecyclerView = findViewById(R.id.category_list_item_view);
+        categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        categoryRecyclerView.setNestedScrollingEnabled(true);
 
         addbtn = findViewById(R.id.add_btn);
         addbtn.setOnClickListener(v -> {
@@ -87,10 +133,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ImageButton addBtn = findViewById(R.id.add_btn);
         Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_button);
-        
+
         remainAmount = findViewById(R.id.totalRemain);
         getRemainMoney();
-        
+
         addBtn.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -108,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         seeAllTransaction = findViewById(R.id.seeAllText);
         seeAllTransaction.setOnClickListener(this);
+        seeAllTransaction2 = findViewById(R.id.seeAllText2);
+        seeAllTransaction2.setOnClickListener(this);
 
         // Add after initializing views
         historyNav = findViewById(R.id.nav_history);
@@ -115,20 +163,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyText = historyNav.findViewById(android.R.id.text1);
         historyNav.setOnClickListener(v -> {
             Intent intent = new Intent(this, HistoryActivity.class);
-            
+
             Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-            
+
             startActivity(intent, options);
         });
 
         homeNav = findViewById(R.id.nav_home);
         homeIcon = homeNav.findViewById(R.id.home_icon);
         homeText = homeNav.findViewById(R.id.home_text);
-        
+
         // Highlight history icon and text
         historyIcon.setColorFilter(getColor(R.color.gray));
         historyText.setTextColor(getColor(R.color.gray));
 
+        updateCategoryData();
         setupBarChart();
         updateBarChartData();
     }
@@ -141,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
@@ -149,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
                 String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
                 String image = cursor.getString(cursor.getColumnIndex(IMAGE));
-                
+
                 try {
                     if (type == 1) {
                         totalRemain += (float) money;
@@ -157,17 +207,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         totalRemain -= (float) money;
                     }
 
-                    if(count < 3) {
+                    if (count < 5) {
                         TransferSlip slip = new TransferSlip(
-                            dateStr + " " + timeStr,
-                            money,
-                            "",
-                            receiver,
-                            description,
-                            image,
-                            category,
-                            type
-                        );
+                                id,
+                                dateStr + " " + timeStr,
+                                money,
+                                receiver,
+                                description,
+                                image,
+                                category,
+                                type);
                         slipList.add(slip);
                         count++;
                     }
@@ -175,27 +224,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.e("MainActivity", "Error parsing date: " + dateStr, e);
                 }
             } while (cursor.moveToNext());
-            
+
             remainAmount.setText(formatNumber(totalRemain) + " ฿");
-            if (totalRemain < 0){
+            if (totalRemain < 0) {
                 remainAmount.setTextColor(getColor(R.color.red));
             } else {
                 remainAmount.setTextColor(getColor(R.color.green_500));
             }
 
-            ListAdapter adapter = new ListAdapter(slipList);
+            ListAdapter adapter = new ListAdapter(slipList, true, this);
             recyclerView.setAdapter(adapter);
-            
+
             cursor.close();
         }
     }
 
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
+
         DecimalDigitsInputFilter(int digits, int digitsAfterZero) {
             mPattern = Pattern.compile("[0-9]{0," + (digits - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) +
                     "})?)||(\\.)?");
         }
+
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             Matcher matcher = mPattern.matcher(dest);
@@ -212,11 +263,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private Cursor getEvents() {
-        String[] FROM = {_ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE};
-        String ORDER_BY = "substr(date, -4) DESC, " +  // ปี
-                         "substr(date, 4, 2) DESC, " +  // เดือน
-                         "substr(date, 1, 2) DESC, " +  // วัน
-                         TIME + " DESC";                // เวลา
+        String[] FROM = { _ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
+        String ORDER_BY = "substr(date, -4) DESC, " + // ปี
+                "substr(date, 4, 2) DESC, " + // เดือน
+                "substr(date, 1, 2) DESC, " + // วัน
+                TIME + " DESC"; // เวลา
         SQLiteDatabase db = events.getReadableDatabase();
 
         return db.query(TABLE_NAME, FROM, null, null, null, null, ORDER_BY);
@@ -226,9 +277,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v == seeAllTransaction) {
             Intent intent = new Intent(this, HistoryActivity.class);
-            
+
             Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-            
+
+            startActivity(intent, options);
+        } else if (v == seeAllTransaction2) {
+            Intent intent = new Intent(this, CategoryActivity.class);
+
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
             startActivity(intent, options);
         }
     }
@@ -239,23 +296,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         barChart.setDrawGridBackground(false);
         barChart.setDrawBarShadow(false);
         barChart.setHighlightFullBarEnabled(false);
-        
+
         // ตั้งค่าแกน X
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f);
-        xAxis.setCenterAxisLabels(true);  // จัดให้ label อยู่ตรงกลางของกลุ่มแท่ง
+        xAxis.setCenterAxisLabels(true); // จัดให้ label อยู่ตรงกลางของกลุ่มแท่ง
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DAY_OF_MONTH, (int)value - 6);
+                cal.add(Calendar.DAY_OF_MONTH, (int) value - 6);
                 return String.format("%d/%d", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1);
             }
         });
-        
-        // ตั้งค่าแกน Y ด้านซ้าย
+
+        // ตั้งค่าแกน Y ด้าซ้าย
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setDrawGridLines(false);
         leftAxis.setAxisMinimum(0f);
@@ -265,10 +322,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return formatNumber(value);
             }
         });
-        
+
         // ปิดแกน Y ด้านขวา
         barChart.getAxisRight().setEnabled(false);
-        
+
         // ตั้งค่าตำนาน (Legend)
         Legend legend = barChart.getLegend();
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -277,15 +334,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         legend.setDrawInside(true);
     }
 
+    private void updateCategoryData() {
+        ArrayList<String> categoryList = new ArrayList<>();
+        ArrayList<TransferSlip> slipList = new ArrayList<>();
+
+        Cursor cursor = getSevenDaysEvents();
+        if (cursor != null) {
+            Log.d("MainActivity", "Cursor is not null");
+            while (cursor.moveToNext()) {
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
+                    String columnName = cursor.getColumnName(i);
+                    if (!columnName.equals(IMAGE)) { // Skip logging image data
+                        Log.d("MainActivity", columnName + ": " + cursor.getString(i));
+                    }
+                }
+            }
+        } else {
+            Log.d("MainActivity", "Cursor is null");
+        }
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+
+                TransferSlip slip = new TransferSlip(
+                        id,
+                        dateStr + " " + timeStr,
+                        money,
+                        receiver,
+                        description,
+                        image,
+                        category,
+                        type);
+                slipList.add(slip);
+
+            } while (cursor.moveToNext());
+
+            for (TransferSlip slip : slipList) {
+                double amount = slip.getAmount();
+                Log.d("MainActivity", slip.getCategory());
+                Log.d("MainActivity", amount + "");
+            }
+
+            CategoryAdapter adapter = new CategoryAdapter(slipList);
+            categoryRecyclerView.setAdapter(adapter);
+
+            cursor.close();
+        }
+    }
+
     private void updateBarChartData() {
         BarChart barChart = findViewById(R.id.bar_chart);
         ArrayList<BarEntry> incomeEntries = new ArrayList<>();
         ArrayList<BarEntry> expenseEntries = new ArrayList<>();
-        
+
         // สร้าง Map เพื่อเก็บข้อมูลรายรับ-รายจ่ายแต่ละวัน
         Map<String, Double> incomeMap = new HashMap<>();
         Map<String, Double> expenseMap = new HashMap<>();
-        
+
         // ดึงข้อมูล 7 วันล่าสุด
         Cursor cursor = getSevenDaysEvents();
         if (cursor != null && cursor.moveToFirst()) {
@@ -293,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String date = cursor.getString(cursor.getColumnIndex(DATE));
-                
+
                 if (type == 1) { // รายรับ
                     incomeMap.put(date, incomeMap.getOrDefault(date, 0.0) + money);
                 } else { // รายจ่าย
@@ -302,100 +415,106 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } while (cursor.moveToNext());
             cursor.close();
         }
-        
+
         // สร้างข้อมูลสำหรับกราฟแท่ง
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -6); // เริ่มจาก 6 วันย้อนหลัง
-        
+        cal.add(Calendar.DAY_OF_MONTH, -6); // เริ่มจาก 6 วันย้อนหัง
+
         for (int i = 0; i < 7; i++) {
-            String date = String.format("%02d/%02d/%d", 
-                cal.get(Calendar.DAY_OF_MONTH),
-                cal.get(Calendar.MONTH) + 1,
-                cal.get(Calendar.YEAR) + 543);
-                
+            String date = String.format("%02d/%02d/%d",
+                    cal.get(Calendar.DAY_OF_MONTH),
+                    cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.YEAR) + 543);
+
             float income = incomeMap.getOrDefault(date, 0.0).floatValue();
             float expense = expenseMap.getOrDefault(date, 0.0).floatValue();
-            
+
             incomeEntries.add(new BarEntry(i, income));
             expenseEntries.add(new BarEntry(i, expense));
-            
+
             cal.add(Calendar.DAY_OF_MONTH, 1); // เพิ่มวันทีละ 1 วัน
         }
-        
+
         BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "รายรับ");
         incomeDataSet.setColor(Color.GREEN);
         incomeDataSet.setDrawValues(true);
         incomeDataSet.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                if (value == 0) return ""; // ซ่อนค่า 0
+                if (value == 0)
+                    return ""; // ซ่อนค่า 0
                 return formatNumber(value);
             }
         });
-        
+
         BarDataSet expenseDataSet = new BarDataSet(expenseEntries, "รายจ่าย");
         expenseDataSet.setColor(Color.RED);
         expenseDataSet.setDrawValues(true);
         expenseDataSet.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                if (value == 0) return ""; // ซ่อนค่า 0
+                if (value == 0)
+                    return ""; // ซ่อนค่า 0
                 return formatNumber(value);
             }
         });
-        
+
         // เพิ่มระยะห่างระหว่างกลุ่มแท่ง
         float groupSpace = 0.3f;
         float barSpace = 0.05f;
         float barWidth = 0.3f;
-        
+
         BarData barData = new BarData(incomeDataSet, expenseDataSet);
         barData.setBarWidth(barWidth);
         barData.setValueTextSize(10f);
-        
+
         barChart.setData(barData);
         barChart.groupBars(0, groupSpace, barSpace);
-        
-        // ปรับขอบเขตของแกน X
+
+        // ปรับขอบขตของแกน X
         barChart.getXAxis().setAxisMinimum(0);
         barChart.getXAxis().setAxisMaximum(7);
-        
+
         // แก้ไข ValueFormatter สำหรับแกน X
         barChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DAY_OF_MONTH, -6 + (int)value); // ปรับสูตรการคำนวณวันที่
-                return String.format("%d/%d", 
-                    cal.get(Calendar.DAY_OF_MONTH), 
-                    cal.get(Calendar.MONTH) + 1);
+                cal.add(Calendar.DAY_OF_MONTH, -6 + (int) value); // ปรับสูตรการคำนวณวันที่
+                return String.format("%d/%d",
+                        cal.get(Calendar.DAY_OF_MONTH),
+                        cal.get(Calendar.MONTH) + 1);
             }
         });
-        
+
         barChart.setVisibleXRangeMaximum(7);
         barChart.invalidate();
     }
 
     private Cursor getSevenDaysEvents() {
-        String[] FROM = {_ID, TYPE, MONEY, DATE};
+        String[] FROM = { _ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
         SQLiteDatabase db = events.getReadableDatabase();
-        
+
+        // คำนวณวันที่ปัจจุบันและ 6 วันย้อนหลัง
         Calendar cal = Calendar.getInstance();
-        String endDate = String.format("%02d/%02d/%d", 
-            cal.get(Calendar.DAY_OF_MONTH),
-            cal.get(Calendar.MONTH) + 1,
-            cal.get(Calendar.YEAR) + 543);
-        
+        String endDate = String.format("%02d/%02d/%d",
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.YEAR) + 543);
+
         cal.add(Calendar.DAY_OF_MONTH, -6);
-        String startDate = String.format("%02d/%02d/%d", 
-            cal.get(Calendar.DAY_OF_MONTH),
-            cal.get(Calendar.MONTH) + 1,
-            cal.get(Calendar.YEAR) + 543);
-        
-        String selection = "date BETWEEN ? AND ?";
-        String[] selectionArgs = {startDate, endDate};
-        String orderBy = DATE + " ASC";
-        
+        String startDate = String.format("%02d/%02d/%d",
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.YEAR) + 543);
+
+        // แก้ไขการ query โดยใช้ฟังก์ชัน SQLite สำหรับแปลงวันที่
+        String selection = "strftime('%Y%m%d', substr(date,7)||'-'||substr(date,4,2)||'-'||substr(date,1,2)) >= strftime('%Y%m%d', substr(?1,7)||'-'||substr(?1,4,2)||'-'||substr(?1,1,2)) "
+                +
+                "AND strftime('%Y%m%d', substr(date,7)||'-'||substr(date,4,2)||'-'||substr(date,1,2)) <= strftime('%Y%m%d', substr(?2,7)||'-'||substr(?2,4,2)||'-'||substr(?2,1,2))";
+        String[] selectionArgs = { startDate, endDate };
+        String orderBy = "strftime('%Y%m%d', substr(date,7)||'-'||substr(date,4,2)||'-'||substr(date,1,2)) ASC";
+
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, orderBy);
     }
 }
