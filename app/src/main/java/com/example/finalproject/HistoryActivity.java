@@ -6,7 +6,12 @@ import static com.example.finalproject.Constants.*;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -28,12 +33,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -84,48 +91,48 @@ public class HistoryActivity extends AppCompatActivity {
         remainAmount = findViewById(R.id.remainAmount);
         income = findViewById(R.id.income);
         outcome = findViewById(R.id.outcome);
-        
+
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setNestedScrollingEnabled(true);
-        
+
         // Initialize database
         events = new EventsData(HistoryActivity.this);
 
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setColorSchemeResources(
-            R.color.green_500,  // สีหลัก
-            R.color.blue_500,   // สีรอง
-            R.color.orange_500  // สีที่สาม
+                R.color.green_500, // สีหลัก
+                R.color.blue_500, // สีรอง
+                R.color.orange_500 // สีที่สาม
         );
-        
+
         swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
-        
+
         swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
-        
+
         swipeRefreshLayout.setSlingshotDistance(100);
-        
+
         swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
-        
+
         swipeRefreshLayout.setOnRefreshListener(() -> {
             View contentView = findViewById(R.id.main);
             contentView.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(200)
-                .withEndAction(() -> {
-                    updateChartData();
-                    
-                    contentView.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(200)
-                        .start();
-                    
-                    swipeRefreshLayout.setRefreshing(false);
-                })
-                .start();
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        updateChartData();
+
+                        contentView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(200)
+                                .start();
+
+                        swipeRefreshLayout.setRefreshing(false);
+                    })
+                    .start();
         });
 
         addbtn = findViewById(R.id.add_btn);
@@ -549,44 +556,238 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void updateChartWithData(float maxMoney, List<Entry> incomeEntries, List<Entry> expenseEntries) {
-        // Sort entries by X value (day)
-        Collections.sort(incomeEntries, (e1, e2) -> Float.compare(e1.getX(), e2.getX()));
-        Collections.sort(expenseEntries, (e1, e2) -> Float.compare(e1.getX(), e2.getX()));
-
-        // Rest of your existing code
-        float axisMaximum = maxMoney == 0f ? 1000f : maxMoney + 200f;
-        chart.getAxisLeft().setAxisMaximum(axisMaximum);
-        chart.getAxisLeft().setAxisMinimum(0f);
-
+        // Create a combined list of all transactions ordered by date
+        List<Entry> combinedEntries = new ArrayList<>();
+        float runningTotal = 0f;
+        float minValue = 0f;  // Track minimum value for y-axis
+        float maxValue = 0f;  // Track maximum value for y-axis
+        
+        // Create a map of daily totals
+        Map<Integer, Float> dailyTotals = new HashMap<>();
+        
+        // Calculate daily net changes
+        for (Entry income : incomeEntries) {
+            int day = (int) income.getX();
+            dailyTotals.put(day, dailyTotals.getOrDefault(day, 0f) + income.getY());
+        }
+        
+        for (Entry expense : expenseEntries) {
+            int day = (int) expense.getX();
+            dailyTotals.put(day, dailyTotals.getOrDefault(day, 0f) - expense.getY());
+        }
+        
+        // Sort days
+        List<Integer> sortedDays = new ArrayList<>(dailyTotals.keySet());
+        Collections.sort(sortedDays);
+        
+        // Create entries with running total
+        for (Integer day : sortedDays) {
+            runningTotal += dailyTotals.get(day);
+            combinedEntries.add(new Entry(day, runningTotal));
+            minValue = Math.min(minValue, runningTotal);
+            maxValue = Math.max(maxValue, runningTotal);
+        }
+    
+        // Set up the chart
+        YAxis leftAxis = chart.getAxisLeft();
+        float padding = Math.max(Math.abs(maxValue), Math.abs(minValue)) * 0.1f;
+        leftAxis.setAxisMaximum(maxValue + padding);
+        leftAxis.setAxisMinimum(minValue - padding);
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setGridColor(Color.LTGRAY);
+        leftAxis.setGridLineWidth(0.5f);
+        leftAxis.setDrawZeroLine(true);
+        leftAxis.setZeroLineColor(Color.GRAY);
+        leftAxis.setZeroLineWidth(1f);
+    
+        // Set up X-Axis
         Calendar calendar = Calendar.getInstance();
         calendar.set(selectedYear - 543, selectedMonth, 1);
         int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        chart.getXAxis().setAxisMinimum(1f);
-        chart.getXAxis().setAxisMaximum(lastDay);
-
-        LineDataSet incomeDataSet = new LineDataSet(incomeEntries, "รายรับ");
-        incomeDataSet.setColor(Color.GREEN);
-        incomeDataSet.setCircleColor(Color.GREEN);
-        incomeDataSet.setDrawValues(true);
-        incomeDataSet.setDrawFilled(true);
-        incomeDataSet.setFillColor(Color.GREEN);
-        incomeDataSet.setFillAlpha(50);
-
-        LineDataSet expenseDataSet = new LineDataSet(expenseEntries, "รายจ่าย");
-        expenseDataSet.setColor(Color.RED);
-        expenseDataSet.setCircleColor(Color.RED);
-        expenseDataSet.setDrawValues(true);
-        expenseDataSet.setDrawFilled(true);
-        expenseDataSet.setFillColor(Color.RED);
-        expenseDataSet.setFillAlpha(50);
-
-        // Add empty state message if no data
-        if (incomeEntries.isEmpty() && expenseEntries.isEmpty()) {
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setAxisMinimum(1f);
+        xAxis.setAxisMaximum(lastDay);
+        xAxis.setDrawGridLines(true);
+        xAxis.setGridColor(Color.LTGRAY);
+        xAxis.setGridLineWidth(0.5f);
+    
+        List<ILineDataSet> dataSets = new ArrayList<>();
+        
+        // Create DataSets for up and down trends - always create both even if empty
+        LineDataSet upDataSet = new LineDataSet(new ArrayList<>(), "เพิ่มขึ้น");
+        upDataSet.setColor(Color.GREEN);
+        upDataSet.setLineWidth(2f);
+        upDataSet.setDrawCircles(false);
+        upDataSet.setDrawValues(false);
+        upDataSet.setMode(LineDataSet.Mode.LINEAR);
+        dataSets.add(upDataSet);
+    
+        LineDataSet downDataSet = new LineDataSet(new ArrayList<>(), "ลดลง");
+        downDataSet.setColor(Color.RED);
+        downDataSet.setLineWidth(2f);
+        downDataSet.setDrawCircles(false);
+        downDataSet.setDrawValues(false);
+        downDataSet.setMode(LineDataSet.Mode.LINEAR);
+        dataSets.add(downDataSet);
+    
+        // If we have data, update the datasets
+        if (!combinedEntries.isEmpty()) {
+            List<Entry> upSegments = new ArrayList<>();
+            List<Entry> downSegments = new ArrayList<>();
+            
+            for (int i = 0; i < combinedEntries.size() - 1; i++) {
+                Entry current = combinedEntries.get(i);
+                Entry next = combinedEntries.get(i + 1);
+                
+                if (next.getY() >= current.getY()) {
+                    upSegments.add(current);
+                    upSegments.add(next);
+                } else {
+                    downSegments.add(current);
+                    downSegments.add(next);
+                }
+            }
+            
+            upDataSet.setValues(upSegments);
+            downDataSet.setValues(downSegments);
+        }
+        
+        // Create DataSet for points (without legend)
+        LineDataSet pointDataSet = new LineDataSet(combinedEntries, "");
+        pointDataSet.setDrawCircles(true);
+        pointDataSet.setCircleRadius(4f);
+        pointDataSet.setDrawValues(true);
+        pointDataSet.setValueTextSize(10f);
+        pointDataSet.setColor(Color.TRANSPARENT);
+        pointDataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format("%.0f฿", value);
+            }
+        });
+        
+        // Set circle colors based on trend with special handling for first point
+        int[] colors = new int[combinedEntries.size()];
+        for (int i = 0; i < combinedEntries.size(); i++) {
+            float currentValue = combinedEntries.get(i).getY();
+            if (i == 0) {
+                // First point: red if negative, green if positive
+                colors[i] = currentValue >= 0 ? Color.GREEN : Color.RED;
+            } else {
+                float previousValue = combinedEntries.get(i - 1).getY();
+                colors[i] = currentValue >= previousValue ? Color.GREEN : Color.RED;
+            }
+        }
+        pointDataSet.setCircleColors(colors);
+        
+        // Set up gradient fill
+        pointDataSet.setDrawFilled(true);
+        pointDataSet.setFillDrawable(new android.graphics.drawable.Drawable() {
+            @Override
+            public void draw(Canvas canvas) {
+                if (combinedEntries.isEmpty()) return;
+    
+                Paint paint = new Paint();
+                paint.setStyle(Paint.Style.FILL);
+                
+                float[] points = new float[combinedEntries.size() * 2];
+                for (int i = 0; i < combinedEntries.size(); i++) {
+                    Entry entry = combinedEntries.get(i);
+                    points[i * 2] = entry.getX();
+                    points[i * 2 + 1] = entry.getY();
+                }
+                
+                // Transform points to pixels
+                chart.getTransformer(YAxis.AxisDependency.LEFT).pointValuesToPixel(points);
+                
+                // Get zero line position in pixels
+                float[] zeroLinePoints = new float[] {0f, 0f};
+                chart.getTransformer(YAxis.AxisDependency.LEFT).pointValuesToPixel(zeroLinePoints);
+                float zeroY = zeroLinePoints[1];
+    
+                // Draw gradient fills for each segment
+                for (int i = 2; i < points.length; i += 2) {
+                    float previousX = points[i - 2];
+                    float previousY = points[i - 1];
+                    float currentX = points[i];
+                    float currentY = points[i + 1];
+                    
+                    // Determine if this segment is increasing or decreasing
+                    boolean isIncreasing = currentY <= previousY; // Note: Y-axis is inverted in canvas
+                    
+                    // Create separate paths for above and below zero line
+                    Path pathAboveZero = new Path();
+                    Path pathBelowZero = new Path();
+                    
+                    // For the part above zero line
+                    if (Math.min(previousY, currentY) < zeroY) {
+                        pathAboveZero.moveTo(previousX, Math.max(previousY, zeroY));
+                        pathAboveZero.lineTo(previousX, previousY);
+                        pathAboveZero.lineTo(currentX, currentY);
+                        pathAboveZero.lineTo(currentX, Math.max(currentY, zeroY));
+                        pathAboveZero.close();
+                    }
+                    
+                    // For the part below zero line
+                    if (Math.max(previousY, currentY) > zeroY) {
+                        pathBelowZero.moveTo(previousX, Math.min(previousY, zeroY));
+                        pathBelowZero.lineTo(previousX, previousY);
+                        pathBelowZero.lineTo(currentX, currentY);
+                        pathBelowZero.lineTo(currentX, Math.min(currentY, zeroY));
+                        pathBelowZero.close();
+                    }
+                    
+                    // Draw fills with swapped colors
+                    if (!pathAboveZero.isEmpty()) {
+                        paint.setColor(isIncreasing ? 
+                            Color.argb(50, 0, 255, 0) :  // Red for increase
+                            Color.argb(50, 255, 0, 0));  // Green for decrease
+                        canvas.drawPath(pathAboveZero, paint);
+                    }
+                    
+                    if (!pathBelowZero.isEmpty()) {
+                        paint.setColor(isIncreasing ? 
+                            Color.argb(50, 0, 255, 0) :  // Red for increase
+                            Color.argb(50, 255, 0, 0));  // Green for decrease
+                        canvas.drawPath(pathBelowZero, paint);
+                    }
+                }
+            }
+    
+            @Override
+            public void setAlpha(int alpha) {}
+    
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {}
+    
+            @Override
+            public int getOpacity() {
+                return PixelFormat.TRANSLUCENT;
+            }
+        });
+        
+        dataSets.add(pointDataSet);
+        
+        // Set up Legend
+        Legend legend = chart.getLegend();
+        legend.setEnabled(true);
+        legend.setDrawInside(false);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setForm(Legend.LegendForm.LINE);
+        legend.setFormSize(10f);
+        legend.setTextSize(12f);
+        legend.setXEntrySpace(20f);
+    
+        // Handle empty state
+        if (combinedEntries.isEmpty()) {
             chart.setNoDataText("ไม่มีข้อมูลในเดือนนี้");
             chart.setNoDataTextColor(Color.GRAY);
         }
-
-        LineData lineData = new LineData(incomeDataSet, expenseDataSet);
+    
+        // Display the chart
+        LineData lineData = new LineData(dataSets);
         chart.setData(lineData);
         chart.invalidate();
     }
