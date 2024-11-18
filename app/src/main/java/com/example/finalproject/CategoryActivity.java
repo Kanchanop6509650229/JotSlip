@@ -1,8 +1,17 @@
 package com.example.finalproject;
 
 import static android.provider.BaseColumns._ID;
-import static com.example.finalproject.Constants.*;
+import static com.example.finalproject.Constants.CATEGORY;
+import static com.example.finalproject.Constants.DATE;
+import static com.example.finalproject.Constants.DESCRIPTION;
+import static com.example.finalproject.Constants.IMAGE;
+import static com.example.finalproject.Constants.MONEY;
+import static com.example.finalproject.Constants.RECEIVER;
+import static com.example.finalproject.Constants.TABLE_NAME;
+import static com.example.finalproject.Constants.TIME;
+import static com.example.finalproject.Constants.TYPE;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,25 +24,28 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -45,21 +57,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.ActivityOptions;
-
-public class HistoryActivity extends AppCompatActivity {
+public class CategoryActivity extends AppCompatActivity {
     private EventsData events;
-    private LineChart chart;
+    private PieChart chart;
     private TextView monthText;
     private TextView yearText;
     private int selectedMonth;
     private int selectedYear;
-    private TextView remainAmountText;
-    private TextView remainAmount;
-    private TextView income;
-    private TextView outcome;
     private ImageButton addbtn;
-    private RecyclerView recyclerView;
+    private RecyclerView categoryRecyclerView;
     private View historyNav;
     private ImageView historyIcon;
     private TextView historyText;
@@ -74,59 +80,56 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.history);
+        setContentView(R.layout.category);
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.green_500, // สีหลัก
+                R.color.blue_500, // สีรอง
+                R.color.orange_500 // สีที่สาม
+        );
+
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
+
+        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+
+        swipeRefreshLayout.setSlingshotDistance(100);
+
+        swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            View contentView = findViewById(R.id.main);
+            contentView.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        updateChartData();
+                        updateCategoryData();
+
+                        contentView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(200)
+                                .start();
+
+                        swipeRefreshLayout.setRefreshing(false);
+                    })
+                    .start();
+        });
 
         // Initialize views
         chart = findViewById(R.id.chart);
         monthText = findViewById(R.id.monthText);
         yearText = findViewById(R.id.yearText);
-        remainAmountText = findViewById(R.id.remainAmountText);
-        remainAmount = findViewById(R.id.remainAmount);
-        income = findViewById(R.id.income);
-        outcome = findViewById(R.id.outcome);
-        
-        // Initialize RecyclerView
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setNestedScrollingEnabled(true);
-        
-        // Initialize database
-        events = new EventsData(HistoryActivity.this);
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(
-            R.color.green_500,  // สีหลัก
-            R.color.blue_500,   // สีรอง
-            R.color.orange_500  // สีที่สาม
-        );
-        
-        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
-        
-        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
-        
-        swipeRefreshLayout.setSlingshotDistance(100);
-        
-        swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
-        
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            View contentView = findViewById(R.id.main);
-            contentView.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(200)
-                .withEndAction(() -> {
-                    updateChartData();
-                    
-                    contentView.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(200)
-                        .start();
-                    
-                    swipeRefreshLayout.setRefreshing(false);
-                })
-                .start();
-        });
+        // Initialize RecyclerView
+        categoryRecyclerView = findViewById(R.id.category_list_item_view);
+        categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        categoryRecyclerView.setNestedScrollingEnabled(true);
+
+        // Initialize database
+        events = new EventsData(CategoryActivity.this);
 
         addbtn = findViewById(R.id.add_btn);
         addbtn.setOnClickListener(v -> {
@@ -139,6 +142,7 @@ public class HistoryActivity extends AppCompatActivity {
         setupChart();
 
         updateChartData();
+        updateCategoryData();
 
         ImageButton addBtn = findViewById(R.id.add_btn);
         Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_button);
@@ -162,6 +166,15 @@ public class HistoryActivity extends AppCompatActivity {
         historyNav = findViewById(R.id.nav_history);
         historyIcon = historyNav.findViewById(android.R.id.icon);
         historyText = historyNav.findViewById(android.R.id.text1);
+        historyNav.setOnClickListener(v -> {
+            Intent intent = new Intent(this, HistoryActivity.class);
+
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intent, options);
+        });
+        historyIcon.setColorFilter(getColor(R.color.gray));
+        historyText.setTextColor(getColor(R.color.gray));
 
         homeNav = findViewById(R.id.nav_home);
         homeIcon = homeNav.findViewById(R.id.home_icon);
@@ -173,10 +186,55 @@ public class HistoryActivity extends AppCompatActivity {
 
             startActivity(intent, options);
         });
-
-        // Highlight history icon and text
         homeIcon.setColorFilter(getColor(R.color.gray));
         homeText.setTextColor(getColor(R.color.gray));
+    }
+
+    private void updateCategoryData() {
+        ArrayList<String> categoryList = new ArrayList<>();
+        ArrayList<TransferSlip> slipList = new ArrayList<>();
+
+        Cursor cursor = getEvents();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+
+                try {
+                    String[] dateParts = dateStr.split("/");
+                    int day = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]);
+                    int year = Integer.parseInt(dateParts[2]);
+
+                    if (month == selectedMonth + 1 && year == selectedYear) {
+                        TransferSlip slip = new TransferSlip(
+                                id,
+                                dateStr + " " + timeStr,
+                                money,
+                                receiver,
+                                description,
+                                image,
+                                category,
+                                type);
+                        slipList.add(slip);
+                    }
+                } catch (Exception e) {
+                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
+                }
+            } while (cursor.moveToNext());
+
+            CategoryAdapter adapter = new CategoryAdapter(slipList);
+            categoryRecyclerView.setAdapter(adapter);
+
+            cursor.close();
+        }
     }
 
     private void setupNavigation() {
@@ -195,6 +253,7 @@ public class HistoryActivity extends AppCompatActivity {
                 selectedMonth = findLatestMonthWithData(selectedYear);
                 updateDisplayTexts();
                 updateChartData();
+                updateCategoryData();
                 Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
@@ -206,6 +265,7 @@ public class HistoryActivity extends AppCompatActivity {
                 selectedMonth = findEarliestMonthWithData(selectedYear);
                 updateDisplayTexts();
                 updateChartData();
+                updateCategoryData();
                 Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
@@ -223,6 +283,7 @@ public class HistoryActivity extends AppCompatActivity {
             }
             updateDisplayTexts();
             updateChartData();
+            updateCategoryData();
             Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
 
@@ -239,6 +300,7 @@ public class HistoryActivity extends AppCompatActivity {
             }
             updateDisplayTexts();
             updateChartData();
+            updateCategoryData();
             Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
     }
@@ -266,7 +328,7 @@ public class HistoryActivity extends AppCompatActivity {
         int closestYear = currentYear;
         int minDistance = Integer.MAX_VALUE;
 
-        // ค้นหาในช่วง ±6 เดือนจากเดือนปัจจุบัน
+        // คนหาในช่วง ±6 เดือนจากเดือนปัจจุบัน
         for (int monthOffset = -6; monthOffset <= 6; monthOffset++) {
             int targetMonth = currentMonth;
             int targetYear = currentYear;
@@ -401,52 +463,35 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void setupChart() {
         chart.getDescription().setEnabled(false);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setDrawGridBackground(false);
-        chart.setPinchZoom(true);
-        chart.setBackgroundColor(Color.WHITE);
+        chart.setDrawHoleEnabled(true);
+        chart.setHoleColor(Color.WHITE);
+        chart.setTransparentCircleColor(Color.WHITE);
+        chart.setTransparentCircleAlpha(110);
+        chart.setHoleRadius(58f);
+        chart.setTransparentCircleRadius(61f);
+        chart.setDrawCenterText(true);
+        chart.setCenterText("รายจ่ายทั้งหมด");
+        chart.setRotationEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
 
-        // Customize Y-Axis (Money)
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setDrawGridLines(false);
-        leftAxis.setAxisMinimum(0f);
-        chart.getAxisRight().setEnabled(false);
-
-        // Customize X-Axis (Days)
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setGranularity(1f);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.format("%d/%d", (int) value, selectedMonth + 1);
-            }
-        });
+        Legend legend = chart.getLegend();
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
+        legend.setTextSize(12f);
     }
 
     private void updateChartData() {
         Cursor cursor = getEvents();
-        List<TransferSlip> slipList = new ArrayList<>();
-        Map<Integer, Float> incomeDayMap = new HashMap<>();
-        Map<Integer, Float> expenseDayMap = new HashMap<>();
-        float maxMoney = 0f;
-        float incomeMoney = 0f;
-        float expenseMoney = 0f;
-
-        // Update UI with zero values by default
-        income.setText("0.00 ฿");
-        outcome.setText("0.00 ฿");
-        remainAmount.setText("0.00 ฿");
-        remainAmount.setTextColor(getColor(R.color.green_500));
+        Map<String, Float> categoryExpenses = new HashMap<>();
+        float totalExpense = 0f;
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
-                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
                 String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
                 String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
                 String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
@@ -461,132 +506,70 @@ public class HistoryActivity extends AppCompatActivity {
                     int year = Integer.parseInt(dateParts[2]);
 
                     if (month == selectedMonth + 1 && year == selectedYear) {
-                        // Create TransferSlip object and add to list
-                        TransferSlip slip = new TransferSlip(
-                                id,
-                                dateStr + " " + timeStr,
-                                money,
-                                receiver,
-                                description,
-                                image,
-                                category,
-                                type);
-                        slipList.add(slip);
-
-                        // Combine transactions of the same type on the same day
-                        if (type == 1) {
-                            float currentDayTotal = incomeDayMap.getOrDefault(day, 0f);
-                            currentDayTotal += (float) money;
-                            incomeDayMap.put(day, currentDayTotal);
-                            incomeMoney += (float) money;
-
-                            if (currentDayTotal > maxMoney) {
-                                maxMoney = currentDayTotal;
-                            }
-                        } else {
-                            float currentDayTotal = expenseDayMap.getOrDefault(day, 0f);
-                            currentDayTotal += (float) money;
-                            expenseDayMap.put(day, currentDayTotal);
-                            expenseMoney += (float) money;
-
-                            if (currentDayTotal > maxMoney) {
-                                maxMoney = currentDayTotal;
-                            }
+                        if (type != 1) { // Assuming type != 1 signifies an expense
+                            float currentValue = categoryExpenses.getOrDefault(category, 0f);
+                            float newValue = currentValue + money;
+                            categoryExpenses.put(category, newValue);
+                            totalExpense += money;
                         }
                     }
                 } catch (Exception e) {
-                    Log.e("MainActivity", "Error parsing date: " + dateStr, e);
+                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
                 }
             } while (cursor.moveToNext());
-
-            // Update UI
-            income.setText(String.format("%.2f", incomeMoney) + " ฿");
-            outcome.setText(String.format("%.2f", expenseMoney) + " ฿");
-            remainAmount.setText(String.format("%.2f", incomeMoney - expenseMoney) + " ฿");
-            if (incomeMoney - expenseMoney < 0) {
-                remainAmount.setTextColor(getColor(R.color.red));
-            } else {
-                remainAmount.setTextColor(getColor(R.color.green_500));
-            }
-
-            // Convert maps to entry lists
-            List<Entry> incomeEntries = new ArrayList<>();
-            List<Entry> expenseEntries = new ArrayList<>();
-
-            for (Map.Entry<Integer, Float> entry : incomeDayMap.entrySet()) {
-                incomeEntries.add(new Entry(entry.getKey(), entry.getValue()));
-            }
-
-            for (Map.Entry<Integer, Float> entry : expenseDayMap.entrySet()) {
-                expenseEntries.add(new Entry(entry.getKey(), entry.getValue()));
-            }
-
-            // Set adapter
-            SlipAdapter adapter = new SlipAdapter(slipList);
-            recyclerView.setAdapter(adapter);
-
             cursor.close();
 
-            // Update chart
-            updateChartWithData(maxMoney, incomeEntries, expenseEntries);
-        }
-
-        // If no data was found, show empty chart
-        if (cursor == null || cursor.getCount() == 0) {
-            List<Entry> emptyIncomeEntries = new ArrayList<>();
-            List<Entry> emptyExpenseEntries = new ArrayList<>();
-            updateChartWithData(1000f, emptyIncomeEntries, emptyExpenseEntries);
-
-            // Set empty adapter
-            SlipAdapter adapter = new SlipAdapter(slipList);
-            recyclerView.setAdapter(adapter);
-        }
-
-        if (cursor != null) {
-            cursor.close();
+            // Update chart with category data
+            updateChartWithData(categoryExpenses, totalExpense);
+        } else {
+            // Show empty chart
+            chart.setData(null);
+            chart.setCenterText("ไม่มีข้อมูลในเดือนนี้");
+            chart.invalidate();
         }
     }
 
-    private void updateChartWithData(float maxMoney, List<Entry> incomeEntries, List<Entry> expenseEntries) {
-        // Sort entries by X value (day)
-        Collections.sort(incomeEntries, (e1, e2) -> Float.compare(e1.getX(), e2.getX()));
-        Collections.sort(expenseEntries, (e1, e2) -> Float.compare(e1.getX(), e2.getX()));
+    private void updateChartWithData(Map<String, Float> categoryExpenses, float totalExpense) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        ArrayList<Integer> colors = new ArrayList<>();
 
-        // Rest of your existing code
-        float axisMaximum = maxMoney == 0f ? 1000f : maxMoney + 200f;
-        chart.getAxisLeft().setAxisMaximum(axisMaximum);
-        chart.getAxisLeft().setAxisMinimum(0f);
+        // Define colors for different categories
+        int[] CHART_COLORS = new int[] {
+                Color.rgb(64, 89, 128), Color.rgb(149, 165, 124),
+                Color.rgb(217, 184, 162), Color.rgb(191, 134, 134),
+                Color.rgb(179, 48, 80), Color.rgb(193, 37, 82),
+                Color.rgb(255, 102, 0), Color.rgb(245, 199, 0),
+                Color.rgb(106, 150, 31), Color.rgb(179, 100, 53)
+        };
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(selectedYear - 543, selectedMonth, 1);
-        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        chart.getXAxis().setAxisMinimum(1f);
-        chart.getXAxis().setAxisMaximum(lastDay);
-
-        LineDataSet incomeDataSet = new LineDataSet(incomeEntries, "รายรับ");
-        incomeDataSet.setColor(Color.GREEN);
-        incomeDataSet.setCircleColor(Color.GREEN);
-        incomeDataSet.setDrawValues(true);
-        incomeDataSet.setDrawFilled(true);
-        incomeDataSet.setFillColor(Color.GREEN);
-        incomeDataSet.setFillAlpha(50);
-
-        LineDataSet expenseDataSet = new LineDataSet(expenseEntries, "รายจ่าย");
-        expenseDataSet.setColor(Color.RED);
-        expenseDataSet.setCircleColor(Color.RED);
-        expenseDataSet.setDrawValues(true);
-        expenseDataSet.setDrawFilled(true);
-        expenseDataSet.setFillColor(Color.RED);
-        expenseDataSet.setFillAlpha(50);
-
-        // Add empty state message if no data
-        if (incomeEntries.isEmpty() && expenseEntries.isEmpty()) {
-            chart.setNoDataText("ไม่มีข้อมูลในเดือนนี้");
-            chart.setNoDataTextColor(Color.GRAY);
+        int colorIndex = 0;
+        for (Map.Entry<String, Float> entry : categoryExpenses.entrySet()) {
+            float percentage = (entry.getValue() / totalExpense) * 100;
+            if (percentage > 0) {
+                entries.add(new PieEntry(entry.getValue(), entry.getKey()));
+                colors.add(CHART_COLORS[colorIndex % CHART_COLORS.length]);
+                colorIndex++;
+            }
         }
 
-        LineData lineData = new LineData(incomeDataSet, expenseDataSet);
-        chart.setData(lineData);
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setColors(colors);
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
+
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format("%.1f%%", (value / totalExpense) * 100);
+            }
+        });
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.WHITE);
+
+        chart.setCenterText(String.format("รายจ่ายทั้งหมด\n%.2f ฿", totalExpense));
+        chart.setCenterTextSize(14f);
+        chart.setData(data);
         chart.invalidate();
     }
 
@@ -640,4 +623,5 @@ public class HistoryActivity extends AppCompatActivity {
         DecimalFormat df = new DecimalFormat("###,###,###,###.##");
         return df.format(number);
     }
+
 }

@@ -1,25 +1,52 @@
 package com.example.finalproject;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private List<TransferSlip> dataSet;
     private MyClickListener mCallback;
+    private boolean isFromMainActivity;
+    private Context context;
 
     public ListAdapter(List<TransferSlip> myDataSet) {
         this.dataSet = myDataSet;
+        this.isFromMainActivity = true;
+    }
+
+    public ListAdapter(List<TransferSlip> myDataSet, boolean isFromMainActivity, Context context) {
+        this.dataSet = myDataSet;
+        this.isFromMainActivity = isFromMainActivity;
+        this.context = context;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_layout, parent, false);
+                
+        CardView cardView = view.findViewById(R.id.list_view);
+        if (isFromMainActivity) {
+            cardView.setCardElevation(0);
+            cardView.setRadius(0);
+            cardView.setCardBackgroundColor(Color.TRANSPARENT);
+            cardView.setContentPadding(0, 0, 0, 0);
+            cardView.setLayoutParams(new ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            ((ViewGroup.MarginLayoutParams) cardView.getLayoutParams()).setMargins(0, 0, 0, 0);
+        }
+        
         return new ViewHolder(view);
     }
 
@@ -34,12 +61,32 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         // Set category name
         holder.categoryName.setText(slip.getCategory());
 
-        // Set transaction note/description
-        String description = slip.getDescription();
-        if (description != null && !description.isEmpty()) {
-            holder.transactionNote.setText(description);
+        if (isFromMainActivity) {
+            // แยกวันที่และเวลาจาก dateTime
+            String[] dateTimeParts = slip.getDateTime().split(" ");
+            if (dateTimeParts.length > 0) {
+                String[] dateParts = dateTimeParts[0].split("/");
+                if (dateParts.length == 3) {
+                    // แปลงรูปแบบวันที่เป็น "dd เดือน พ.ศ."
+                    String[] thaiMonths = {"", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"};
+                    
+                    String day = dateParts[0];
+                    int monthIndex = Integer.parseInt(dateParts[1]);
+                    String month = thaiMonths[monthIndex];
+                    String year = dateParts[2];
+                    
+                    holder.transactionNote.setText(String.format("%s %s %s", day, month, year));
+                }
+            }
         } else {
-            holder.transactionNote.setText("ไม่มีบันทึกเพิ่มเติม");
+            // แสดง description ตามปกติ
+            String description = slip.getDescription();
+            if (description != null && !description.isEmpty()) {
+                holder.transactionNote.setText(description);
+            } else {
+                holder.transactionNote.setText("ไม่มีบันทึกเพิ่มเติม");
+            }
         }
 
         // Set amount with proper formatting and color based on type
@@ -54,6 +101,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                 .getResources().getColor(android.R.color.holo_red_dark));
         }
         holder.transactionAmount.setText(amount);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (context != null) {
+                Intent intent = new Intent(context, SlipInfoActivity.class);
+                intent.putExtra("slip_id", slip.getId());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

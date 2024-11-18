@@ -5,5 +5,8 @@
     <color name="red">#ED1111</color>
     <color name="primary">#FF5722</color>
     <color name="gray">#9E9E9E</color>
+    <color name="dark_gray">#8B8A8A</color>
     <color name="green_500">#4CAF50</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="orange_500">#FF9800</color>
 </resources>

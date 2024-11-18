@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
+    android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".HistoryActivity">
+    tools:context=".SlipInfoActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,17 +19,17 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/gallery_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:src="@android:drawable/ic_menu_gallery"
                 android:adjustViewBounds="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/cancel"
                 android:scaleType="fitCenter"
                 tools:ignore="ImageContrastCheck,ImageContrastCheck" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -40,19 +38,6 @@
             android:orientation="horizontal"
             android:gravity="center"
             android:padding="16dp">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#CCCCCC"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="หรือ"
-                android:paddingHorizontal="16dp"
-                android:textColor="#666666"/>
 
             <View
                 android:layout_width="0dp"
@@ -75,6 +60,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
+                android:enabled="false"
                 >
                 <RadioButton
                     android:id="@+id/radio_income"
@@ -82,12 +68,14 @@
                     android:layout_height="wrap_content"
                     android:checked="false"
                     android:layout_marginHorizontal="20dp"
+                    android:enabled="false"
                     android:text="@string/income" />
                 <RadioButton
                     android:id="@+id/radio_outcome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
+                    android:enabled="false"
                     android:text="@string/outcome" />
             </RadioGroup>
 
@@ -114,34 +102,18 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/add_money"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="5dp"
+                        android:gravity="center"
                         android:ems="10"
                         android:inputType="numberDecimal" />
 
                 </TableRow>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/money_cancel"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:textColor="@color/red"
-                        android:onClick="onClick"
-                        android:clickable="true"
-                        android:text="@string/cancel" />
-
-                </TableRow>
             </TableRow>
 
             <TableRow
@@ -168,12 +140,15 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <Spinner
-                        android:id="@+id/type_spinner"
+                    <TextView
+                        android:id="@+id/type_text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:spinnerMode="dropdown" />
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="5dp"
+                        android:gravity="center"
+                        android:ems="10"
+                        android:inputType="text" />
                 </TableRow>
 
             </TableRow>
@@ -201,32 +176,15 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/description"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="5dp"
+                        android:gravity="center"
                         android:ems="10"
                         android:inputType="text" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/description_cancel"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:textColor="@color/red"
-                        android:onClick="onClick"
-                        android:clickable="true"
-                        android:text="@string/cancel" />
-
                 </TableRow>
 
             </TableRow>
@@ -254,33 +212,15 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <Button
-                        android:id="@+id/date_btn"
+                    <TextView
+                        android:id="@+id/date_text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="5dp"
-                        android:background="@android:color/transparent"
-                        android:textColor="@color/black"
-                        android:text="@string/date_format" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/date_cancel"
                         android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:textColor="@color/red"
-                        android:onClick="onClick"
-                        android:clickable="true"
-                        android:text="@string/cancel" />
-
+                        android:ems="10"
+                        android:inputType="text" />
                 </TableRow>
 
             </TableRow>
@@ -307,33 +247,15 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <Button
-                        android:id="@+id/time_btn"
+                    <TextView
+                        android:id="@+id/time_text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="5dp"
-                        android:background="@android:color/transparent"
-                        android:textColor="@color/black"
-                        android:text="@string/time_format" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/time_cancel"
                         android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:textColor="@color/red"
-                        android:onClick="onClick"
-                        android:clickable="true"
-                        android:text="@string/cancel" />
-
+                        android:ems="10"
+                        android:inputType="text" />
                 </TableRow>
 
             </TableRow>
@@ -361,52 +283,108 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/receiver"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="5dp"
                         android:layout_weight="1"
+                        android:gravity="center"
                         android:ems="10"
                         android:inputType="text" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/receiver_cancel"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:textColor="@color/red"
-                        android:onClick="onClick"
-                        android:clickable="true"
-                        android:text="@string/cancel" />
-
                 </TableRow>
 
             </TableRow>
         </TableLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?android:attr/windowBackground"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="3">
+
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
-            <Button
-                android:id="@+id/submit_btn"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/home_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home" />
+
+            <TextView
+                android:id="@+id/home_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:text="Submit" />
+                android:text="ภาพรวม"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_add"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageButton
+                android:id="@+id/add_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_add_background"
+                android:padding="8dp"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_history"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@android:id/icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:tint="@color/white"
+                android:src="@drawable/ic_history" />
+
+            <TextView
+                android:id="@android:id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="ประวัติ"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>
 
-</ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

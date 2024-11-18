@@ -102,6 +102,8 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         EdgeToEdge.enable(this);
         setContentView(R.layout.add_transactions);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         galleryButton = findViewById(R.id.gallery_btn);
         galleryButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -356,5 +358,11 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
             EditText receiverInput = findViewById(R.id.receiver);
             receiverInput.setText("");
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

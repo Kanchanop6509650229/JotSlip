@@ -1,20 +1,20 @@
 package com.example.finalproject;
 
 public class TransferSlip {
+    private long id;
     private String dateTime;
     private int type;
     private double amount;
-    private String sender;
     private String receiver;
     private String description;
     private String image;
     private String category;
 
     // Constructor with all fields
-    public TransferSlip(String dateTime, double amount, String sender, String receiver, String description, String image, String category, int type) {
+    public TransferSlip(long id, String dateTime, double amount, String receiver, String description, String image, String category, int type) {
+        this.id = id;
         this.dateTime = dateTime;
         this.amount = amount;
-        this.sender = sender;
         this.receiver = receiver;
         this.description = description;
         this.image = image;
@@ -23,10 +23,9 @@ public class TransferSlip {
     }
 
     // Minimal constructor used by SlipParser
-    public TransferSlip(String dateTime, double amount, String sender, String receiver) {
+    public TransferSlip(String dateTime, double amount, String receiver) {
         this.dateTime = dateTime;
         this.amount = amount;
-        this.sender = sender;
         this.receiver = receiver;
         this.description = "";
         this.image = "";
@@ -46,10 +45,6 @@ public class TransferSlip {
         return amount;
     }
 
-    public String getSender() {
-        return sender;
-    }
-
     public String getReceiver() {
         return receiver;
     }
@@ -66,6 +61,10 @@ public class TransferSlip {
         return category;
     }
 
+    public long getId() {
+        return id;
+    }
+
     // Setters
     public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
@@ -77,10 +76,6 @@ public class TransferSlip {
 
     public void setAmount(double amount) {
         this.amount = amount;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
     }
 
     public void setReceiver(String receiver) {

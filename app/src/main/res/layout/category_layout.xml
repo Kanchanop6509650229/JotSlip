@@ -55,21 +55,21 @@
                         android:text="ชื่อหมวดหมู่" />
 
                     <TextView
-                        android:id="@+id/transactionNote"
+                        android:id="@+id/transactionAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
-                        android:text="บันทึกเพิ่มเติม" />
+                        android:text="0 ฿" />
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/transactionAmount"
+                    android:id="@+id/transactionPercent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginStart="8dp"
-                    android:text="0 ฿" />
+                    android:text="0 %" />
 
             </LinearLayout>
 
