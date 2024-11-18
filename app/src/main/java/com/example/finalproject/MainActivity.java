@@ -296,6 +296,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         barChart.setDrawGridBackground(false);
         barChart.setDrawBarShadow(false);
         barChart.setHighlightFullBarEnabled(false);
+        
+        // Disable zooming and scaling
+        barChart.setScaleEnabled(false);  // ปิดการซูม
+        barChart.setPinchZoom(false);     // ปิดการ pinch zoom
+        barChart.setDoubleTapToZoomEnabled(false);  // ปิดการ double tap zoom
+        barChart.setDragEnabled(false);   // ปิดการลาก
 
         // ตั้งค่าแกน X
         XAxis xAxis = barChart.getXAxis();
@@ -376,12 +382,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 slipList.add(slip);
 
             } while (cursor.moveToNext());
-
-            for (TransferSlip slip : slipList) {
-                double amount = slip.getAmount();
-                Log.d("MainActivity", slip.getCategory());
-                Log.d("MainActivity", amount + "");
-            }
 
             CategoryAdapter adapter = new CategoryAdapter(slipList);
             categoryRecyclerView.setAdapter(adapter);

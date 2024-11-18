@@ -1,6 +1,9 @@
 package com.example.finalproject;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +83,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 .sum();
         double percentage = (group.getTotalAmount() / totalExpense) * 100;
         holder.transactionPercent.setText(String.format("%.1f%%", percentage));
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), CategoryActivity.class);
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation((MainActivity) v.getContext()).toBundle();
+            v.getContext().startActivity(intent, options);
+        });
     }
 
     @Override

@@ -402,10 +402,11 @@ public class HistoryActivity extends AppCompatActivity {
     private void setupChart() {
         chart.getDescription().setEnabled(false);
         chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
+        chart.setDragEnabled(false);
+        chart.setScaleEnabled(false);
+        chart.setPinchZoom(false);
+        chart.setDoubleTapToZoomEnabled(false);
         chart.setDrawGridBackground(false);
-        chart.setPinchZoom(true);
         chart.setBackgroundColor(Color.WHITE);
 
         // Customize Y-Axis (Money)
