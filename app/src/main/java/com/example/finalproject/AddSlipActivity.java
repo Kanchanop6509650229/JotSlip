@@ -24,6 +24,7 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,6 +50,7 @@ import androidx.core.view.WindowInsetsCompat;
 import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -74,6 +76,111 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     Calendar myCalendar = Calendar.getInstance();
 
     private ImageButton galleryButton;
+
+    private boolean validateInput() {
+        String errorMessage = null;
+
+        // 1. Check radio button selection
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+        if (radioGroup.getCheckedRadioButtonId() == -1) {
+            errorMessage = "กรุณาเลือกประเภทรายรับ/รายจ่าย";
+        }
+
+        // 2. Check money input
+        if (errorMessage == null) {
+            String moneyStr = moneyEditText.getText().toString().trim();
+            if (moneyStr.isEmpty()) {
+                errorMessage = "กรุณากรอกจำนวนเงิน";
+            } else {
+                try {
+                    double money = Double.parseDouble(moneyStr);
+                    if (money <= 0) {
+                        errorMessage = "จำนวนเงินต้องมากกว่า 0";
+                    } else if (money > 99999999.99) {
+                        errorMessage = "จำนวนเงินต้องไม่เกิน 99,999,999.99";
+                    }
+                } catch (NumberFormatException e) {
+                    errorMessage = "รูปแบบจำนวนเงินไม่ถูกต้อง";
+                }
+            }
+        }
+
+        // 3. Check category (spinner)
+        if (errorMessage == null) {
+            if (spinner.getSelectedItem() == null ||
+                    spinner.getSelectedItem().toString().trim().isEmpty()) {
+                errorMessage = "กรุณาเลือกประเภท";
+            }
+        }
+
+        // 4. Check date
+        if (errorMessage == null) {
+            String dateStr = btnDate.getText().toString();
+            if (dateStr.equals(getString(R.string.date_format))) {
+                errorMessage = "กรุณาเลือกวันที่";
+            } else {
+                try {
+                    String[] dateParts = dateStr.split("/");
+                    int day = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]);
+                    int year = Integer.parseInt(dateParts[2]);
+
+                    if (day < 1 || day > 31 || month < 1 || month > 12 ||
+                            year < 2500 || year > 2600) {
+                        errorMessage = "รูปแบบวันที่ไม่ถูกต้อง";
+                    }
+                } catch (Exception e) {
+                    errorMessage = "รูปแบบวันที่ไม่ถูกต้อง";
+                }
+            }
+        }
+
+        // 5. Check time
+        if (errorMessage == null) {
+            String timeStr = btnTime.getText().toString();
+            if (timeStr.equals(getString(R.string.time_format))) {
+                errorMessage = "กรุณาเลือกเวลา";
+            } else {
+                try {
+                    String[] timeParts = timeStr.split(":");
+                    int hour = Integer.parseInt(timeParts[0]);
+                    int minute = Integer.parseInt(timeParts[1]);
+
+                    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                        errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                    }
+                } catch (Exception e) {
+                    errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                }
+            }
+        }
+
+        // 6. Optional: Check description length if provided
+        if (errorMessage == null) {
+            String description = descriptionEditText.getText().toString().trim();
+            if (!description.isEmpty() && description.length() > 100) {
+                errorMessage = "รายละเอียดต้องไม่เกิน 100 ตัวอักษร";
+            }
+        }
+
+        // 7. Optional: Check receiver length if provided
+        if (errorMessage == null) {
+            String receiver = receiverTextView.getText().toString().trim();
+            if (!receiver.isEmpty() && receiver.length() > 50) {
+                errorMessage = "ชื่อผู้รับต้องไม่เกิน 50 ตัวอักษร";
+            }
+        }
+
+        // Show error if any
+        if (errorMessage != null) {
+            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            return false;
+        }
+
+        return true;
+    }
 
     ActivityResultLauncher<Intent> activityResultLauncher3 = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -115,7 +222,8 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         });
 
         spinner = findViewById(R.id.type_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.types_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.types_array,
+                android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         spinner.setAdapter(adapter);
 
@@ -128,7 +236,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         descriptionEditText = findViewById(R.id.description);
         receiverTextView = findViewById(R.id.receiver);
         moneyEditText = findViewById(R.id.add_money);
-        moneyEditText.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(8, 2)});
+        moneyEditText.setFilters(new InputFilter[] { new DecimalDigitsInputFilter(8, 2) });
 
         slipProcessor = new SlipProcessor();
 
@@ -143,7 +251,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
         btnTime = findViewById(R.id.time_btn);
         btnTime.setOnClickListener(new View.OnClickListener() {
-            public  void onClick(View v) {
+            public void onClick(View v) {
                 new TimePickerDialog(AddSlipActivity.this, t,
                         myCalendar.get(Calendar.HOUR_OF_DAY),
                         myCalendar.get(Calendar.MINUTE), true).show();
@@ -175,6 +283,10 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         submitBtn = findViewById(R.id.submit_btn);
         submitBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if (!validateInput()) {
+                    return;
+                }
+
                 events = new EventsData(AddSlipActivity.this);
                 try {
                     // Log the values before saving
@@ -192,13 +304,17 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                     // Log success
                     Log.d("SQLite_Save", "Transaction saved successfully");
                     Toast.makeText(AddSlipActivity.this, "บันทึกข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+                    finish(); // Close activity after successful save
 
                 } catch (Exception e) {
                     // Log any errors
                     Log.e("SQLite_Save", "Error saving transaction: " + e.getMessage());
-                    Toast.makeText(AddSlipActivity.this, "เกิดข้อผิดพลาดในการบันทึก", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddSlipActivity.this, "เกิดข้อผิดพลาดในการบันทึก: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 } finally {
-                    events.close();
+                    if (events != null) {
+                        events.close();
+                    }
                 }
             }
         });
@@ -239,11 +355,11 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             Log.e("SQLite_Save", "Failed to insert row");
         }
-    }//end addEvent
+    }// end addEvent
 
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
+                int dayOfMonth) {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -325,10 +441,12 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
+
         DecimalDigitsInputFilter(int digits, int digitsAfterZero) {
             mPattern = Pattern.compile("[0-9]{0," + (digits - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) +
                     "})?)||(\\.)?");
         }
+
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             Matcher matcher = mPattern.matcher(dest);
