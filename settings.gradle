@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Final project"
+rootProject.name = "JotSlip"
 include ':app'
