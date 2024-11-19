@@ -135,7 +135,7 @@ public class CategoryActivity extends AppCompatActivity {
         addbtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddSlipActivity.class);
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.slide_up, R.anim.hold);
         });
 
         setupNavigation();

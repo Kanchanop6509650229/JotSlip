@@ -139,7 +139,7 @@ public class HistoryActivity extends AppCompatActivity {
         addbtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddSlipActivity.class);
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.slide_up, R.anim.hold);
         });
 
         setupNavigation();
@@ -559,27 +559,27 @@ public class HistoryActivity extends AppCompatActivity {
         // Create a combined list of all transactions ordered by date
         List<Entry> combinedEntries = new ArrayList<>();
         float runningTotal = 0f;
-        float minValue = 0f;  // Track minimum value for y-axis
-        float maxValue = 0f;  // Track maximum value for y-axis
-        
+        float minValue = 0f; // Track minimum value for y-axis
+        float maxValue = 0f; // Track maximum value for y-axis
+
         // Create a map of daily totals
         Map<Integer, Float> dailyTotals = new HashMap<>();
-        
+
         // Calculate daily net changes
         for (Entry income : incomeEntries) {
             int day = (int) income.getX();
             dailyTotals.put(day, dailyTotals.getOrDefault(day, 0f) + income.getY());
         }
-        
+
         for (Entry expense : expenseEntries) {
             int day = (int) expense.getX();
             dailyTotals.put(day, dailyTotals.getOrDefault(day, 0f) - expense.getY());
         }
-        
+
         // Sort days
         List<Integer> sortedDays = new ArrayList<>(dailyTotals.keySet());
         Collections.sort(sortedDays);
-        
+
         // Create entries with running total
         for (Integer day : sortedDays) {
             runningTotal += dailyTotals.get(day);
@@ -587,7 +587,7 @@ public class HistoryActivity extends AppCompatActivity {
             minValue = Math.min(minValue, runningTotal);
             maxValue = Math.max(maxValue, runningTotal);
         }
-    
+
         // Set up the chart
         YAxis leftAxis = chart.getAxisLeft();
         float padding = Math.max(Math.abs(maxValue), Math.abs(minValue)) * 0.1f;
@@ -599,7 +599,7 @@ public class HistoryActivity extends AppCompatActivity {
         leftAxis.setDrawZeroLine(true);
         leftAxis.setZeroLineColor(Color.GRAY);
         leftAxis.setZeroLineWidth(1f);
-    
+
         // Set up X-Axis
         Calendar calendar = Calendar.getInstance();
         calendar.set(selectedYear - 543, selectedMonth, 1);
@@ -610,9 +610,9 @@ public class HistoryActivity extends AppCompatActivity {
         xAxis.setDrawGridLines(true);
         xAxis.setGridColor(Color.LTGRAY);
         xAxis.setGridLineWidth(0.5f);
-    
+
         List<ILineDataSet> dataSets = new ArrayList<>();
-        
+
         // Create DataSets for up and down trends - always create both even if empty
         LineDataSet upDataSet = new LineDataSet(new ArrayList<>(), "เพิ่มขึ้น");
         upDataSet.setColor(Color.GREEN);
@@ -621,7 +621,7 @@ public class HistoryActivity extends AppCompatActivity {
         upDataSet.setDrawValues(false);
         upDataSet.setMode(LineDataSet.Mode.LINEAR);
         dataSets.add(upDataSet);
-    
+
         LineDataSet downDataSet = new LineDataSet(new ArrayList<>(), "ลดลง");
         downDataSet.setColor(Color.RED);
         downDataSet.setLineWidth(2f);
@@ -629,16 +629,16 @@ public class HistoryActivity extends AppCompatActivity {
         downDataSet.setDrawValues(false);
         downDataSet.setMode(LineDataSet.Mode.LINEAR);
         dataSets.add(downDataSet);
-    
+
         // If we have data, update the datasets
         if (!combinedEntries.isEmpty()) {
             List<Entry> upSegments = new ArrayList<>();
             List<Entry> downSegments = new ArrayList<>();
-            
+
             for (int i = 0; i < combinedEntries.size() - 1; i++) {
                 Entry current = combinedEntries.get(i);
                 Entry next = combinedEntries.get(i + 1);
-                
+
                 if (next.getY() >= current.getY()) {
                     upSegments.add(current);
                     upSegments.add(next);
@@ -647,11 +647,11 @@ public class HistoryActivity extends AppCompatActivity {
                     downSegments.add(next);
                 }
             }
-            
+
             upDataSet.setValues(upSegments);
             downDataSet.setValues(downSegments);
         }
-        
+
         // Create DataSet for points (without legend)
         LineDataSet pointDataSet = new LineDataSet(combinedEntries, "");
         pointDataSet.setDrawCircles(true);
@@ -665,7 +665,7 @@ public class HistoryActivity extends AppCompatActivity {
                 return String.format("%.0f฿", value);
             }
         });
-        
+
         // Set circle colors based on trend with special handling for first point
         int[] colors = new int[combinedEntries.size()];
         for (int i = 0; i < combinedEntries.size(); i++) {
@@ -679,46 +679,47 @@ public class HistoryActivity extends AppCompatActivity {
             }
         }
         pointDataSet.setCircleColors(colors);
-        
+
         // Set up gradient fill
         pointDataSet.setDrawFilled(true);
         pointDataSet.setFillDrawable(new android.graphics.drawable.Drawable() {
             @Override
             public void draw(Canvas canvas) {
-                if (combinedEntries.isEmpty()) return;
-    
+                if (combinedEntries.isEmpty())
+                    return;
+
                 Paint paint = new Paint();
                 paint.setStyle(Paint.Style.FILL);
-                
+
                 float[] points = new float[combinedEntries.size() * 2];
                 for (int i = 0; i < combinedEntries.size(); i++) {
                     Entry entry = combinedEntries.get(i);
                     points[i * 2] = entry.getX();
                     points[i * 2 + 1] = entry.getY();
                 }
-                
+
                 // Transform points to pixels
                 chart.getTransformer(YAxis.AxisDependency.LEFT).pointValuesToPixel(points);
-                
+
                 // Get zero line position in pixels
-                float[] zeroLinePoints = new float[] {0f, 0f};
+                float[] zeroLinePoints = new float[] { 0f, 0f };
                 chart.getTransformer(YAxis.AxisDependency.LEFT).pointValuesToPixel(zeroLinePoints);
                 float zeroY = zeroLinePoints[1];
-    
+
                 // Draw gradient fills for each segment
                 for (int i = 2; i < points.length; i += 2) {
                     float previousX = points[i - 2];
                     float previousY = points[i - 1];
                     float currentX = points[i];
                     float currentY = points[i + 1];
-                    
+
                     // Determine if this segment is increasing or decreasing
                     boolean isIncreasing = currentY <= previousY; // Note: Y-axis is inverted in canvas
-                    
+
                     // Create separate paths for above and below zero line
                     Path pathAboveZero = new Path();
                     Path pathBelowZero = new Path();
-                    
+
                     // For the part above zero line
                     if (Math.min(previousY, currentY) < zeroY) {
                         pathAboveZero.moveTo(previousX, Math.max(previousY, zeroY));
@@ -727,7 +728,7 @@ public class HistoryActivity extends AppCompatActivity {
                         pathAboveZero.lineTo(currentX, Math.max(currentY, zeroY));
                         pathAboveZero.close();
                     }
-                    
+
                     // For the part below zero line
                     if (Math.max(previousY, currentY) > zeroY) {
                         pathBelowZero.moveTo(previousX, Math.min(previousY, zeroY));
@@ -736,38 +737,38 @@ public class HistoryActivity extends AppCompatActivity {
                         pathBelowZero.lineTo(currentX, Math.min(currentY, zeroY));
                         pathBelowZero.close();
                     }
-                    
+
                     // Draw fills with swapped colors
                     if (!pathAboveZero.isEmpty()) {
-                        paint.setColor(isIncreasing ? 
-                            Color.argb(50, 0, 255, 0) :  // Red for increase
-                            Color.argb(50, 255, 0, 0));  // Green for decrease
+                        paint.setColor(isIncreasing ? Color.argb(50, 0, 255, 0) : // Red for increase
+                                Color.argb(50, 255, 0, 0)); // Green for decrease
                         canvas.drawPath(pathAboveZero, paint);
                     }
-                    
+
                     if (!pathBelowZero.isEmpty()) {
-                        paint.setColor(isIncreasing ? 
-                            Color.argb(50, 0, 255, 0) :  // Red for increase
-                            Color.argb(50, 255, 0, 0));  // Green for decrease
+                        paint.setColor(isIncreasing ? Color.argb(50, 0, 255, 0) : // Red for increase
+                                Color.argb(50, 255, 0, 0)); // Green for decrease
                         canvas.drawPath(pathBelowZero, paint);
                     }
                 }
             }
-    
+
             @Override
-            public void setAlpha(int alpha) {}
-    
+            public void setAlpha(int alpha) {
+            }
+
             @Override
-            public void setColorFilter(ColorFilter colorFilter) {}
-    
+            public void setColorFilter(ColorFilter colorFilter) {
+            }
+
             @Override
             public int getOpacity() {
                 return PixelFormat.TRANSLUCENT;
             }
         });
-        
+
         dataSets.add(pointDataSet);
-        
+
         // Set up Legend
         Legend legend = chart.getLegend();
         legend.setEnabled(true);
@@ -779,13 +780,13 @@ public class HistoryActivity extends AppCompatActivity {
         legend.setFormSize(10f);
         legend.setTextSize(12f);
         legend.setXEntrySpace(20f);
-    
+
         // Handle empty state
         if (combinedEntries.isEmpty()) {
             chart.setNoDataText("ไม่มีข้อมูลในเดือนนี้");
             chart.setNoDataTextColor(Color.GRAY);
         }
-    
+
         // Display the chart
         LineData lineData = new LineData(dataSets);
         chart.setData(lineData);

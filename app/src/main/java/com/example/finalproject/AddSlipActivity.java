@@ -354,6 +354,12 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.smooth_fade_in, R.anim.slide_down);
+    }
+
     private void addEvent() {
         String imageString = null;
 

@@ -80,39 +80,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setColorSchemeResources(
-            R.color.green_500,  // สีหลัก
-            R.color.blue_500,   // สีรอง
-            R.color.orange_500  // สีที่สาม
+                R.color.green_500, // สีหลัก
+                R.color.blue_500, // สีรอง
+                R.color.orange_500 // สีที่สาม
         );
-        
+
         swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
-        
+
         swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
-        
+
         swipeRefreshLayout.setSlingshotDistance(100);
-        
+
         swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
-        
+
         swipeRefreshLayout.setOnRefreshListener(() -> {
             View contentView = findViewById(R.id.main);
             contentView.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(200)
-                .withEndAction(() -> {
-                    updateBarChartData();
-                    updateCategoryData();
-                    getRemainMoney();
-                    
-                    contentView.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(200)
-                        .start();
-                    
-                    swipeRefreshLayout.setRefreshing(false);
-                })
-                .start();
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        updateBarChartData();
+                        updateCategoryData();
+                        getRemainMoney();
+
+                        contentView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(200)
+                                .start();
+
+                        swipeRefreshLayout.setRefreshing(false);
+                    })
+                    .start();
         });
 
         // Initialize RecyclerView
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addbtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddSlipActivity.class);
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            overridePendingTransition(R.anim.slide_up, R.anim.hold);
         });
 
         ImageButton addBtn = findViewById(R.id.add_btn);
@@ -296,12 +296,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         barChart.setDrawGridBackground(false);
         barChart.setDrawBarShadow(false);
         barChart.setHighlightFullBarEnabled(false);
-        
+
         // Disable zooming and scaling
-        barChart.setScaleEnabled(false);  // ปิดการซูม
-        barChart.setPinchZoom(false);     // ปิดการ pinch zoom
-        barChart.setDoubleTapToZoomEnabled(false);  // ปิดการ double tap zoom
-        barChart.setDragEnabled(false);   // ปิดการลาก
+        barChart.setScaleEnabled(false); // ปิดการซูม
+        barChart.setPinchZoom(false); // ปิดการ pinch zoom
+        barChart.setDoubleTapToZoomEnabled(false); // ปิดการ double tap zoom
+        barChart.setDragEnabled(false); // ปิดการลาก
 
         // ตั้งค่าแกน X
         XAxis xAxis = barChart.getXAxis();
