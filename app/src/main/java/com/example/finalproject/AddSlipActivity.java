@@ -113,24 +113,58 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
 
-        // 4. Check date
+        // 4. Check date and time
         if (errorMessage == null) {
             String dateStr = btnDate.getText().toString();
+            String timeStr = btnTime.getText().toString();
+
+            // First check if date is selected
             if (dateStr.equals(getString(R.string.date_format))) {
                 errorMessage = "กรุณาเลือกวันที่";
-            } else {
+            }
+            // Then check if time is selected
+            else if (timeStr.equals(getString(R.string.time_format))) {
+                errorMessage = "กรุณาเลือกเวลา";
+            }
+            // If both are selected, validate format and future date
+            else {
                 try {
+                    // Parse input date
                     String[] dateParts = dateStr.split("/");
                     int day = Integer.parseInt(dateParts[0]);
                     int month = Integer.parseInt(dateParts[1]);
-                    int year = Integer.parseInt(dateParts[2]);
+                    int yearBE = Integer.parseInt(dateParts[2]);
+                    int yearCE = yearBE - 543; // Convert BE to CE
 
+                    // Parse input time
+                    String[] timeParts = timeStr.split(":");
+                    int hour = Integer.parseInt(timeParts[0]);
+                    int minute = Integer.parseInt(timeParts[1]);
+
+                    // Validate date format
                     if (day < 1 || day > 31 || month < 1 || month > 12 ||
-                            year < 2500 || year > 2600) {
+                            yearBE < 2500 || yearBE > 2600) {
                         errorMessage = "รูปแบบวันที่ไม่ถูกต้อง";
                     }
+                    // Validate time format
+                    else if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                        errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                    }
+                    // Check if date and time is in the future
+                    else {
+                        Calendar inputDateTime = Calendar.getInstance();
+                        inputDateTime.set(yearCE, month - 1, day, hour, minute, 0);
+                        inputDateTime.set(Calendar.MILLISECOND, 0);
+
+                        Calendar now = Calendar.getInstance();
+                        now.set(Calendar.MILLISECOND, 0);
+
+                        if (inputDateTime.after(now)) {
+                            errorMessage = "วันที่และเวลาต้องไม่เป็นอนาคต";
+                        }
+                    }
                 } catch (Exception e) {
-                    errorMessage = "รูปแบบวันที่ไม่ถูกต้อง";
+                    errorMessage = "รูปแบบวันที่หรือเวลาไม่ถูกต้อง";
                 }
             }
         }
