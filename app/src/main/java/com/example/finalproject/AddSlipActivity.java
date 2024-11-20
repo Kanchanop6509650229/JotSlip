@@ -36,6 +36,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
@@ -73,10 +82,37 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     private Bitmap currentBitmap;
     private boolean isIncome = true;
 
+    private static final int PERMISSION_REQUEST_CODE = 100;
+
     Calendar myCalendar = Calendar.getInstance();
 
     private ImageButton galleryButton;
 
+    private void checkAndRequestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13 ขึ้นไป ใช้ READ_MEDIA_IMAGES
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.READ_MEDIA_IMAGES },
+                        PERMISSION_REQUEST_CODE);
+            } else {
+                openGallery();
+            }
+        } else {
+            // Android 12 ลงมา ใช้ READ_EXTERNAL_STORAGE
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                        PERMISSION_REQUEST_CODE);
+            } else {
+                openGallery();
+            }
+        }
+    }
+
+    // Validate input
     private boolean validateInput() {
         String errorMessage = null;
 
@@ -246,14 +282,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         galleryButton = findViewById(R.id.gallery_btn);
-        galleryButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                Intent chooser = Intent.createChooser(intent, "Select photo from...");
-                activityResultLauncher3.launch(chooser);
-            }
-        });
+        galleryButton.setOnClickListener(v -> checkAndRequestPermissions());
 
         spinner = findViewById(R.id.type_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.types_array,
@@ -352,6 +381,56 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // ได้รับอนุญาต
+                openGallery();
+            } else {
+                // ถูกปฏิเสธ
+                if (shouldShowRequestPermissionRationale(permissions[0])) {
+                    // ผู้ใช้ปฏิเสธครั้งแรก แสดงคำอธิบายเพิ่มเติม
+                    new AlertDialog.Builder(this)
+                            .setTitle("ต้องการสิทธิ์การเข้าถึง")
+                            .setMessage("แอปจำเป็นต้องเข้าถึงรูปภาพเพื่อสแกนสลิป")
+                            .setPositiveButton("ตั้งค่า", (dialog, which) -> {
+                                dialog.dismiss();
+                                checkAndRequestPermissions();
+                            })
+                            .setNegativeButton("ยกเลิก", (dialog, which) -> dialog.dismiss())
+                            .create()
+                            .show();
+                } else {
+                    // ผู้ใช้เลือก "Don't ask again" แสดงข้อความแนะนำให้ไปตั้งค่า
+                    new AlertDialog.Builder(this)
+                            .setTitle("ต้องการสิทธิ์การเข้าถึง")
+                            .setMessage("กรุณาอนุญาตการเข้าถึงรูปภาพในการตั้งค่าแอปพลิเคชัน")
+                            .setPositiveButton("ไปที่ตั้งค่า", (dialog, which) -> {
+                                dialog.dismiss();
+                                // เปิดหน้าตั้งค่าแอป
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            })
+                            .setNegativeButton("ยกเลิก", (dialog, which) -> dialog.dismiss())
+                            .create()
+                            .show();
+                }
+            }
+        }
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        Intent chooser = Intent.createChooser(intent, "เลือกรูปภาพจาก");
+        activityResultLauncher3.launch(chooser);
     }
 
     @Override
