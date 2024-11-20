@@ -64,7 +64,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 groupedData.add(group);
             }
         }
-        
+
         Collections.sort(groupedData, (a, b) -> Double.compare(b.getTotalAmount(), a.getTotalAmount()));
     }
 
@@ -72,7 +72,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         CategoryGroup group = groupedData.get(position);
 
-        holder.categoryIcon.setImageResource(R.drawable.ic_launcher_foreground);
+        // Set category icon
+        int iconResId = getCategoryIcon(group.getCategory());
+        holder.categoryIcon.setImageResource(iconResId);
+
         holder.categoryName.setText(group.getCategory());
         holder.transactionAmount.setText(String.format("- %.2f ฿", group.getTotalAmount()));
         holder.transactionAmount.setTextColor(holder.itemView.getContext()
@@ -91,6 +94,39 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         });
     }
 
+    private int getCategoryIcon(String category) {
+        switch (category) {
+            case "อาหาร/เครื่องดื่ม":
+                return R.mipmap.foodandbaverages;
+            case "ช็อปปิ้ง":
+                return R.mipmap.shopping;
+            case "ครอบครัว/ส่วนตัว":
+                return R.mipmap.family;
+            case "ออมเงิน/ลงทุน":
+                return R.mipmap.saving;
+            case "ชำระบิล":
+                return R.mipmap.bill;
+            case "บันเทิง":
+                return R.mipmap.entertainment;
+            case "ของขวัญ/บริจาค":
+                return R.mipmap.gift;
+            case "ค่าเดินทาง":
+                return R.mipmap.transportation;
+            case "การศึกษา":
+                return R.mipmap.education;
+            case "โรงแรม/ท่องเที่ยว":
+                return R.mipmap.travelandtourism;
+            case "ประกัน":
+                return R.mipmap.insuarance;
+            case "ถอนเงิน":
+                return R.mipmap.withdrawal;
+            case "สินเชื่อ/เช่าซื้อ":
+                return R.mipmap.loan;
+            default:
+                return R.mipmap.others;
+        }
+    }
+
     @Override
     public int getItemCount() {
         return groupedData.size();
@@ -104,7 +140,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         void onItemClick(int position, View v);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView categoryIcon;
         TextView categoryName;
         TextView transactionPercent;
@@ -121,9 +157,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         @Override
         public void onClick(View v) {
-            if (mCallback != null) {
-                mCallback.onItemClick(getAdapterPosition(), v);
-            }
+            // Handle click event if needed
         }
     }
 
