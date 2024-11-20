@@ -21,4 +21,9 @@
         <item>ถอนเงิน</item>
         <item>สินเชื่อ/เช่าซื้อ</item>
     </string-array>
+    <string name="totalText">ยอดเงินคงเหลือ</string>
+    <string name="totalRemain">0 ฿</string>
+    <string name="ListHeader">ยอดใช้จ่าย 7 วันล่าสุด</string>
+    <string name="seeAllText">ดูทั้งหมด</string>
+    <string name="LastestHeader">ธุรกรรมล่าสุด</string>
 </resources>
