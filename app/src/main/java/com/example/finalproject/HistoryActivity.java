@@ -3,16 +3,26 @@ package com.example.finalproject;
 import static android.provider.BaseColumns._ID;
 import static com.example.finalproject.Constants.*;
 
+import android.Manifest;
+import android.app.ActivityOptions;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -20,16 +30,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -42,19 +55,27 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.ActivityOptions;
-
 public class HistoryActivity extends AppCompatActivity {
+    private static final int STORAGE_PERMISSION_CODE = 100;
+
     private EventsData events;
     private LineChart chart;
     private TextView monthText;
@@ -66,6 +87,7 @@ public class HistoryActivity extends AppCompatActivity {
     private TextView income;
     private TextView outcome;
     private ImageButton addbtn;
+    private ImageButton exportButton;
     private RecyclerView recyclerView;
     private View historyNav;
     private ImageView historyIcon;
@@ -80,10 +102,21 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.history);
 
-        // Initialize views
+        events = new EventsData(this);
+
+        initializeViews();
+        setupSwipeRefresh();
+        setupNavigation();
+        setupChart();
+        setupExportButton();
+        updateChartData();
+
+        setupAddButton();
+    }
+
+    private void initializeViews() {
         chart = findViewById(R.id.chart);
         monthText = findViewById(R.id.monthText);
         yearText = findViewById(R.id.yearText);
@@ -92,83 +125,22 @@ public class HistoryActivity extends AppCompatActivity {
         income = findViewById(R.id.income);
         outcome = findViewById(R.id.outcome);
 
-        // Initialize RecyclerView
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setNestedScrollingEnabled(true);
 
-        // Initialize database
-        events = new EventsData(HistoryActivity.this);
+        exportButton = findViewById(R.id.exportButton);
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setColorSchemeResources(
-                R.color.green_500, // สีหลัก
-                R.color.blue_500, // สีรอง
-                R.color.orange_500 // สีที่สาม
-        );
-
-        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
-
-        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
-
-        swipeRefreshLayout.setSlingshotDistance(100);
-
-        swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            View contentView = findViewById(R.id.main);
-            contentView.animate()
-                    .scaleX(0.95f)
-                    .scaleY(0.95f)
-                    .setDuration(200)
-                    .withEndAction(() -> {
-                        updateChartData();
-
-                        contentView.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(200)
-                                .start();
-
-                        swipeRefreshLayout.setRefreshing(false);
-                    })
-                    .start();
-        });
-
-        addbtn = findViewById(R.id.add_btn);
-        addbtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AddSlipActivity.class);
-            startActivity(intent);
-            overridePendingTransition(R.anim.slide_up, R.anim.hold);
-        });
-
-        setupNavigation();
-        setupChart();
-
-        updateChartData();
-
-        ImageButton addBtn = findViewById(R.id.add_btn);
-        Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_button);
-
-        addBtn.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    v.startAnimation(scaleAnimation);
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    v.clearAnimation();
-                    v.setScaleX(1);
-                    v.setScaleY(1);
-                    break;
-            }
-            return false;
-        });
-
-        // Add after initializing views
         historyNav = findViewById(R.id.nav_history);
         historyIcon = historyNav.findViewById(android.R.id.icon);
         historyText = historyNav.findViewById(android.R.id.text1);
+        historyNav.setOnClickListener(v -> {
+            Intent intent = new Intent(this, HistoryActivity.class);
+
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intent, options);
+        });
 
         homeNav = findViewById(R.id.nav_home);
         homeIcon = homeNav.findViewById(R.id.home_icon);
@@ -184,6 +156,297 @@ public class HistoryActivity extends AppCompatActivity {
         // Highlight history icon and text
         homeIcon.setColorFilter(getColor(R.color.gray));
         homeText.setTextColor(getColor(R.color.gray));
+    }
+
+    private boolean checkPermissionAndExport() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return true;
+        }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                    STORAGE_PERMISSION_CODE);
+            return false;
+        }
+        return true;
+    }
+
+    private void exportData() {
+        List<TransferSlip> allTransactions = getAllTransactionsForCurrentMonth();
+        double totalIncome = Double.parseDouble(income.getText().toString().replace(" ฿", ""));
+        double totalExpense = Double.parseDouble(outcome.getText().toString().replace(" ฿", ""));
+
+        // สร้าง Map เก็บข้อมูลกราฟรายวัน
+        Map<String, Double> dailyBalances = new LinkedHashMap<>();
+
+        // ดึงข้อมูลจาก LineChart
+        if (chart.getLineData() != null && !chart.getLineData().getDataSets().isEmpty()) {
+            ILineDataSet dataSet = chart.getLineData().getDataSets().get(0);
+            for (int i = 0; i < dataSet.getEntryCount(); i++) {
+                Entry entry = dataSet.getEntryForIndex(i);
+                String date = String.format("%02d/%02d/%d",
+                        (int) entry.getX(),
+                        selectedMonth + 1,
+                        selectedYear);
+                dailyBalances.put(date, (double) entry.getY());
+            }
+        }
+
+        DataExportUtil.exportHistoryData(
+                this,
+                monthText.getText().toString(),
+                yearText.getText().toString(),
+                totalIncome,
+                totalExpense,
+                allTransactions,
+                chart,
+                dailyBalances);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                exportData();
+            } else {
+                Toast.makeText(this,
+                        "ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void showExportDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.export_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        Button btnExportCsv = dialogView.findViewById(R.id.btnExportCsv);
+        Button btnExportImage = dialogView.findViewById(R.id.btnExportImage);
+
+        btnExportCsv.setOnClickListener(v -> {
+            if (checkPermissionAndExport()) {
+                exportDataToCsv();
+                dialog.dismiss();
+            }
+        });
+
+        btnExportImage.setOnClickListener(v -> {
+            if (checkPermissionAndExport()) {
+                exportDataToImage();
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void exportDataToCsv() {
+        List<TransferSlip> allTransactions = getAllTransactionsForCurrentMonth();
+        double totalIncome = Double.parseDouble(income.getText().toString().replace(" ฿", ""));
+        double totalExpense = Double.parseDouble(outcome.getText().toString().replace(" ฿", ""));
+
+        // คำนวณยอดคงเหลือรายวันจากรายการธุรกรรม
+        Map<String, Double> dailyBalances = new LinkedHashMap<>();
+        double runningBalance = 0;
+
+        // เรียงลำดับรายการตามวันที่
+        Collections.sort(allTransactions, (a, b) -> {
+            String dateA = a.getDateTime().split(" ")[0];
+            String dateB = b.getDateTime().split(" ")[0];
+            return dateA.compareTo(dateB);
+        });
+
+        // คำนวณยอดคงเหลือสะสมรายวัน
+        for (TransferSlip slip : allTransactions) {
+            String date = slip.getDateTime().split(" ")[0];
+            double amount = slip.getAmount();
+
+            // เพิ่มหรือลดยอดตามประเภทรายการ
+            if (slip.getType() == 1) { // รายรับ
+                runningBalance += amount;
+            } else { // รายจ่าย
+                runningBalance -= amount;
+            }
+
+            // บันทึกยอดคงเหลือของวันนั้น
+            dailyBalances.put(date, runningBalance);
+        }
+
+        DataExportUtil.exportHistoryData(
+                this,
+                monthText.getText().toString(),
+                yearText.getText().toString(),
+                totalIncome,
+                totalExpense,
+                allTransactions,
+                null,
+                dailyBalances);
+    }
+
+    private void exportDataToImage() {
+        double totalIncome = Double.parseDouble(income.getText().toString().replace(" ฿", ""));
+        double totalExpense = Double.parseDouble(outcome.getText().toString().replace(" ฿", ""));
+
+        Map<String, Double> dailyBalances = new LinkedHashMap<>();
+        if (chart.getLineData() != null && !chart.getLineData().getDataSets().isEmpty()) {
+            ILineDataSet dataSet = chart.getLineData().getDataSets().get(0);
+            for (int i = 0; i < dataSet.getEntryCount(); i++) {
+                Entry entry = dataSet.getEntryForIndex(i);
+                String date = String.format("%02d/%02d/%d",
+                        (int) entry.getX(),
+                        selectedMonth + 1,
+                        selectedYear);
+                dailyBalances.put(date, (double) entry.getY());
+            }
+        }
+
+        Bitmap summaryImage = SummaryImageGenerator.generateHistorySummaryImage(
+                this,
+                monthText.getText().toString(),
+                yearText.getText().toString(),
+                totalIncome,
+                totalExpense,
+                chart,
+                dailyBalances);
+
+        // บันทึกไฟล์รูปภาพ
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                .format(new Date());
+        String fileName = String.format("history_summary_%s_%s_%s.jpg",
+                monthText.getText(), yearText.getText(), timestamp);
+
+        // บันทึกรูปภาพลงใน Gallery
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+            values.put(MediaStore.Images.Media.IS_PENDING, 1);
+        }
+
+        ContentResolver resolver = getContentResolver();
+        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        try {
+            if (imageUri != null) {
+                try (OutputStream out = resolver.openOutputStream(imageUri)) {
+                    if (out != null) {
+                        summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    }
+                }
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    values.clear();
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                    resolver.update(imageUri, values, null, null);
+                }
+
+                Toast.makeText(this,
+                        "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (IOException e) {
+            // ในกรณีที่เกิดข้อผิดพลาด ให้ลบไฟล์ที่ค้างอยู่
+            if (imageUri != null) {
+                resolver.delete(imageUri, null, null);
+            }
+            Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+            Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
+        }
+    }
+
+    // เปลี่ยนการเรียกใช้จากปุ่ม export
+    private void setupExportButton() {
+        exportButton.setOnClickListener(v -> {
+            if (checkPermissionAndExport()) {
+                showExportDialog();
+            }
+        });
+    }
+
+    private List<TransferSlip> getAllTransactionsForCurrentMonth() {
+        List<TransferSlip> transactions = new ArrayList<>();
+        SQLiteDatabase db = events.getReadableDatabase();
+        String[] FROM = { _ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
+
+        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(selectedYear - 543, selectedMonth, 1);
+        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
+
+        String selection = "date BETWEEN ? AND ?";
+        String[] selectionArgs = { startDay, endDay };
+        String ORDER_BY = DATE + " ASC, " + TIME + " ASC";
+
+        Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, ORDER_BY);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
+                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+
+                TransferSlip slip = new TransferSlip(
+                        id,
+                        dateStr + " " + timeStr,
+                        money,
+                        receiver,
+                        description,
+                        image,
+                        category,
+                        type);
+                transactions.add(slip);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return transactions;
+    }
+
+    private void setupSwipeRefresh() {
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.green_500,
+                R.color.blue_500,
+                R.color.orange_500);
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
+        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+        swipeRefreshLayout.setSlingshotDistance(100);
+        swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            View contentView = findViewById(R.id.main);
+            contentView.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        updateChartData();
+                        contentView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(200)
+                                .start();
+                        swipeRefreshLayout.setRefreshing(false);
+                    })
+                    .start();
+        });
     }
 
     private void setupNavigation() {
@@ -815,6 +1078,32 @@ public class HistoryActivity extends AppCompatActivity {
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, ORDER_BY);
     }
 
+    private void setupAddButton() {
+        addbtn = findViewById(R.id.add_btn);
+        Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_button);
+
+        addbtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddSlipActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_up, R.anim.hold);
+        });
+
+        addbtn.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.startAnimation(scaleAnimation);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    v.clearAnimation();
+                    v.setScaleX(1);
+                    v.setScaleY(1);
+                    break;
+            }
+            return false;
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -838,7 +1127,6 @@ public class HistoryActivity extends AppCompatActivity {
         }
     }
 
-    // Add this utility method to help with number formatting
     private String formatNumber(float number) {
         DecimalFormat df = new DecimalFormat("###,###,###,###.##");
         return df.format(number);
