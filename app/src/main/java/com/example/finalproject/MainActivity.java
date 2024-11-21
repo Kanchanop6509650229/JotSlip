@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (totalRemain < 0) {
                 remainAmount.setTextColor(getColor(R.color.red));
             } else {
-                remainAmount.setTextColor(getColor(R.color.green_500));
+                remainAmount.setTextColor(getColor(R.color.dark_green));
             }
 
             ListAdapter adapter = new ListAdapter(slipList, true, this);

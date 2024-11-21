@@ -6,451 +6,392 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:background="@drawable/gradient_background"
     android:fitsSystemWindows="true"
-    android:background="@color/background_green"
     tools:context=".HistoryActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <LinearLayout
+        <!-- Image Upload Card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/ligth_green"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
 
-            <ImageButton
-                android:id="@+id/gallery_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:adjustViewBounds="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cancel"
-                android:scaleType="fitCenter"
-                android:src="@android:drawable/ic_menu_gallery"
-                tools:ignore="ImageContrastCheck,ImageContrastCheck" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="16dp">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_weight="1"
-                android:background="@color/black"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/or"
-                android:paddingHorizontal="16dp"
-                android:textColor="@color/black"
-                android:textStyle="bold"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_weight="1"
-                android:background="@color/black"/>
-
-        </LinearLayout>
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginVertical="10dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <RadioGroup
-                android:id="@+id/radio_group"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:background="@color/green_500"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:padding="24dp">
 
-                <RadioButton
-                    android:id="@+id/radio_income"
+                <ImageButton
+                    android:id="@+id/gallery_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:checked="false"
-                    android:textStyle="bold"
-                    android:text="@string/income" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="16dp"
+                    android:src="@android:drawable/ic_menu_gallery" />
 
-                <RadioButton
-                    android:id="@+id/radio_outcome"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:textStyle="bold"
-                    android:text="@string/outcome" />
-            </RadioGroup>
+                    android:layout_marginTop="8dp"
+                    android:text="@string/or"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/highlight_background"
-                android:elevation="10dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <ImageView
-                        android:id="@+id/thb_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:src="@mipmap/thb" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <EditText
-                        android:id="@+id/add_money"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="5dp"
-                        android:ems="10"
-                        android:inputType="numberDecimal" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/money_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:onClick="onClick"
-                        android:text="@string/cancel"
-                        android:textColor="@color/red" />
-
-                </TableRow>
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/highlight_background"
-                android:elevation="10dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <ImageView
-                        android:id="@+id/question_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_weight="0"
-                        android:src="@mipmap/question" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <Spinner
-                        android:id="@+id/type_spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:spinnerMode="dropdown" />
-                </TableRow>
-
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/highlight_background"
-                android:elevation="10dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <ImageView
-                        android:id="@+id/description_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:src="@mipmap/text" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <EditText
-                        android:id="@+id/description"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="5dp"
-                        android:ems="10"
-                        android:inputType="text" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/description_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:onClick="onClick"
-                        android:text="@string/cancel"
-                        android:textColor="@color/red" />
-
-                </TableRow>
-
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/highlight_background"
-                android:elevation="10dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <ImageView
-                        android:id="@+id/calendar_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:src="@mipmap/calendar" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <Button
-                        android:id="@+id/date_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="5dp"
-                        android:background="@android:color/transparent"
-                        android:text="@string/date_format"
-                        android:textColor="@color/black" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/date_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:onClick="onClick"
-                        android:text="@string/cancel"
-                        android:textColor="@color/red" />
-
-                </TableRow>
-
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/highlight_background"
-                android:elevation="10dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/time_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:src="@mipmap/calendar" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <Button
-                        android:id="@+id/time_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="5dp"
-                        android:background="@android:color/transparent"
-                        android:text="@string/time_format"
-                        android:textColor="@color/black" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/time_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:onClick="onClick"
-                        android:text="@string/cancel"
-                        android:textColor="@color/red" />
-
-                </TableRow>
-
-            </TableRow>
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="10dp"
-                android:background="@drawable/highlight_background"
-                android:elevation="10dp"
-                android:orientation="horizontal"
-                android:padding="10dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <ImageView
-                        android:id="@+id/imageView2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="20dp"
-                        android:src="@mipmap/people" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <EditText
-                        android:id="@+id/receiver"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:inputType="text" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0">
-
-                    <TextView
-                        android:id="@+id/receiver_cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="20dp"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:onClick="onClick"
-                        android:text="@string/cancel"
-                        android:textColor="@color/red" />
-
-                </TableRow>
-
-            </TableRow>
-        </TableLayout>
-
-        <LinearLayout
+        <!-- Transaction Type Card -->
+        <!-- ส่วนของ Radio Group -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
 
-            <Button
-                android:id="@+id/submit_btn"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:text="Submit"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="10dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ประเภทธุรกรรม"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
+
+                <RadioGroup
+                    android:id="@+id/radio_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/radio_group_background"
+                    android:padding="4dp">
+
+                    <RadioButton
+                        android:id="@+id/radio_income"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/radio_selector"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:text="@string/income"
+                        android:textColor="@drawable/radio_text_selector"/>
+
+                    <RadioButton
+                        android:id="@+id/radio_outcome"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/radio_selector"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:text="@string/outcome"
+                        android:textColor="@drawable/radio_text_selector"/>
+
+                </RadioGroup>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Amount Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:background="@drawable/highlight_background"
-                android:layout_centerInParent="true"
-                android:elevation="10dp"
-                android:padding="10dp"/>
-        </LinearLayout>
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/thb_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/thb"
+                    android:tint="@color/green_500" />
+
+                <EditText
+                    android:id="@+id/add_money"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="จำนวนเงิน"
+                    android:inputType="numberDecimal"
+                    android:textColorHint="@color/gray" />
+
+                <TextView
+                    android:id="@+id/money_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:text="@string/cancel"
+                    android:textColor="@color/red" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Category Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/question_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/question"
+                    android:tint="@color/green_500" />
+
+                <Spinner
+                    android:id="@+id/type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/custom_spinner_background"
+                    android:spinnerMode="dropdown" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Description Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/description_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/text"
+                    android:tint="@color/green_500" />
+
+                <EditText
+                    android:id="@+id/description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="รายละเอียด"
+                    android:inputType="text"
+                    android:textColorHint="@color/gray" />
+
+                <TextView
+                    android:id="@+id/description_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:text="@string/cancel"
+                    android:textColor="@color/red" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Date Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/calendar_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/calendar"
+                    android:tint="@color/green_500" />
+
+                <Button
+                    android:id="@+id/date_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/date_format"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/date_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:text="@string/cancel"
+                    android:textColor="@color/red" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Time Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/time_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/calendar"
+                    android:tint="@color/green_500" />
+
+                <Button
+                    android:id="@+id/time_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/time_format"
+                    android:textAlignment="textStart"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/time_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:text="@string/cancel"
+                    android:textColor="@color/red" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Receiver Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/people"
+                    android:tint="@color/green_500" />
+
+                <EditText
+                    android:id="@+id/receiver"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="ผู้รับ"
+                    android:inputType="text"
+                    android:textColorHint="@color/gray" />
+
+                <TextView
+                    android:id="@+id/receiver_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:text="@string/cancel"
+                    android:textColor="@color/red" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/submit_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/green_500"
+            android:padding="16dp"
+            android:text="Submit"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:cornerRadius="24dp" />
 
     </LinearLayout>
-
 </ScrollView>
