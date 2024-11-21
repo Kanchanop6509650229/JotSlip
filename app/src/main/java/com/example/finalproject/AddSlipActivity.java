@@ -24,8 +24,8 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -36,6 +36,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
@@ -50,6 +59,7 @@ import androidx.core.view.WindowInsetsCompat;
 import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -72,9 +82,175 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     private Bitmap currentBitmap;
     private boolean isIncome = true;
 
+    private static final int PERMISSION_REQUEST_CODE = 100;
+
     Calendar myCalendar = Calendar.getInstance();
 
     private ImageButton galleryButton;
+
+    private void checkAndRequestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13 ขึ้นไป ใช้ READ_MEDIA_IMAGES
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.READ_MEDIA_IMAGES },
+                        PERMISSION_REQUEST_CODE);
+            } else {
+                openGallery();
+            }
+        } else {
+            // Android 12 ลงมา ใช้ READ_EXTERNAL_STORAGE
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                        PERMISSION_REQUEST_CODE);
+            } else {
+                openGallery();
+            }
+        }
+    }
+
+    // Validate input
+    private boolean validateInput() {
+        String errorMessage = null;
+
+        // 1. Check radio button selection
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+        if (radioGroup.getCheckedRadioButtonId() == -1) {
+            errorMessage = "กรุณาเลือกประเภทรายรับ/รายจ่าย";
+        }
+
+        // 2. Check money input
+        if (errorMessage == null) {
+            String moneyStr = moneyEditText.getText().toString().trim();
+            if (moneyStr.isEmpty()) {
+                errorMessage = "กรุณากรอกจำนวนเงิน";
+            } else {
+                try {
+                    double money = Double.parseDouble(moneyStr);
+                    if (money <= 0) {
+                        errorMessage = "จำนวนเงินต้องมากกว่า 0";
+                    } else if (money > 99999999.99) {
+                        errorMessage = "จำนวนเงินต้องไม่เกิน 99,999,999.99";
+                    }
+                } catch (NumberFormatException e) {
+                    errorMessage = "รูปแบบจำนวนเงินไม่ถูกต้อง";
+                }
+            }
+        }
+
+        // 3. Check category (spinner)
+        if (errorMessage == null) {
+            if (spinner.getSelectedItem() == null ||
+                    spinner.getSelectedItem().toString().trim().isEmpty()) {
+                errorMessage = "กรุณาเลือกประเภท";
+            }
+        }
+
+        // 4. Check date and time
+        if (errorMessage == null) {
+            String dateStr = btnDate.getText().toString();
+            String timeStr = btnTime.getText().toString();
+
+            // First check if date is selected
+            if (dateStr.equals(getString(R.string.date_format))) {
+                errorMessage = "กรุณาเลือกวันที่";
+            }
+            // Then check if time is selected
+            else if (timeStr.equals(getString(R.string.time_format))) {
+                errorMessage = "กรุณาเลือกเวลา";
+            }
+            // If both are selected, validate format and future date
+            else {
+                try {
+                    // Parse input date
+                    String[] dateParts = dateStr.split("/");
+                    int day = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]);
+                    int yearBE = Integer.parseInt(dateParts[2]);
+                    int yearCE = yearBE - 543; // Convert BE to CE
+
+                    // Parse input time
+                    String[] timeParts = timeStr.split(":");
+                    int hour = Integer.parseInt(timeParts[0]);
+                    int minute = Integer.parseInt(timeParts[1]);
+
+                    // Validate date format
+                    if (day < 1 || day > 31 || month < 1 || month > 12 ||
+                            yearBE < 2500 || yearBE > 2600) {
+                        errorMessage = "รูปแบบวันที่ไม่ถูกต้อง";
+                    }
+                    // Validate time format
+                    else if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                        errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                    }
+                    // Check if date and time is in the future
+                    else {
+                        Calendar inputDateTime = Calendar.getInstance();
+                        inputDateTime.set(yearCE, month - 1, day, hour, minute, 0);
+                        inputDateTime.set(Calendar.MILLISECOND, 0);
+
+                        Calendar now = Calendar.getInstance();
+                        now.set(Calendar.MILLISECOND, 0);
+
+                        if (inputDateTime.after(now)) {
+                            errorMessage = "วันที่และเวลาต้องไม่เป็นอนาคต";
+                        }
+                    }
+                } catch (Exception e) {
+                    errorMessage = "รูปแบบวันที่หรือเวลาไม่ถูกต้อง";
+                }
+            }
+        }
+
+        // 5. Check time
+        if (errorMessage == null) {
+            String timeStr = btnTime.getText().toString();
+            if (timeStr.equals(getString(R.string.time_format))) {
+                errorMessage = "กรุณาเลือกเวลา";
+            } else {
+                try {
+                    String[] timeParts = timeStr.split(":");
+                    int hour = Integer.parseInt(timeParts[0]);
+                    int minute = Integer.parseInt(timeParts[1]);
+
+                    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                        errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                    }
+                } catch (Exception e) {
+                    errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                }
+            }
+        }
+
+        // 6. Optional: Check description length if provided
+        if (errorMessage == null) {
+            String description = descriptionEditText.getText().toString().trim();
+            if (!description.isEmpty() && description.length() > 100) {
+                errorMessage = "รายละเอียดต้องไม่เกิน 100 ตัวอักษร";
+            }
+        }
+
+        // 7. Optional: Check receiver length if provided
+        if (errorMessage == null) {
+            String receiver = receiverTextView.getText().toString().trim();
+            if (!receiver.isEmpty() && receiver.length() > 50) {
+                errorMessage = "ชื่อผู้รับต้องไม่เกิน 50 ตัวอักษร";
+            }
+        }
+
+        // Show error if any
+        if (errorMessage != null) {
+            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            return false;
+        }
+
+        return true;
+    }
 
     ActivityResultLauncher<Intent> activityResultLauncher3 = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -106,28 +282,20 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         galleryButton = findViewById(R.id.gallery_btn);
-        galleryButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                Intent chooser = Intent.createChooser(intent, "Select photo from...");
-                activityResultLauncher3.launch(chooser);
-            }
-        });
+        galleryButton.setOnClickListener(v -> checkAndRequestPermissions());
 
         // ในเมธอด onCreate ของ AddSlipActivity
         spinner = findViewById(R.id.type_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
                 R.array.types_array,
-                android.R.layout.simple_spinner_item
-        );
+                android.R.layout.simple_spinner_item);
 
-// สร้าง custom layout สำหรับ dropdown items
+        // สร้าง custom layout สำหรับ dropdown items
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-// กำหนดสีเมื่อเลือก item
+        // กำหนดสีเมื่อเลือก item
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -150,7 +318,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         descriptionEditText = findViewById(R.id.description);
         receiverTextView = findViewById(R.id.receiver);
         moneyEditText = findViewById(R.id.add_money);
-        moneyEditText.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(8, 2)});
+        moneyEditText.setFilters(new InputFilter[] { new DecimalDigitsInputFilter(8, 2) });
 
         slipProcessor = new SlipProcessor();
 
@@ -165,7 +333,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
         btnTime = findViewById(R.id.time_btn);
         btnTime.setOnClickListener(new View.OnClickListener() {
-            public  void onClick(View v) {
+            public void onClick(View v) {
                 new TimePickerDialog(AddSlipActivity.this, t,
                         myCalendar.get(Calendar.HOUR_OF_DAY),
                         myCalendar.get(Calendar.MINUTE), true).show();
@@ -197,6 +365,10 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         submitBtn = findViewById(R.id.submit_btn);
         submitBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if (!validateInput()) {
+                    return;
+                }
+
                 events = new EventsData(AddSlipActivity.this);
                 try {
                     // Log the values before saving
@@ -214,16 +386,76 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                     // Log success
                     Log.d("SQLite_Save", "Transaction saved successfully");
                     Toast.makeText(AddSlipActivity.this, "บันทึกข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+                    finish(); // Close activity after successful save
 
                 } catch (Exception e) {
                     // Log any errors
                     Log.e("SQLite_Save", "Error saving transaction: " + e.getMessage());
-                    Toast.makeText(AddSlipActivity.this, "เกิดข้อผิดพลาดในการบันทึก", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddSlipActivity.this, "เกิดข้อผิดพลาดในการบันทึก: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 } finally {
-                    events.close();
+                    if (events != null) {
+                        events.close();
+                    }
                 }
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // ได้รับอนุญาต
+                openGallery();
+            } else {
+                // ถูกปฏิเสธ
+                if (shouldShowRequestPermissionRationale(permissions[0])) {
+                    // ผู้ใช้ปฏิเสธครั้งแรก แสดงคำอธิบายเพิ่มเติม
+                    new AlertDialog.Builder(this)
+                            .setTitle("ต้องการสิทธิ์การเข้าถึง")
+                            .setMessage("แอปจำเป็นต้องเข้าถึงรูปภาพเพื่อสแกนสลิป")
+                            .setPositiveButton("ตั้งค่า", (dialog, which) -> {
+                                dialog.dismiss();
+                                checkAndRequestPermissions();
+                            })
+                            .setNegativeButton("ยกเลิก", (dialog, which) -> dialog.dismiss())
+                            .create()
+                            .show();
+                } else {
+                    // ผู้ใช้เลือก "Don't ask again" แสดงข้อความแนะนำให้ไปตั้งค่า
+                    new AlertDialog.Builder(this)
+                            .setTitle("ต้องการสิทธิ์การเข้าถึง")
+                            .setMessage("กรุณาอนุญาตการเข้าถึงรูปภาพในการตั้งค่าแอปพลิเคชัน")
+                            .setPositiveButton("ไปที่ตั้งค่า", (dialog, which) -> {
+                                dialog.dismiss();
+                                // เปิดหน้าตั้งค่าแอป
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            })
+                            .setNegativeButton("ยกเลิก", (dialog, which) -> dialog.dismiss())
+                            .create()
+                            .show();
+                }
+            }
+        }
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        Intent chooser = Intent.createChooser(intent, "เลือกรูปภาพจาก");
+        activityResultLauncher3.launch(chooser);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.smooth_fade_in, R.anim.slide_down);
     }
 
     private void addEvent() {
@@ -261,11 +493,11 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             Log.e("SQLite_Save", "Failed to insert row");
         }
-    }//end addEvent
+    }// end addEvent
 
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
+                int dayOfMonth) {
             myCalendar.set(Calendar.YEAR, year);
             myCalendar.set(Calendar.MONTH, monthOfYear);
             myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -347,10 +579,12 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
+
         DecimalDigitsInputFilter(int digits, int digitsAfterZero) {
             mPattern = Pattern.compile("[0-9]{0," + (digits - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) +
                     "})?)||(\\.)?");
         }
+
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             Matcher matcher = mPattern.matcher(dest);
