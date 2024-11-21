@@ -11,6 +11,7 @@ import static com.example.finalproject.Constants.TIME;
 import static com.example.finalproject.Constants.TYPE;
 import static com.example.finalproject.Constants._ID;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -21,6 +22,8 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -30,6 +33,7 @@ import android.widget.TextView;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.DecimalFormat;
@@ -49,6 +53,7 @@ public class SlipInfoActivity extends AppCompatActivity {
     private EventsData events;
     private EditText descriptionEditText;
     private Uri image_uri;
+    private long slipId;
 
     private SlipProcessor slipProcessor;
     private Bitmap currentBitmap;
@@ -58,20 +63,71 @@ public class SlipInfoActivity extends AppCompatActivity {
 
     private ImageButton galleryButton;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.slip_info);
 
-        long slipId = getIntent().getLongExtra("slip_id", -1);
+        slipId = getIntent().getLongExtra("slip_id", -1);
         if (slipId != -1) {
             events = new EventsData(this);
             loadSlipData(slipId);
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("รายละเอียดรายการ"); // เพิ่มชื่อ title
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // เพิ่มปุ่มลบในแถบด้านบน
+        MenuItem deleteItem = menu.add(Menu.NONE, 1, Menu.NONE, "ลบ");
+        deleteItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        deleteItem.setIcon(android.R.drawable.ic_menu_delete);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == 1) { // ID ของปุ่มลบที่เราสร้าง
+            showDeleteConfirmationDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("ยืนยันการลบ")
+                .setMessage("คุณต้องการลบรายการนี้ใช่หรือไม่?")
+                .setPositiveButton("ลบ", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteSlip();
+                    }
+                })
+                .setNegativeButton("ยกเลิก", null)
+                .show();
+    }
+
+    private void deleteSlip() {
+        SQLiteDatabase db = events.getWritableDatabase();
+        String whereClause = _ID + " = ?";
+        String[] whereArgs = { String.valueOf(slipId) };
+
+        int deletedRows = db.delete(TABLE_NAME, whereClause, whereArgs);
+
+        if (deletedRows > 0) {
+            // ลบสำเร็จ
+            finish(); // ปิดหน้าจอและกลับไปหน้าก่อนหน้า
+        } else {
+            // แสดงข้อความเมื่อลบไม่สำเร็จ
+            new AlertDialog.Builder(this)
+                    .setTitle("ข้อผิดพลาด")
+                    .setMessage("ไม่สามารถลบรายการได้")
+                    .setPositiveButton("ตกลง", null)
+                    .show();
+        }
     }
 
     private void loadSlipData(long id) {
