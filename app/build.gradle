@@ -39,4 +39,5 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.google.mlkit:text-recognition:16.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 }

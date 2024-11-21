@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    tools:context=".MainActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".HistoryActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,14 +25,13 @@
                 android:id="@+id/gallery_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="16dp"
                 android:src="@android:drawable/ic_menu_gallery"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cancel"
+                android:scaleType="fitCenter"
                 tools:ignore="ImageContrastCheck,ImageContrastCheck" />
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/app_name" />
         </LinearLayout>
 
         <LinearLayout
@@ -70,6 +70,7 @@
             android:layout_marginVertical="20dp">
 
             <RadioGroup
+                android:id="@+id/radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -403,7 +404,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="20dp"
-                android:text="Button" />
+                android:text="Submit" />
         </LinearLayout>
 
     </LinearLayout>

@@ -1,236 +1,252 @@
 package com.example.finalproject;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import static android.provider.BaseColumns._ID;
+import static com.example.finalproject.Constants.CATEGORY;
+import static com.example.finalproject.Constants.DATE;
+import static com.example.finalproject.Constants.DESCRIPTION;
+import static com.example.finalproject.Constants.IMAGE;
+import static com.example.finalproject.Constants.MONEY;
+import static com.example.finalproject.Constants.RECEIVER;
+import static com.example.finalproject.Constants.TABLE_NAME;
+import static com.example.finalproject.Constants.TIME;
+import static com.example.finalproject.Constants.TYPE;
+
+import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.VideoView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.DateFormat;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private ImageButton addbtn;
+    private RecyclerView recyclerView;
+    private RecyclerView categoryRecyclerView;
+    private View historyNav;
+    private ImageView historyIcon;
+    private TextView historyText;
+    private View homeNav;
+    private ImageView homeIcon;
+    private TextView homeText;
+    private EventsData events;
+    private TextView remainAmount;
+    private TextView seeAllTransaction;
+    private TextView seeAllTransaction2;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    DecimalFormat formatter = new DecimalFormat("#,###,###.##");
-    private TextView dateTimeTextView;
-    private TextView amountTextView;
-    private TextView senderTextView;
-    private TextView receiverTextView;
-    private EditText moneyEditText;
-    Calendar myCalendar = Calendar.getInstance();
-
-    ActivityResultLauncher<Intent> activityResultLauncher3 = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        try {
-                            Uri uri = data.getData();
-                            ImageView imageView = findViewById(R.id.imageView);
-                            imageView.getLayoutParams().height = 400;
-                            
-                            // เก็บ bitmap และแสดงรูป
-                            currentBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                            imageView.setImageBitmap(currentBitmap);
-                            
-                            // เรียกใช้ processSlipImage เมื่อโหลดรูปเสร็จ
-                            processSlipImage();
-                            
-                        } catch (Exception e) {
-                            Log.e("Log", "Error processing image: " + e.getMessage());
-                        }
-                    }
-                }
-            });
-
-    private SlipProcessor slipProcessor;
-    private Bitmap currentBitmap;
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.add_transactions);
+        setContentView(R.layout.homepage);
 
-        Spinner spinner = findViewById(R.id.type_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.types_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_list_item_checked);
-        spinner.setAdapter(adapter);
+        events = new EventsData(this);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.green_500, // สีหลัก
+                R.color.blue_500, // สีรอง
+                R.color.orange_500 // สีที่สาม
+        );
+
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.white);
+
+        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+
+        swipeRefreshLayout.setSlingshotDistance(100);
+
+        swipeRefreshLayout.setProgressViewOffset(false, 0, 100);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            View contentView = findViewById(R.id.main);
+            contentView.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        updateBarChartData();
+                        updateCategoryData();
+                        getRemainMoney();
+
+                        contentView.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(200)
+                                .start();
+
+                        swipeRefreshLayout.setRefreshing(false);
+                    })
+                    .start();
         });
 
-        moneyEditText = findViewById(R.id.add_money);
-        moneyEditText.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(8, 2)});
+        // Initialize RecyclerView
+        recyclerView = findViewById(R.id.list_item_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setNestedScrollingEnabled(true);
 
-        final ImageButton btn3 = findViewById(R.id.gallery_btn);
-        btn3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                intent.createChooser(intent, "Select photo from...");
-                activityResultLauncher3.launch(intent);
+        categoryRecyclerView = findViewById(R.id.category_list_item_view);
+        categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        categoryRecyclerView.setNestedScrollingEnabled(true);
+
+        addbtn = findViewById(R.id.add_btn);
+        addbtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddSlipActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_up, R.anim.hold);
+        });
+
+        ImageButton addBtn = findViewById(R.id.add_btn);
+        Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_button);
+
+        remainAmount = findViewById(R.id.totalRemain);
+        getRemainMoney();
+
+        addBtn.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.startAnimation(scaleAnimation);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    v.clearAnimation();
+                    v.setScaleX(1);
+                    v.setScaleY(1);
+                    break;
             }
+            return false;
         });
 
-        slipProcessor = new SlipProcessor();
+        seeAllTransaction = findViewById(R.id.seeAllText);
+        seeAllTransaction.setOnClickListener(this);
+        seeAllTransaction2 = findViewById(R.id.seeAllText2);
+        seeAllTransaction2.setOnClickListener(this);
 
-        Button btnDate = findViewById(R.id.date_btn);
-        btnDate.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                new DatePickerDialog(MainActivity.this, d,
-                        myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
+        // Add after initializing views
+        historyNav = findViewById(R.id.nav_history);
+        historyIcon = historyNav.findViewById(android.R.id.icon);
+        historyText = historyNav.findViewById(android.R.id.text1);
+        historyNav.setOnClickListener(v -> {
+            Intent intent = new Intent(this, HistoryActivity.class);
+
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intent, options);
         });
 
-        Button btnTime = findViewById(R.id.time_btn);
-        btnTime.setOnClickListener(new View.OnClickListener() {
-            public  void onClick(View v) {
-                new TimePickerDialog(MainActivity.this, t,
-                        myCalendar.get(Calendar.HOUR_OF_DAY),
-                        myCalendar.get(Calendar.MINUTE), true).show();
-            }
-        });
+        homeNav = findViewById(R.id.nav_home);
+        homeIcon = homeNav.findViewById(R.id.home_icon);
+        homeText = homeNav.findViewById(R.id.home_text);
 
-        // Set click listeners for cancel buttons
-        TextView moneyCancel = findViewById(R.id.money_cancel);
-        TextView descriptionCancel = findViewById(R.id.description_cancel);
-        TextView dateCancel = findViewById(R.id.date_cancel);
-        TextView timeCancel = findViewById(R.id.time_cancel);
-        TextView receiverCancel = findViewById(R.id.receiver_cancel);
+        // Highlight history icon and text
+        historyIcon.setColorFilter(getColor(R.color.gray));
+        historyText.setTextColor(getColor(R.color.gray));
 
-        moneyCancel.setOnClickListener(this);
-        descriptionCancel.setOnClickListener(this);
-        dateCancel.setOnClickListener(this);
-        timeCancel.setOnClickListener(this);
-        receiverCancel.setOnClickListener(this);
+        updateCategoryData();
+        setupBarChart();
+        updateBarChartData();
     }
 
-    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
-            myCalendar.set(Calendar.YEAR, year);
-            myCalendar.set(Calendar.MONTH, monthOfYear);
-            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            updateDateLabel();
-        }
-    };
+    private void getRemainMoney() {
+        Cursor cursor = getEvents();
+        List<TransferSlip> slipList = new ArrayList<>();
+        float totalRemain = 0f;
+        int count = 0;
 
-    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            myCalendar.set(Calendar.MINUTE, minute);
-            updateTimeLabel();
-        }
-    };
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
+                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
 
-    private void updateTimeLabel() {
-        Button timeBtn = findViewById(R.id.time_btn);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        timeBtn.setText(timeFormat.format(myCalendar.getTime()));
-    }
+                try {
+                    if (type == 1) {
+                        totalRemain += (float) money;
+                    } else {
+                        totalRemain -= (float) money;
+                    }
 
-    private void updateDateLabel() {
-        Button dateBtn = findViewById(R.id.date_btn);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        dateBtn.setText(dateFormat.format(myCalendar.getTime()));
-    }
-
-    private void processSlipImage() {
-        if (currentBitmap != null) {
-            slipProcessor.processSlip(currentBitmap, new SlipProcessor.OnSlipProcessedListener() {
-                @Override
-                public void onSlipProcessed(TransferSlip slip) {
-                    runOnUiThread(() -> {
-                        // แยกวันที่และเวลา
-                        String[] dateTimeParts = slip.getDateTime().split(" ");
-                        if (dateTimeParts.length >= 2) {
-                            try {
-                                // แปลงรูปแบบวันที่
-                                String dateStr = dateTimeParts[0];
-                                String timeStr = dateTimeParts[1];
-                                
-                                // อัพเดทค่าใน Button
-                                Button dateInput = findViewById(R.id.date_btn);
-                                Button timeInput = findViewById(R.id.time_btn);
-                                
-                                dateInput.setText(dateStr);
-                                timeInput.setText(timeStr);
-                                
-                            } catch (Exception e) {
-                                Log.e("MainActivity", "Error formatting date: " + e.getMessage());
-                            }
-                        }
-
-                        // อัพเดทค่าผู้รับโอน
-                        EditText receiverInput = findViewById(R.id.receiver);
-                        receiverInput.setText(slip.getReceiver());
-
-                        // อัพเดทจำนวนเงิน
-                        EditText moneyInput = findViewById(R.id.add_money);
-                        moneyInput.setText(String.format("%.2f", slip.getAmount()));
-                    });
+                    if (count < 5) {
+                        TransferSlip slip = new TransferSlip(
+                                id,
+                                dateStr + " " + timeStr,
+                                money,
+                                receiver,
+                                description,
+                                image,
+                                category,
+                                type);
+                        slipList.add(slip);
+                        count++;
+                    }
+                } catch (Exception e) {
+                    Log.e("MainActivity", "Error parsing date: " + dateStr, e);
                 }
-                
-                @Override
-                public void onError(String error) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(MainActivity.this, 
-                            "เกิดข้อผิดพลาด: " + error, 
-                            Toast.LENGTH_LONG).show();
-                    });
-                }
-            });
+            } while (cursor.moveToNext());
+
+            remainAmount.setText(formatNumber(totalRemain) + " ฿");
+            if (totalRemain < 0) {
+                remainAmount.setTextColor(getColor(R.color.red));
+            } else {
+                remainAmount.setTextColor(getColor(R.color.green_500));
+            }
+
+            ListAdapter adapter = new ListAdapter(slipList, true, this);
+            recyclerView.setAdapter(adapter);
+
+            cursor.close();
         }
     }
 
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
+
         DecimalDigitsInputFilter(int digits, int digitsAfterZero) {
             mPattern = Pattern.compile("[0-9]{0," + (digits - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) +
                     "})?)||(\\.)?");
         }
+
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             Matcher matcher = mPattern.matcher(dest);
@@ -240,25 +256,266 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // Add this utility method to help with number formatting
+    private String formatNumber(float number) {
+        DecimalFormat df = new DecimalFormat("###,###,###,###.##");
+        return df.format(number);
+    }
+
+    private Cursor getEvents() {
+        String[] FROM = { _ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
+        String ORDER_BY = "substr(date, -4) DESC, " + // ปี
+                "substr(date, 4, 2) DESC, " + // เดือน
+                "substr(date, 1, 2) DESC, " + // วัน
+                TIME + " DESC"; // เวลา
+        SQLiteDatabase db = events.getReadableDatabase();
+
+        return db.query(TABLE_NAME, FROM, null, null, null, null, ORDER_BY);
+    }
+
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        
-        if (id == R.id.money_cancel) {
-            EditText moneyInput = findViewById(R.id.add_money);
-            moneyInput.setText("");
-        } else if (id == R.id.description_cancel) {
-            EditText descriptionInput = findViewById(R.id.description);
-            descriptionInput.setText("");
-        } else if (id == R.id.date_cancel) {
-            Button dateBtn = findViewById(R.id.date_btn);
-            dateBtn.setText(R.string.date_format);
-        } else if (id == R.id.time_cancel) {
-            Button timeBtn = findViewById(R.id.time_btn);
-            timeBtn.setText(R.string.time_format);
-        } else if (id == R.id.receiver_cancel) {
-            EditText receiverInput = findViewById(R.id.receiver);
-            receiverInput.setText("");
+    public void onClick(View v) {
+        if (v == seeAllTransaction) {
+            Intent intent = new Intent(this, HistoryActivity.class);
+
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intent, options);
+        } else if (v == seeAllTransaction2) {
+            Intent intent = new Intent(this, CategoryActivity.class);
+
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intent, options);
         }
     }
+
+    private void setupBarChart() {
+        BarChart barChart = findViewById(R.id.bar_chart);
+        barChart.getDescription().setEnabled(false);
+        barChart.setDrawGridBackground(false);
+        barChart.setDrawBarShadow(false);
+        barChart.setHighlightFullBarEnabled(false);
+
+        // Disable zooming and scaling
+        barChart.setScaleEnabled(false); // ปิดการซูม
+        barChart.setPinchZoom(false); // ปิดการ pinch zoom
+        barChart.setDoubleTapToZoomEnabled(false); // ปิดการ double tap zoom
+        barChart.setDragEnabled(false); // ปิดการลาก
+
+        // ตั้งค่าแกน X
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setCenterAxisLabels(true); // จัดให้ label อยู่ตรงกลางของกลุ่มแท่ง
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, (int) value - 6);
+                return String.format("%d/%d", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1);
+            }
+        });
+
+        // ตั้งค่าแกน Y ด้าซ้าย
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return formatNumber(value);
+            }
+        });
+
+        // ปิดแกน Y ด้านขวา
+        barChart.getAxisRight().setEnabled(false);
+
+        // ตั้งค่าตำนาน (Legend)
+        Legend legend = barChart.getLegend();
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(true);
+    }
+
+    private void updateCategoryData() {
+        ArrayList<String> categoryList = new ArrayList<>();
+        ArrayList<TransferSlip> slipList = new ArrayList<>();
+
+        Cursor cursor = getSevenDaysEvents();
+        if (cursor != null) {
+            Log.d("MainActivity", "Cursor is not null");
+            while (cursor.moveToNext()) {
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
+                    String columnName = cursor.getColumnName(i);
+                    if (!columnName.equals(IMAGE)) { // Skip logging image data
+                        Log.d("MainActivity", columnName + ": " + cursor.getString(i));
+                    }
+                }
+            }
+        } else {
+            Log.d("MainActivity", "Cursor is null");
+        }
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+
+                TransferSlip slip = new TransferSlip(
+                        id,
+                        dateStr + " " + timeStr,
+                        money,
+                        receiver,
+                        description,
+                        image,
+                        category,
+                        type);
+                slipList.add(slip);
+
+            } while (cursor.moveToNext());
+
+            CategoryAdapter adapter = new CategoryAdapter(slipList);
+            categoryRecyclerView.setAdapter(adapter);
+
+            cursor.close();
+        }
+    }
+
+    private void updateBarChartData() {
+        BarChart barChart = findViewById(R.id.bar_chart);
+        ArrayList<BarEntry> incomeEntries = new ArrayList<>();
+        ArrayList<BarEntry> expenseEntries = new ArrayList<>();
+
+        // สร้าง Map เพื่อเก็บข้อมูลรายรับ-รายจ่ายแต่ละวัน
+        Map<String, Double> incomeMap = new HashMap<>();
+        Map<String, Double> expenseMap = new HashMap<>();
+
+        // ดึงข้อมูล 7 วันล่าสุด
+        Cursor cursor = getSevenDaysEvents();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int type = cursor.getInt(cursor.getColumnIndex(TYPE));
+                double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
+                String date = cursor.getString(cursor.getColumnIndex(DATE));
+
+                if (type == 1) { // รายรับ
+                    incomeMap.put(date, incomeMap.getOrDefault(date, 0.0) + money);
+                } else { // รายจ่าย
+                    expenseMap.put(date, expenseMap.getOrDefault(date, 0.0) + money);
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        // สร้างข้อมูลสำหรับกราฟแท่ง
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -6); // เริ่มจาก 6 วันย้อนหัง
+
+        for (int i = 0; i < 7; i++) {
+            String date = String.format("%02d/%02d/%d",
+                    cal.get(Calendar.DAY_OF_MONTH),
+                    cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.YEAR) + 543);
+
+            float income = incomeMap.getOrDefault(date, 0.0).floatValue();
+            float expense = expenseMap.getOrDefault(date, 0.0).floatValue();
+
+            incomeEntries.add(new BarEntry(i, income));
+            expenseEntries.add(new BarEntry(i, expense));
+
+            cal.add(Calendar.DAY_OF_MONTH, 1); // เพิ่มวันทีละ 1 วัน
+        }
+
+        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "รายรับ");
+        incomeDataSet.setColor(Color.GREEN);
+        incomeDataSet.setDrawValues(true);
+        incomeDataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0)
+                    return ""; // ซ่อนค่า 0
+                return formatNumber(value);
+            }
+        });
+
+        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, "รายจ่าย");
+        expenseDataSet.setColor(Color.RED);
+        expenseDataSet.setDrawValues(true);
+        expenseDataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0)
+                    return ""; // ซ่อนค่า 0
+                return formatNumber(value);
+            }
+        });
+
+        // เพิ่มระยะห่างระหว่างกลุ่มแท่ง
+        float groupSpace = 0.3f;
+        float barSpace = 0.05f;
+        float barWidth = 0.3f;
+
+        BarData barData = new BarData(incomeDataSet, expenseDataSet);
+        barData.setBarWidth(barWidth);
+        barData.setValueTextSize(10f);
+
+        barChart.setData(barData);
+        barChart.groupBars(0, groupSpace, barSpace);
+
+        // ปรับขอบขตของแกน X
+        barChart.getXAxis().setAxisMinimum(0);
+        barChart.getXAxis().setAxisMaximum(7);
+
+        // แก้ไข ValueFormatter สำหรับแกน X
+        barChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, -6 + (int) value); // ปรับสูตรการคำนวณวันที่
+                return String.format("%d/%d",
+                        cal.get(Calendar.DAY_OF_MONTH),
+                        cal.get(Calendar.MONTH) + 1);
+            }
+        });
+
+        barChart.setVisibleXRangeMaximum(7);
+        barChart.invalidate();
+    }
+
+    private Cursor getSevenDaysEvents() {
+        String[] FROM = { _ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
+        SQLiteDatabase db = events.getReadableDatabase();
+
+        // คำนวณวันที่ปัจจุบันและ 6 วันย้อนหลัง
+        Calendar cal = Calendar.getInstance();
+        String endDate = String.format("%02d/%02d/%d",
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.YEAR) + 543);
+
+        cal.add(Calendar.DAY_OF_MONTH, -6);
+        String startDate = String.format("%02d/%02d/%d",
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.YEAR) + 543);
+
+        // แก้ไขการ query โดยใช้ฟังก์ชัน SQLite สำหรับแปลงวันที่
+        String selection = "strftime('%Y%m%d', substr(date,7)||'-'||substr(date,4,2)||'-'||substr(date,1,2)) >= strftime('%Y%m%d', substr(?1,7)||'-'||substr(?1,4,2)||'-'||substr(?1,1,2)) "
+                +
+                "AND strftime('%Y%m%d', substr(date,7)||'-'||substr(date,4,2)||'-'||substr(date,1,2)) <= strftime('%Y%m%d', substr(?2,7)||'-'||substr(?2,4,2)||'-'||substr(?2,1,2))";
+        String[] selectionArgs = { startDate, endDate };
+        String orderBy = "strftime('%Y%m%d', substr(date,7)||'-'||substr(date,4,2)||'-'||substr(date,1,2)) ASC";
+
+        return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, orderBy);
+    }
 }
+
