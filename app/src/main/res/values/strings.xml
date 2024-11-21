@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Final project</string>
+    <string name="app_name">JotSlip</string>
     <string name="date_format">dd/mm/yyyy</string>
     <string name="time_format">HH:mm</string>
     <string name="income">รายรับ</string>
