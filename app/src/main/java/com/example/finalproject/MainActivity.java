@@ -163,15 +163,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyText = historyNav.findViewById(android.R.id.text1);
         historyNav.setOnClickListener(v -> {
             Intent intent = new Intent(this, HistoryActivity.class);
-
             Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
-
             startActivity(intent, options);
         });
 
+        // ปรับแต่ง animation สำหรับ navigation
+
+        historyNav.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.startAnimation(scaleAnimation);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    v.clearAnimation();
+                    v.setScaleX(1);
+                    v.setScaleY(1);
+                    break;
+            }
+            return false;
+        });
+
+// ทำแบบเดียวกันสำหรับ home navigation
         homeNav = findViewById(R.id.nav_home);
         homeIcon = homeNav.findViewById(R.id.home_icon);
         homeText = homeNav.findViewById(R.id.home_text);
+
+        homeNav.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.startAnimation(scaleAnimation);
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    v.clearAnimation();
+                    v.setScaleX(1);
+                    v.setScaleY(1);
+                    break;
+            }
+            return false;
+        });
 
         // Highlight history icon and text
         historyIcon.setColorFilter(getColor(R.color.gray));
