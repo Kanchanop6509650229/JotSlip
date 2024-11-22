@@ -14,15 +14,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/padding_medium">
 
         <!-- Image Upload Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -30,20 +30,20 @@
                 android:background="@color/green_500"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="@dimen/padding_large">
 
                 <ImageButton
                     android:id="@+id/gallery_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="16dp"
+                    android:padding="@dimen/padding_medium"
                     android:src="@android:drawable/ic_menu_gallery" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/margin_small"
                     android:text="@string/or"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -55,23 +55,23 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ประเภทธุรกรรม"
+                    android:text="@string/transaction_type"
                     android:textColor="@color/gray"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="12dp"/>
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_marginBottom="@dimen/margin_bottom"/>
 
                 <RadioGroup
                     android:id="@+id/radio_group"
@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:background="@drawable/radio_group_background"
-                    android:padding="4dp">
+                    android:padding="@dimen/padding_smaller">
 
                     <RadioButton
                         android:id="@+id/radio_income"
@@ -89,19 +89,19 @@
                         android:background="@drawable/radio_selector"
                         android:button="@null"
                         android:gravity="center"
-                        android:padding="12dp"
+                        android:padding="@dimen/padding"
                         android:text="@string/income"
                         android:textColor="@drawable/radio_text_selector"/>
 
                     <RadioButton
                         android:id="@+id/radio_outcome"
-                        android:layout_width="0dp"
+                        android:layout_width="@dimen/width"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="@drawable/radio_selector"
                         android:button="@null"
                         android:gravity="center"
-                        android:padding="12dp"
+                        android:padding="@dimen/padding"
                         android:text="@string/outcome"
                         android:textColor="@drawable/radio_text_selector"/>
 
@@ -114,16 +114,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <ImageView
                     android:id="@+id/thb_icon"
@@ -136,11 +136,11 @@
                     android:id="@+id/add_money"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="จำนวนเงิน"
+                    android:hint="@string/amount"
                     android:inputType="numberDecimal"
                     android:textColorHint="@color/gray" />
 
@@ -151,7 +151,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp"
+                    android:padding="@dimen/padding_small"
                     android:text="@string/cancel"
                     android:textColor="@color/red" />
             </LinearLayout>
@@ -161,16 +161,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <ImageView
                     android:id="@+id/question_icon"
@@ -183,7 +183,7 @@
                     android:id="@+id/type_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/padding_medium"
                     android:background="@drawable/custom_spinner_background"
                     android:spinnerMode="dropdown" />
             </LinearLayout>
@@ -193,16 +193,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <ImageView
                     android:id="@+id/description_icon"
@@ -213,13 +213,13 @@
 
                 <EditText
                     android:id="@+id/description"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/width"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="รายละเอียด"
+                    android:hint="@string/description"
                     android:inputType="text"
                     android:textColorHint="@color/gray" />
 
@@ -230,7 +230,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp"
+                    android:padding="@dimen/padding_small"
                     android:text="@string/cancel"
                     android:textColor="@color/red" />
             </LinearLayout>
@@ -240,16 +240,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <ImageView
                     android:id="@+id/calendar_icon"
@@ -260,10 +260,10 @@
 
                 <Button
                     android:id="@+id/date_btn"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/width"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
                     android:gravity="start|center_vertical"
@@ -279,7 +279,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp"
+                    android:padding="@dimen/padding_small"
                     android:text="@string/cancel"
                     android:textColor="@color/red" />
             </LinearLayout>
@@ -289,16 +289,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <ImageView
                     android:id="@+id/time_icon"
@@ -309,10 +309,10 @@
 
                 <Button
                     android:id="@+id/time_btn"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/width"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
                     android:gravity="start|center_vertical"
@@ -328,7 +328,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp"
+                    android:padding="@dimen/padding_small"
                     android:text="@string/cancel"
                     android:textColor="@color/red" />
             </LinearLayout>
@@ -338,16 +338,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="@dimen/margin_large"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="@dimen/padding_medium">
 
                 <ImageView
                     android:id="@+id/imageView2"
@@ -358,13 +358,13 @@
 
                 <EditText
                     android:id="@+id/receiver"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/width"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="ผู้รับ"
+                    android:hint="@string/recevier"
                     android:inputType="text"
                     android:textColorHint="@color/gray" />
 
@@ -375,7 +375,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:padding="8dp"
+                    android:padding="@dimen/padding_small"
                     android:text="@string/cancel"
                     android:textColor="@color/red" />
             </LinearLayout>
@@ -387,11 +387,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/green_500"
-            android:padding="16dp"
-            android:text="Submit"
+            android:padding="@dimen/padding_medium"
+            android:text="@string/submit"
             android:textColor="@color/white"
             android:textStyle="bold"
-            app:cornerRadius="24dp" />
+            app:cornerRadius="@dimen/card_corner_radius" />
 
     </LinearLayout>
 </ScrollView>

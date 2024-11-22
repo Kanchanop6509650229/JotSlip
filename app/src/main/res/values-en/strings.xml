@@ -29,4 +29,9 @@
     <string name="or">or</string>
     <string name="home_text">Overview</string>
     <string name="history">History</string>
+    <string name="transaction_type">Transaction Type</string>
+    <string name="amount">Amount</string>
+    <string name="description">Description</string>
+    <string name="recevier">Recevier</string>
+    <string name="submit">Submit</string>
 </resources>
