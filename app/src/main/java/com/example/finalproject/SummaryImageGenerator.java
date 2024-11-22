@@ -44,10 +44,10 @@ public class SummaryImageGenerator {
         LinearGradient gradient = new LinearGradient(
                 0, 0, 0, IMAGE_HEIGHT,
                 new int[]{
-                        Color.rgb(248, 249, 250),  // Light gray at top
-                        Color.rgb(240, 242, 245)   // Slightly darker at bottom
+                        Color.rgb(156, 204, 101),  // สีเขียวอ่อนด้านบน (#9CCC65)
+                        Color.rgb(241, 248, 233)  // Slightly darker at bottom
                 },
-                null,
+                new float[]{0.3f, 1.0f},
                 Shader.TileMode.CLAMP
         );
         backgroundPaint.setShader(gradient);
@@ -57,7 +57,7 @@ public class SummaryImageGenerator {
 
         // Draw app name with style
         Paint appNamePaint = new Paint();
-        appNamePaint.setColor(Color.rgb(76, 175, 80)); // Green color
+        appNamePaint.setColor(Color.rgb(46, 125, 50)); // Green color
         appNamePaint.setTextSize(60f);
         appNamePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         canvas.drawText("JotSlip", PADDING, currentY, appNamePaint);
@@ -183,10 +183,10 @@ public class SummaryImageGenerator {
         LinearGradient gradient = new LinearGradient(
                 0, 0, 0, IMAGE_HEIGHT,
                 new int[]{
-                        Color.rgb(248, 249, 250),
-                        Color.rgb(240, 242, 245)
+                        Color.rgb(156, 204, 101),  // สีเขียวอ่อนด้านบน (#9CCC65)
+                        Color.rgb(241, 248, 233)   // สีพื้นหลังอ่อนมากด้านล่าง (#f1f8e9)
                 },
-                null,
+                new float[]{0.3f, 1.0f},
                 Shader.TileMode.CLAMP
         );
         backgroundPaint.setShader(gradient);
@@ -196,7 +196,7 @@ public class SummaryImageGenerator {
 
         // App name
         Paint appNamePaint = new Paint();
-        appNamePaint.setColor(Color.rgb(76, 175, 80));
+        appNamePaint.setColor(Color.rgb(46, 125, 50));
         appNamePaint.setTextSize(60f);
         appNamePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         canvas.drawText("JotSlip", PADDING, currentY, appNamePaint);

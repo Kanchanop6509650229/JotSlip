@@ -18,6 +18,7 @@
 
         <!-- Image Upload Card -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/image_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -27,27 +28,31 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/green_500"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:orientation="vertical">
 
-                <ImageButton
+                <!-- ส่วนแสดงรูป -->
+                <ImageView
                     android:id="@+id/gallery_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="16dp"
-                    android:src="@android:drawable/ic_menu_gallery" />
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_upload_image"/>
 
+                <!-- ส่วนปุ่มลบรูป จะแสดงเมื่อมีรูปเท่านั้น -->
                 <TextView
+                    android:id="@+id/remove_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/or"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
+                    android:layout_gravity="center"
+                    android:padding="8dp"
+                    android:text="ลบรูปภาพ"
+                    android:textColor="@color/red"
+                    android:visibility="gone"
+                    android:background="?attr/selectableItemBackground"/>
+
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <!-- Transaction Type Card -->

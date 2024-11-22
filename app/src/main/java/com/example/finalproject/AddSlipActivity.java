@@ -9,14 +9,15 @@ import static com.example.finalproject.Constants.DESCRIPTION;
 import static com.example.finalproject.Constants.DATE;
 import static com.example.finalproject.Constants.TIME;
 import static com.example.finalproject.Constants.RECEIVER;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -32,6 +33,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -78,6 +80,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     private EventsData events;
     private EditText descriptionEditText;
     private Uri image_uri;
+    private TextView removeImageButton;
 
     private SlipProcessor slipProcessor;
     private Bitmap currentBitmap;
@@ -87,7 +90,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
     Calendar myCalendar = Calendar.getInstance();
 
-    private ImageButton galleryButton;
+    private ImageView galleryButton;
 
     private void checkAndRequestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -253,23 +256,26 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         return true;
     }
 
-    ActivityResultLauncher<Intent> activityResultLauncher3 = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        try {
-                            Uri uri = data.getData();
-                            currentBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                            galleryButton.setImageBitmap(currentBitmap);
+    private final ActivityResultLauncher<Intent> activityResultLauncher3 = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    try {
+                        Uri uri = result.getData().getData();
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
-                            processSlipImage();
+                        // ปรับขนาดรูปภาพ
+                        currentBitmap = getResizedBitmap(bitmap);
 
-                        } catch (Exception e) {
-                            Log.e("Log", "Error processing image: " + e.getMessage());
-                        }
+                        // อัพเดทการแสดงผล
+                        updateImageView();
+
+                        // ประมวลผลสลิป
+                        processSlipImage();
+
+                    } catch (Exception e) {
+                        Log.e("AddSlipActivity", "Error loading image: " + e.getMessage());
+                        Toast.makeText(this, "ไม่สามารถโหลดรูปภาพได้", Toast.LENGTH_SHORT).show();
+                        resetImageView();
                     }
                 }
             });
@@ -283,7 +289,16 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         galleryButton = findViewById(R.id.gallery_btn);
-        galleryButton.setOnClickListener(v -> checkAndRequestPermissions());
+        removeImageButton = findViewById(R.id.remove_image);
+
+        galleryButton.setOnClickListener(v -> {
+            checkAndRequestPermissions();
+        });
+
+        removeImageButton.setOnClickListener(v -> {
+            currentBitmap = null;
+            resetImageView();
+        });
 
         // ในเมธอด onCreate ของ AddSlipActivity
         spinner = findViewById(R.id.type_spinner);
@@ -401,6 +416,42 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+    }
+
+    private void updateImageView() {
+        if (currentBitmap != null) {
+            galleryButton.setImageBitmap(currentBitmap);
+            galleryButton.setBackgroundResource(0);
+            removeImageButton.setVisibility(View.VISIBLE);
+        } else {
+            resetImageView();
+        }
+    }
+
+    private void resetImageView() {
+        galleryButton.setImageResource(R.drawable.ic_upload_image);
+        galleryButton.setBackgroundResource(0);
+        removeImageButton.setVisibility(View.GONE);
+    }
+
+    private Bitmap getResizedBitmap(Bitmap bitmap) {
+        int maxWidth = Resources.getSystem().getDisplayMetrics().widthPixels - 64; // หักค่า padding
+        int maxHeight = maxWidth; // กำหนดความสูงสูงสุดเท่ากับความกว้าง
+
+        float scale = Math.min(
+                (float) maxWidth / bitmap.getWidth(),
+                (float) maxHeight / bitmap.getHeight());
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scale, scale);
+
+        return Bitmap.createBitmap(
+                bitmap,
+                0, 0,
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                matrix,
+                true);
     }
 
     @Override
