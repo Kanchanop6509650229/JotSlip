@@ -1,0 +1,21 @@
+<resources>
+    <!-- Margins -->
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_horizontal">20dp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="card_elevation_low">4dp</dimen>
+    <dimen name="card_elevation_high">8dp</dimen>
+    <dimen name="card_elevation_very_high">16dp</dimen>
+
+    <!-- Heights -->
+    <dimen name="padding_bottom_extra">80dp</dimen>
+    <dimen name="chart_height">220dp</dimen>
+
+    <!-- Paddings -->
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+</resources>

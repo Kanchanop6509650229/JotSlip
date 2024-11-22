@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:paddingBottom="80dp"
+            android:paddingBottom="@dimen/padding_bottom_extra"
             android:clipToPadding="false"
             tools:context=".HistoryActivity">
 
@@ -32,11 +32,11 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp">
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/margin_large"
+                    app:cardElevation="@dimen/card_elevation_high">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -49,7 +49,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/margin_medium"
                             android:text="@string/totalText"
                             android:textColor="@color/white"
                             android:textSize="18sp" />
@@ -59,8 +59,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:layout_marginBottom="@dimen/margin_medium"
                             android:text="@string/totalRemain"
                             android:textColor="@color/white"
                             android:textSize="36sp"
@@ -72,27 +72,27 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="24dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginHorizontal="@dimen/margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardCornerRadius="@dimen/margin_large"
+                    app:cardElevation="@dimen/card_elevation_low">
 
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/bar_chart"
                         android:layout_width="match_parent"
-                        android:layout_height="220dp"
-                        android:layout_margin="16dp" />
+                        android:layout_height="@dimen/chart_height"
+                        android:layout_margin="@dimen/padding_medium" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Categories Section -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/margin_large"
+                    app:cardElevation="@dimen/card_elevation_low">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -102,7 +102,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/ListHeader"
@@ -135,9 +135,9 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_margin="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/margin_large"
+                    app:cardElevation="@dimen/card_elevation_low">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -147,7 +147,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/LastestHeader"
@@ -178,110 +178,4 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- Bottom Navigation -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:cardElevation="16dp">
-
-        <LinearLayout
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
-
-            <!-- Home Button -->
-            <FrameLayout
-                android:id="@+id/nav_home"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@+id/home_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home"
-                        app:tint="@color/green_500" />
-
-                    <TextView
-                        android:id="@+id/home_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ภาพรวม"
-                        android:textColor="@color/green_500" />
-                </LinearLayout>
-            </FrameLayout>
-
-            <!-- Add Button -->
-            <FrameLayout
-                android:id="@+id/nav_add"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageButton
-                    android:id="@+id/add_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/ic_add_background"
-                    android:clickable="true"
-                    android:focusable="true" />
-            </FrameLayout>
-
-            <!-- History Button -->
-            <FrameLayout
-                android:id="@+id/nav_history"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@android:id/icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_history"
-                        app:tint="@color/gray" />
-
-                    <TextView
-                        android:id="@android:id/text1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ประวัติ"
-                        android:textColor="@color/gray" />
-                </LinearLayout>
-            </FrameLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
