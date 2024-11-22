@@ -27,4 +27,6 @@
     <string name="seeAllText">ดูทั้งหมด</string>
     <string name="LastestHeader">ธุรกรรมล่าสุด</string>
     <string name="or">หรือ</string>
+    <string name="home_text">ภาพรวม</string>
+    <string name="history">ประวัติ</string>
 </resources>

@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:paddingBottom="@dimen/padding_bottom_extra"
+            android:paddingBottom="@dimen/bottom_padding"
             android:clipToPadding="false"
             tools:context=".HistoryActivity">
 
@@ -32,11 +32,11 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_medium"
-                    android:layout_marginStart="@dimen/margin_medium"
-                    android:layout_marginEnd="@dimen/margin_medium"
-                    app:cardCornerRadius="@dimen/margin_large"
-                    app:cardElevation="@dimen/card_elevation_high">
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation"
+                    android:layout_marginTop="@dimen/padding_medium"
+                    android:layout_marginStart="@dimen/padding_medium"
+                    android:layout_marginEnd="@dimen/padding_medium">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -63,7 +63,7 @@
                             android:layout_marginBottom="@dimen/margin_medium"
                             android:text="@string/totalRemain"
                             android:textColor="@color/white"
-                            android:textSize="36sp"
+                            android:textSize="@dimen/text_size_large"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -74,14 +74,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/margin_horizontal"
                     android:layout_marginTop="@dimen/margin_large"
-                    app:cardCornerRadius="@dimen/margin_large"
-                    app:cardElevation="@dimen/card_elevation_low">
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
 
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/bar_chart"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/chart_height"
-                        android:layout_margin="@dimen/padding_medium" />
+                        android:layout_height="@dimen/bar_chart_height"
+                        android:layout_margin="@dimen/margin_medium" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Categories Section -->
@@ -91,8 +91,8 @@
                     android:layout_marginTop="@dimen/margin_medium"
                     android:layout_marginStart="@dimen/margin_medium"
                     android:layout_marginEnd="@dimen/margin_medium"
-                    app:cardCornerRadius="@dimen/margin_large"
-                    app:cardElevation="@dimen/card_elevation_low">
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -106,11 +106,11 @@
 
                             <TextView
                                 android:id="@+id/ListHeader"
-                                android:layout_width="0dp"
+                                android:layout_width="@dimen/width"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@string/ListHeader"
-                                android:textSize="18sp"
+                                android:textSize="@dimen/text_size_medium"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -136,8 +136,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin_medium"
-                    app:cardCornerRadius="@dimen/margin_large"
-                    app:cardElevation="@dimen/card_elevation_low">
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -151,11 +151,11 @@
 
                             <TextView
                                 android:id="@+id/LastestHeader"
-                                android:layout_width="0dp"
+                                android:layout_width="@dimen/width"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@string/LastestHeader"
-                                android:textSize="18sp"
+                                android:textSize="@dimen/text_size_medium"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -178,4 +178,110 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Bottom Navigation -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:cardElevation="@dimen/card_elevation_medium">
+
+        <LinearLayout
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+
+            <!-- Home Button -->
+            <FrameLayout
+                android:id="@+id/nav_home"
+                android:layout_width="@dimen/width"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/home_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_home"
+                        app:tint="@color/green_500" />
+
+                    <TextView
+                        android:id="@+id/home_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/home_text"
+                        android:textColor="@color/green_500" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Add Button -->
+            <FrameLayout
+                android:id="@+id/nav_add"
+                android:layout_width="@dimen/width"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageButton
+                    android:id="@+id/add_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_add_background"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </FrameLayout>
+
+            <!-- History Button -->
+            <FrameLayout
+                android:id="@+id/nav_history"
+                android:layout_width="@dimen/width"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@android:id/icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_history"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@android:id/text1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/history"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

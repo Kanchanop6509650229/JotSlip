@@ -27,4 +27,6 @@
     <string name="seeAllText">View All</string>
     <string name="LastestHeader">Latest Transactions</string>
     <string name="or">or</string>
+    <string name="home_text">Overview</string>
+    <string name="history">History</string>
 </resources>
