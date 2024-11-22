@@ -35,7 +35,7 @@
             android:screenOrientation="portrait"
             android:exported="false"/>
         <activity
-            android:theme="@style/Theme.AppCompat.Light"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:name=".CategoryActivity"
             android:screenOrientation="portrait"
             android:exported="false"/>
