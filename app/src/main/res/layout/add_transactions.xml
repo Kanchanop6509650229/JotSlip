@@ -134,7 +134,7 @@
                     android:id="@+id/thb_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/thb"
+                    android:src="@mipmap/thaibath"
                     android:tint="@color/green_500" />
 
                 <EditText
@@ -181,7 +181,7 @@
                     android:id="@+id/question_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/question"
+                    android:src="@mipmap/category"
                     android:tint="@color/green_500" />
 
                 <Spinner
@@ -213,7 +213,7 @@
                     android:id="@+id/description_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/text"
+                    android:src="@mipmap/detail"
                     android:tint="@color/green_500" />
 
                 <EditText
@@ -260,7 +260,7 @@
                     android:id="@+id/calendar_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/calendar"
+                    android:src="@mipmap/calendar2"
                     android:tint="@color/green_500" />
 
                 <Button
@@ -309,7 +309,7 @@
                     android:id="@+id/time_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/calendar"
+                    android:src="@mipmap/clock"
                     android:tint="@color/green_500" />
 
                 <Button
@@ -358,7 +358,7 @@
                     android:id="@+id/imageView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/people"
+                    android:src="@mipmap/people1"
                     android:tint="@color/green_500" />
 
                 <EditText
