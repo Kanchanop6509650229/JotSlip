@@ -18,6 +18,9 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -227,22 +230,65 @@ public class HistoryActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
+        // ทำให้พื้นหลัง dialog โปร่งใส
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
         dialog.show();
 
         Button btnExportCsv = dialogView.findViewById(R.id.btnExportCsv);
         Button btnExportImage = dialogView.findViewById(R.id.btnExportImage);
 
+        // Set drawables tint to white
+        if (btnExportCsv.getCompoundDrawables()[0] != null) {
+            Drawable csvDrawable = btnExportCsv.getCompoundDrawables()[0].mutate();
+            csvDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+            btnExportCsv.setCompoundDrawables(csvDrawable, null, null, null);
+        }
+
+        if (btnExportImage.getCompoundDrawables()[0] != null) {
+            Drawable imgDrawable = btnExportImage.getCompoundDrawables()[0].mutate();
+            imgDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+            btnExportImage.setCompoundDrawables(imgDrawable, null, null, null);
+        }
+
         btnExportCsv.setOnClickListener(v -> {
             if (checkPermissionAndExport()) {
-                exportDataToCsv();
-                dialog.dismiss();
+                // Add click animation
+                v.animate()
+                        .scaleX(0.95f)
+                        .scaleY(0.95f)
+                        .setDuration(100)
+                        .withEndAction(() -> {
+                            v.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start();
+                            exportDataToCsv();
+                            dialog.dismiss();
+                        })
+                        .start();
             }
         });
 
         btnExportImage.setOnClickListener(v -> {
             if (checkPermissionAndExport()) {
-                exportDataToImage();
-                dialog.dismiss();
+                // Add click animation
+                v.animate()
+                        .scaleX(0.95f)
+                        .scaleY(0.95f)
+                        .setDuration(100)
+                        .withEndAction(() -> {
+                            v.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start();
+                            exportDataToImage();
+                            dialog.dismiss();
+                        })
+                        .start();
             }
         });
     }
