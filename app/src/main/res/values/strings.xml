@@ -27,4 +27,11 @@
     <string name="seeAllText">ดูทั้งหมด</string>
     <string name="LastestHeader">ธุรกรรมล่าสุด</string>
     <string name="or">หรือ</string>
+    <string name="home_text">ภาพรวม</string>
+    <string name="history">ประวัติ</string>
+    <string name="transaction_type">ประเภทธุรกรรม</string>
+    <string name="amount">จำนวนเงิน</string>
+    <string name="description">รายละเอียด</string>
+    <string name="recevier">ผู้รับ</string>
+    <string name="submit">ยืนยัน</string>
 </resources>

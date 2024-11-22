@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:paddingBottom="80dp"
+            android:paddingBottom="@dimen/bottom_padding"
             android:clipToPadding="false"
             tools:context=".HistoryActivity">
 
@@ -32,11 +32,11 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp">
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation"
+                    android:layout_marginTop="@dimen/padding_medium"
+                    android:layout_marginStart="@dimen/padding_medium"
+                    android:layout_marginEnd="@dimen/padding_medium">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -49,7 +49,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="@dimen/margin_medium"
                             android:text="@string/totalText"
                             android:textColor="@color/white"
                             android:textSize="18sp" />
@@ -59,11 +59,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:layout_marginBottom="@dimen/margin_medium"
                             android:text="@string/totalRemain"
                             android:textColor="@color/white"
-                            android:textSize="36sp"
+                            android:textSize="@dimen/text_size_large"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -72,27 +72,27 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="24dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginHorizontal="@dimen/margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
 
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/bar_chart"
                         android:layout_width="match_parent"
-                        android:layout_height="220dp"
-                        android:layout_margin="16dp" />
+                        android:layout_height="@dimen/bar_chart_height"
+                        android:layout_margin="@dimen/margin_medium" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Categories Section -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -102,15 +102,15 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/ListHeader"
-                                android:layout_width="0dp"
+                                android:layout_width="@dimen/width"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@string/ListHeader"
-                                android:textSize="18sp"
+                                android:textSize="@dimen/text_size_medium"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -135,9 +135,9 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_margin="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -147,15 +147,15 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/LastestHeader"
-                                android:layout_width="0dp"
+                                android:layout_width="@dimen/width"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@string/LastestHeader"
-                                android:textSize="18sp"
+                                android:textSize="@dimen/text_size_medium"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -184,7 +184,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:cardElevation="16dp">
+        app:cardElevation="@dimen/card_elevation_medium">
 
         <LinearLayout
             android:id="@+id/bottom_navigation"
@@ -197,7 +197,7 @@
             <!-- Home Button -->
             <FrameLayout
                 android:id="@+id/nav_home"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -210,7 +210,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/padding_medium">
 
                     <ImageView
                         android:id="@+id/home_icon"
@@ -223,8 +223,8 @@
                         android:id="@+id/home_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ภาพรวม"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/home_text"
                         android:textColor="@color/green_500" />
                 </LinearLayout>
             </FrameLayout>
@@ -232,7 +232,7 @@
             <!-- Add Button -->
             <FrameLayout
                 android:id="@+id/nav_add"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground">
@@ -250,7 +250,7 @@
             <!-- History Button -->
             <FrameLayout
                 android:id="@+id/nav_history"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -263,7 +263,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/padding_medium">
 
                     <ImageView
                         android:id="@android:id/icon"
@@ -276,8 +276,8 @@
                         android:id="@android:id/text1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ประวัติ"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/history"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
