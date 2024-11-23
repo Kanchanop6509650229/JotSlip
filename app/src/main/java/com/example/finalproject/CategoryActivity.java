@@ -239,6 +239,7 @@ public class CategoryActivity extends AppCompatActivity {
                 updateDisplayTexts();
                 updateChartData();
                 updateCategoryData();
+                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -250,6 +251,7 @@ public class CategoryActivity extends AppCompatActivity {
                 updateDisplayTexts();
                 updateChartData();
                 updateCategoryData();
+                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -267,6 +269,7 @@ public class CategoryActivity extends AppCompatActivity {
             updateDisplayTexts();
             updateChartData();
             updateCategoryData();
+            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
 
         findViewById(R.id.nextMonth).setOnClickListener(v -> {
@@ -283,6 +286,7 @@ public class CategoryActivity extends AppCompatActivity {
             updateDisplayTexts();
             updateChartData();
             updateCategoryData();
+            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
     }
 
@@ -541,23 +545,39 @@ public class CategoryActivity extends AppCompatActivity {
         Cursor cursor = getEvents();
         Map<String, Float> categoryExpenses = new HashMap<>();
         float totalExpense = 0f;
-
         if (cursor != null && cursor.moveToFirst()) {
             do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
-
-                if (type != 1) { // Only count expenses
-                    float currentValue = categoryExpenses.getOrDefault(category, 0f);
-                    categoryExpenses.put(category, currentValue + money);
-                    totalExpense += money;
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+                try {
+                    String[] dateParts = dateStr.split("/");
+                    int day = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]);
+                    int year = Integer.parseInt(dateParts[2]);
+                    if (month == selectedMonth + 1 && year == selectedYear) {
+                        if (type != 1) { // Assuming type != 1 signifies an expense
+                            float currentValue = categoryExpenses.getOrDefault(category, 0f);
+                            float newValue = currentValue + money;
+                            categoryExpenses.put(category, newValue);
+                            totalExpense += money;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
                 }
             } while (cursor.moveToNext());
             cursor.close();
-
+            // Update chart with category data
             updateChartWithData(categoryExpenses, totalExpense);
         } else {
+            // Show empty chart
             chart.setData(null);
             chart.setCenterText("ไม่มีข้อมูลในเดือนนี้");
             chart.invalidate();
