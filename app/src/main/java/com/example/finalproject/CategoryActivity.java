@@ -239,7 +239,6 @@ public class CategoryActivity extends AppCompatActivity {
                 updateDisplayTexts();
                 updateChartData();
                 updateCategoryData();
-                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -251,7 +250,6 @@ public class CategoryActivity extends AppCompatActivity {
                 updateDisplayTexts();
                 updateChartData();
                 updateCategoryData();
-                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -269,7 +267,6 @@ public class CategoryActivity extends AppCompatActivity {
             updateDisplayTexts();
             updateChartData();
             updateCategoryData();
-            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
 
         findViewById(R.id.nextMonth).setOnClickListener(v -> {
@@ -286,7 +283,6 @@ public class CategoryActivity extends AppCompatActivity {
             updateDisplayTexts();
             updateChartData();
             updateCategoryData();
-            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
     }
 

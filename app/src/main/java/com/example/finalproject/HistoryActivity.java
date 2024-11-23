@@ -564,7 +564,6 @@ public class HistoryActivity extends AppCompatActivity {
                 selectedMonth = findLatestMonthWithData(selectedYear);
                 updateDisplayTexts();
                 updateChartData();
-                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -575,7 +574,6 @@ public class HistoryActivity extends AppCompatActivity {
                 selectedMonth = findEarliestMonthWithData(selectedYear);
                 updateDisplayTexts();
                 updateChartData();
-                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -592,7 +590,6 @@ public class HistoryActivity extends AppCompatActivity {
             }
             updateDisplayTexts();
             updateChartData();
-            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
 
         findViewById(R.id.nextMonth).setOnClickListener(v -> {
@@ -608,7 +605,6 @@ public class HistoryActivity extends AppCompatActivity {
             }
             updateDisplayTexts();
             updateChartData();
-            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
     }
 
@@ -1171,8 +1167,6 @@ public class HistoryActivity extends AppCompatActivity {
         // ใช้การเปรียบเทียบวันที่โดยตรง
         String selection = "date BETWEEN ? AND ?";
         String[] selectionArgs = { startDay, endDay };
-
-        Log.d("MainActivity", "Querying for dates between: " + startDay + " and " + endDay);
 
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, ORDER_BY);
     }
