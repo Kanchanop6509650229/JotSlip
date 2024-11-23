@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             } while (cursor.moveToNext());
 
-            CategoryAdapter adapter = new CategoryAdapter(slipList);
+            CategoryAdapter adapter = new CategoryAdapter(slipList, true);
             categoryRecyclerView.setAdapter(adapter);
 
             cursor.close();

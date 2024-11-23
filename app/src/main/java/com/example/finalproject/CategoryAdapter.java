@@ -23,9 +23,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     private List<TransferSlip> dataSet;
     private List<CategoryGroup> groupedData;
     private MyClickListener mCallback;
+    private boolean isInMainActivity;
 
-    public CategoryAdapter(List<TransferSlip> myDataSet) {
+    public CategoryAdapter(List<TransferSlip> myDataSet, boolean isInMainActivity) {
         this.dataSet = myDataSet != null ? myDataSet : new ArrayList<>();
+        this.isInMainActivity = isInMainActivity;
         groupSlipsByCategory();
     }
 
@@ -87,11 +89,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         double percentage = (group.getTotalAmount() / totalExpense) * 100;
         holder.transactionPercent.setText(String.format("%.1f%%", percentage));
 
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), CategoryActivity.class);
-            Bundle options = ActivityOptions.makeSceneTransitionAnimation((MainActivity) v.getContext()).toBundle();
-            v.getContext().startActivity(intent, options);
-        });
+        // Only set click listener if in MainActivity
+        if (isInMainActivity) {
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), CategoryActivity.class);
+                Bundle options = ActivityOptions.makeSceneTransitionAnimation((MainActivity) v.getContext()).toBundle();
+                v.getContext().startActivity(intent, options);
+            });
+        }
     }
 
     private int getCategoryIcon(String category) {

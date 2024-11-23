@@ -192,6 +192,22 @@ public class CategoryActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshData() {
+        // Clear existing data
+        if (chart != null) {
+            chart.clear();
+        }
+
+        // Update all data
+        updateChartData();
+        updateCategoryData();
+
+        // Force redraw
+        if (chart != null) {
+            chart.invalidate();
+        }
+    }
+
     private void setupNavigation() {
         Calendar calendar = Calendar.getInstance();
         selectedMonth = calendar.get(Calendar.MONTH);
@@ -210,8 +226,7 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedYear = newYear;
                 selectedMonth = findLatestMonthWithData(selectedYear);
                 updateDisplayTexts();
-                updateChartData();
-                updateCategoryData();
+                refreshData();
             }
         });
 
@@ -221,8 +236,7 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedYear = newYear;
                 selectedMonth = findEarliestMonthWithData(selectedYear);
                 updateDisplayTexts();
-                updateChartData();
-                updateCategoryData();
+                refreshData();
             }
         });
 
@@ -238,8 +252,7 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedMonth = newMonth;
             }
             updateDisplayTexts();
-            updateChartData();
-            updateCategoryData();
+            refreshData();
         });
 
         findViewById(R.id.nextMonth).setOnClickListener(v -> {
@@ -254,8 +267,7 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedMonth = newMonth;
             }
             updateDisplayTexts();
-            updateChartData();
-            updateCategoryData();
+            refreshData();
         });
     }
 
@@ -591,7 +603,7 @@ public class CategoryActivity extends AppCompatActivity {
                 }
             } while (cursor.moveToNext());
 
-            CategoryAdapter adapter = new CategoryAdapter(slipList);
+            CategoryAdapter adapter = new CategoryAdapter(slipList, false);
             categoryRecyclerView.setAdapter(adapter);
 
             cursor.close();
