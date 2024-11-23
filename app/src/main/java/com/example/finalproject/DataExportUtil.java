@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -22,10 +23,10 @@ import java.util.Map;
 public class DataExportUtil {
 
     public static void exportHistoryData(Context context, String month, String year,
-                                         double totalIncome, double totalExpense,
-                                         List<TransferSlip> transactions,
-                                         LineChart lineChart,
-                                         Map<String, Double> dailyBalances) {
+                                       double totalIncome, double totalExpense,
+                                       List<TransferSlip> transactions,
+                                       LineChart lineChart,
+                                       Map<String, Double> dailyBalances) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String timestamp = dateFormat.format(new Date());
         String baseFileName = String.format("history_export_%s_%s_%s", month, year, timestamp);
@@ -83,8 +84,8 @@ public class DataExportUtil {
     }
 
     public static void exportCategoryData(Context context, String month, String year,
-                                          double totalExpense, Map<String, Double> categoryExpenses,
-                                          PieChart pieChart) {
+                                        double totalExpense, Map<String, Double> categoryExpenses,
+                                        PieChart pieChart) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String timestamp = dateFormat.format(new Date());
         String baseFileName = String.format("category_export_%s_%s_%s", month, year, timestamp);
@@ -123,10 +124,25 @@ public class DataExportUtil {
     }
 
     private static void saveChartAsImage(com.github.mikephil.charting.charts.Chart chart, File file) throws IOException {
-        Bitmap bitmap = chart.getChartBitmap();
-        FileOutputStream fos = new FileOutputStream(file);
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        fos.close();
+        // Store original dimensions
+        ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
+        int originalWidth = chart.getWidth();
+        int originalHeight = chart.getHeight();
+
+        try {
+            // Create bitmap and save
+            Bitmap bitmap = chart.getChartBitmap();
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.close();
+        } finally {
+            // Restore original dimensions
+            if (originalParams != null) {
+                originalParams.width = originalWidth;
+                originalParams.height = originalHeight;
+                chart.setLayoutParams(originalParams);
+                chart.requestLayout();
+            }
+        }
     }
 }
-

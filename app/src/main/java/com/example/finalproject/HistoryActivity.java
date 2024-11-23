@@ -31,6 +31,7 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -337,75 +338,102 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void exportDataToImage() {
+        // เก็บขนาดเดิมของกราฟ
+        final ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
+        final int originalWidth = chart.getWidth();
+        final int originalHeight = chart.getHeight();
+
+        Map<String, Double> dailyBalances = new LinkedHashMap<>();
         double totalIncome = Double.parseDouble(income.getText().toString().replace(" ฿", ""));
         double totalExpense = Double.parseDouble(outcome.getText().toString().replace(" ฿", ""));
 
-        Map<String, Double> dailyBalances = new LinkedHashMap<>();
-        if (chart.getLineData() != null && !chart.getLineData().getDataSets().isEmpty()) {
-            ILineDataSet dataSet = chart.getLineData().getDataSets().get(0);
-            for (int i = 0; i < dataSet.getEntryCount(); i++) {
-                Entry entry = dataSet.getEntryForIndex(i);
-                String date = String.format("%02d/%02d/%d",
-                        (int) entry.getX(),
-                        selectedMonth + 1,
-                        selectedYear);
-                dailyBalances.put(date, (double) entry.getY());
-            }
-        }
-
-        Bitmap summaryImage = SummaryImageGenerator.generateHistorySummaryImage(
-                this,
-                monthText.getText().toString(),
-                yearText.getText().toString(),
-                totalIncome,
-                totalExpense,
-                chart,
-                dailyBalances);
-
-        // บันทึกไฟล์รูปภาพ
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                .format(new Date());
-        String fileName = String.format("history_summary_%s_%s_%s.jpg",
-                monthText.getText(), yearText.getText(), timestamp);
-
-        // บันทึกรูปภาพลงใน Gallery
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-            values.put(MediaStore.Images.Media.IS_PENDING, 1);
-        }
-
-        ContentResolver resolver = getContentResolver();
-        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
         try {
-            if (imageUri != null) {
-                try (OutputStream out = resolver.openOutputStream(imageUri)) {
-                    if (out != null) {
-                        summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            // คำนวณขนาดกราฟที่ต้องการ (ให้เต็มพื้นที่การ์ด)
+            int desiredWidth = chart.getWidth();
+            int desiredHeight = 250; // หรือขนาดที่ต้องการ
+
+            // กำหนดขนาดกราฟใหม่
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    desiredWidth,
+                    desiredHeight);
+            chart.setLayoutParams(params);
+
+            if (chart.getLineData() != null && !chart.getLineData().getDataSets().isEmpty()) {
+                ILineDataSet dataSet = chart.getLineData().getDataSets().get(0);
+                for (int i = 0; i < dataSet.getEntryCount(); i++) {
+                    Entry entry = dataSet.getEntryForIndex(i);
+                    String date = String.format("%02d/%02d/%d",
+                            (int) entry.getX(),
+                            selectedMonth + 1,
+                            selectedYear);
+                    dailyBalances.put(date, (double) entry.getY());
+                }
+            }
+
+            Bitmap summaryImage = SummaryImageGenerator.generateHistorySummaryImage(
+                    this,
+                    monthText.getText().toString(),
+                    yearText.getText().toString(),
+                    totalIncome,
+                    totalExpense,
+                    chart,
+                    dailyBalances);
+
+            // บันทึกไฟล์รูปภาพ
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                    .format(new Date());
+            String fileName = String.format("history_summary_%s_%s_%s.jpg",
+                    monthText.getText(), yearText.getText(), timestamp);
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            }
+
+            ContentResolver resolver = getContentResolver();
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            try {
+                if (imageUri != null) {
+                    try (OutputStream out = resolver.openOutputStream(imageUri)) {
+                        if (out != null) {
+                            summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        }
                     }
-                }
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    values.clear();
-                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
-                    resolver.update(imageUri, values, null, null);
-                }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        values.clear();
+                        values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                        resolver.update(imageUri, values, null, null);
+                    }
 
-                Toast.makeText(this,
-                        "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
-                        Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,
+                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
+                            Toast.LENGTH_LONG).show();
+                }
+            } catch (IOException e) {
+                if (imageUri != null) {
+                    resolver.delete(imageUri, null, null);
+                }
+                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+                Log.e("HistoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
-        } catch (IOException e) {
-            // ในกรณีที่เกิดข้อผิดพลาด ให้ลบไฟล์ที่ค้างอยู่
-            if (imageUri != null) {
-                resolver.delete(imageUri, null, null);
-            }
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
-            Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
+        } finally {
+            // คืนค่าขนาดกราฟกลับเป็นขนาดเดิม
+            chart.setLayoutParams(originalParams);
+            chart.getLayoutParams().width = originalWidth;
+            chart.getLayoutParams().height = originalHeight;
+
+            // บังคับให้วาดใหม่
+            chart.requestLayout();
+            chart.invalidate();
+
+            // เรียก updateChartData เพื่ออัพเดทข้อมูลและการแสดงผลใหม่
+            updateChartData();
         }
     }
 

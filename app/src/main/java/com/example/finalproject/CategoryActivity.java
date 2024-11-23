@@ -31,6 +31,7 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -192,22 +193,6 @@ public class CategoryActivity extends AppCompatActivity {
         });
     }
 
-    private void refreshData() {
-        // Clear existing data
-        if (chart != null) {
-            chart.clear();
-        }
-
-        // Update all data
-        updateChartData();
-        updateCategoryData();
-
-        // Force redraw
-        if (chart != null) {
-            chart.invalidate();
-        }
-    }
-
     private void setupNavigation() {
         Calendar calendar = Calendar.getInstance();
         selectedMonth = calendar.get(Calendar.MONTH);
@@ -226,7 +211,8 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedYear = newYear;
                 selectedMonth = findLatestMonthWithData(selectedYear);
                 updateDisplayTexts();
-                refreshData();
+                updateChartData();
+                updateCategoryData();
             }
         });
 
@@ -236,7 +222,8 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedYear = newYear;
                 selectedMonth = findEarliestMonthWithData(selectedYear);
                 updateDisplayTexts();
-                refreshData();
+                updateChartData();
+                updateCategoryData();
             }
         });
 
@@ -252,7 +239,8 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedMonth = newMonth;
             }
             updateDisplayTexts();
-            refreshData();
+            updateChartData();
+            updateCategoryData();
         });
 
         findViewById(R.id.nextMonth).setOnClickListener(v -> {
@@ -267,7 +255,8 @@ public class CategoryActivity extends AppCompatActivity {
                 selectedMonth = newMonth;
             }
             updateDisplayTexts();
-            refreshData();
+            updateChartData();
+            updateCategoryData();
         });
     }
 
@@ -376,60 +365,87 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void exportDataToImage() {
+        // เก็บขนาดเดิมของกราฟ
+        final ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
+        final int originalWidth = chart.getWidth();
+        final int originalHeight = chart.getHeight();
+
         Map<String, Double> categoryExpenses = getCategoryExpenses();
         double totalExpense = calculateTotalExpense();
 
-        Bitmap summaryImage = SummaryImageGenerator.generateCategorySummaryImage(
-                this,
-                monthText.getText().toString(),
-                yearText.getText().toString(),
-                totalExpense,
-                chart,
-                categoryExpenses);
-
-        // บันทึกไฟล์รูปภาพ
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String fileName = String.format("category_summary_%s_%s_%s.jpg",
-                monthText.getText(), yearText.getText(), timestamp);
-
-        // บันทึกรูปภาพลงใน Gallery
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-            values.put(MediaStore.Images.Media.IS_PENDING, 1);
-        }
-
-        ContentResolver resolver = getContentResolver();
-        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
         try {
-            if (imageUri != null) {
-                try (OutputStream out = resolver.openOutputStream(imageUri)) {
-                    if (out != null) {
-                        summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            // คำนวณขนาดกราฟที่ต้องการ
+            int desiredWidth = chart.getWidth();
+            int desiredHeight = 300; // หรือขนาดที่ต้องการ
+
+            // กำหนดขนาดกราฟใหม่
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    desiredWidth,
+                    desiredHeight);
+            chart.setLayoutParams(params);
+
+            Bitmap summaryImage = SummaryImageGenerator.generateCategorySummaryImage(
+                    this,
+                    monthText.getText().toString(),
+                    yearText.getText().toString(),
+                    totalExpense,
+                    chart,
+                    categoryExpenses);
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                    .format(new Date());
+            String fileName = String.format("category_summary_%s_%s_%s.jpg",
+                    monthText.getText(), yearText.getText(), timestamp);
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            }
+
+            ContentResolver resolver = getContentResolver();
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            try {
+                if (imageUri != null) {
+                    try (OutputStream out = resolver.openOutputStream(imageUri)) {
+                        if (out != null) {
+                            summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        }
                     }
-                }
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    values.clear();
-                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
-                    resolver.update(imageUri, values, null, null);
-                }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        values.clear();
+                        values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                        resolver.update(imageUri, values, null, null);
+                    }
 
-                Toast.makeText(this,
-                        "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
-                        Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,
+                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
+                            Toast.LENGTH_LONG).show();
+                }
+            } catch (IOException e) {
+                if (imageUri != null) {
+                    resolver.delete(imageUri, null, null);
+                }
+                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+                Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
-        } catch (IOException e) {
-            // ในกรณีที่เกิดข้อผิดพลาด ให้ลบไฟล์ที่ค้างอยู่
-            if (imageUri != null) {
-                resolver.delete(imageUri, null, null);
-            }
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
-            Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
+        } finally {
+            // คืนค่าขนาดกราฟกลับเป็นขนาดเดิม
+            chart.setLayoutParams(originalParams);
+            chart.getLayoutParams().width = originalWidth;
+            chart.getLayoutParams().height = originalHeight;
+
+            // บังคับให้วาดใหม่
+            chart.requestLayout();
+            chart.invalidate();
+
+            // เรียก updateChartData เพื่ออัพเดทข้อมูลและการแสดงผลใหม่
+            updateChartData();
         }
     }
 
