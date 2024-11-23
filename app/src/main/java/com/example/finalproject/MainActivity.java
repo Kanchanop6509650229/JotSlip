@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -24,11 +25,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,6 +73,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView seeAllTransaction;
     private TextView seeAllTransaction2;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View navCategory;
+    private ImageView categoryIcon;
+    private TextView categoryText;
+    private View navSettings;
+    private ImageView settingsIcon;
+    private TextView settingsText;
+
+    private static final String PREF_NAME = "AppSettings";
+    private static final String PREF_LANGUAGE = "language";
+    private static final String PREF_FONT_SIZE = "fontSize";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +166,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return false;
         });
 
+        navSettings = findViewById(R.id.nav_settings);
+        settingsIcon = findViewById(R.id.settings_icon);
+        settingsText = findViewById(R.id.settings_text);
+        settingsIcon.setColorFilter(getColor(R.color.gray));
+        settingsText.setTextColor(getColor(R.color.gray));
+
+        navSettings.setOnClickListener(v -> showSettingsDialog());
+
+        navCategory = findViewById(R.id.nav_category);
+        categoryIcon = findViewById(R.id.category_icon);
+        categoryText = findViewById(R.id.category_text);
+
+        navCategory.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CategoryActivity.class);
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, options);
+        });
+
         seeAllTransaction = findViewById(R.id.seeAllText);
         seeAllTransaction.setOnClickListener(this);
         seeAllTransaction2 = findViewById(R.id.seeAllText2);
@@ -184,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return false;
         });
 
-// ทำแบบเดียวกันสำหรับ home navigation
+        // ทำแบบเดียวกันสำหรับ home navigation
         homeNav = findViewById(R.id.nav_home);
         homeIcon = homeNav.findViewById(R.id.home_icon);
         homeText = homeNav.findViewById(R.id.home_text);
@@ -548,5 +580,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, orderBy);
     }
-}
 
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
+
+        resetDataCard.setOnClickListener(v -> {
+            dialog.dismiss();
+            showResetConfirmationDialog();
+        });
+
+        dialog.show();
+    }
+
+    private void showResetConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // สร้าง AlertDialog แบบกำหนดเอง
+        View dialogView = getLayoutInflater().inflate(R.layout.reset_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // ทำให้พื้นหลัง dialog โปร่งใส
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
+
+        // ตั้งค่าการทำงานของปุ่มใน dialog
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+
+        btnConfirm.setOnClickListener(v -> {
+            resetAllData();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    private void resetAllData() {
+        try {
+            // ลบข้อมูลในฐานข้อมูล
+            events = new EventsData(this);
+            SQLiteDatabase db = events.getWritableDatabase();
+            db.delete(TABLE_NAME, null, null);
+
+            // อัพเดทการแสดงผล
+            updateBarChartData();
+            updateCategoryData();
+            getRemainMoney();
+
+            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Log.e("MainActivity", "Error resetting data: " + e.getMessage());
+        }
+    }
+}

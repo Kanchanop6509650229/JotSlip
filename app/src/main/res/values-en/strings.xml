@@ -34,4 +34,13 @@
     <string name="description">Description</string>
     <string name="recevier">Recevier</string>
     <string name="submit">Submit</string>
+    <string name="settings">Settings</string>
+    <string name="language">Change Language</string>
+    <string name="font_size">Font Size</string>
+    <string name="reset_data">Reset All Data</string>
+    <string name="thai">Thai</string>
+    <string name="english">English</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_normal">Normal</string>
+    <string name="font_size_large">Large</string>
 </resources>

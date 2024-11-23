@@ -272,7 +272,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:cardElevation="16dp">
+        app:cardElevation="@dimen/card_elevation_medium">
 
         <LinearLayout
             android:id="@+id/bottom_navigation"
@@ -298,7 +298,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/padding_medium">
 
                     <ImageView
                         android:id="@+id/home_icon"
@@ -311,8 +311,43 @@
                         android:id="@+id/home_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ภาพรวม"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/home_text"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Category Button -->
+            <FrameLayout
+                android:id="@+id/nav_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/category_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_category"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/category_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="หมวดหมู่"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
@@ -351,7 +386,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/padding_medium">
 
                     <ImageView
                         android:id="@android:id/icon"
@@ -364,9 +399,44 @@
                         android:id="@android:id/text1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ประวัติ"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/history"
                         android:textColor="@color/green_500" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Settings Button -->
+            <FrameLayout
+                android:id="@+id/nav_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/settings_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_settings"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/settings_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="ตั้งค่า"
+                        android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>

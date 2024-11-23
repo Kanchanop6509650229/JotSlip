@@ -34,4 +34,13 @@
     <string name="description">รายละเอียด</string>
     <string name="recevier">ผู้รับ</string>
     <string name="submit">ยืนยัน</string>
+    <string name="settings">การตั้งค่า</string>
+    <string name="language">เปลี่ยนภาษา</string>
+    <string name="font_size">ขนาดตัวอักษร</string>
+    <string name="reset_data">รีเซ็ตข้อมูลทั้งหมด</string>
+    <string name="thai">ไทย</string>
+    <string name="english">English</string>
+    <string name="font_size_small">เล็ก</string>
+    <string name="font_size_normal">ปกติ</string>
+    <string name="font_size_large">ใหญ่</string>
 </resources>

@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -91,6 +93,12 @@ public class CategoryActivity extends AppCompatActivity {
     private ImageView homeIcon;
     private TextView homeText;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View navCategory;
+    private ImageView categoryIcon;
+    private TextView categoryText;
+    private View navSettings;
+    private ImageView settingsIcon;
+    private TextView settingsText;
     private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
 
@@ -125,6 +133,24 @@ public class CategoryActivity extends AppCompatActivity {
 
         exportButton = findViewById(R.id.exportButton);
         events = new EventsData(this);
+
+        navSettings = findViewById(R.id.nav_settings);
+        settingsIcon = findViewById(R.id.settings_icon);
+        settingsText = findViewById(R.id.settings_text);
+        settingsIcon.setColorFilter(getColor(R.color.gray));
+        settingsText.setTextColor(getColor(R.color.gray));
+
+        navSettings.setOnClickListener(v -> showSettingsDialog());
+
+        navCategory = findViewById(R.id.nav_category);
+        categoryIcon = findViewById(R.id.category_icon);
+        categoryText = findViewById(R.id.category_text);
+
+        navCategory.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CategoryActivity.class);
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, options);
+        });
 
         setupNavigationViews();
     }
@@ -850,5 +876,73 @@ public class CategoryActivity extends AppCompatActivity {
     private String formatNumber(float number) {
         DecimalFormat df = new DecimalFormat("###,###,###,###.##");
         return df.format(number);
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
+
+        resetDataCard.setOnClickListener(v -> {
+            dialog.dismiss();
+            showResetConfirmationDialog();
+        });
+
+        dialog.show();
+    }
+
+    private void showResetConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // สร้าง AlertDialog แบบกำหนดเอง
+        View dialogView = getLayoutInflater().inflate(R.layout.reset_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // ทำให้พื้นหลัง dialog โปร่งใส
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
+
+        // ตั้งค่าการทำงานของปุ่มใน dialog
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+
+        btnConfirm.setOnClickListener(v -> {
+            resetAllData();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    private void resetAllData() {
+        try {
+            // ลบข้อมูลในฐานข้อมูล
+            events = new EventsData(this);
+            SQLiteDatabase db = events.getWritableDatabase();
+            db.delete(TABLE_NAME, null, null);
+
+            // อัพเดทการแสดงผล
+            updateChartData();
+            updateCategoryData();
+            updateExpenseData();
+            updateDisplayTexts();
+
+            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Log.e("MainActivity", "Error resetting data: " + e.getMessage());
+        }
     }
 }
