@@ -484,17 +484,12 @@ public class CategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { TYPE, MONEY, DATE, CATEGORY };
 
-        // สร้างรูปแบบวันที่สำหรับการค้นหา
-        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(selectedYear - 543, selectedMonth, 1);
-        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
-
-        // ใช้การเปรียบเทียบวันที่โดยตรง และเลือกเฉพาะรายจ่าย (TYPE != 1)
-        String selection = "date BETWEEN ? AND ? AND type != 1";
-        String[] selectionArgs = { startDay, endDay };
+        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
+        String[] selectionArgs = { 
+            String.format("%02d", selectedMonth + 1), 
+            String.valueOf(selectedYear) 
+        };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
 
@@ -502,10 +497,7 @@ public class CategoryActivity extends AppCompatActivity {
             do {
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
-
-                // รวมยอดเงินตามหมวดหมู่
                 categoryExpenses.merge(category, money, Double::sum);
-
             } while (cursor.moveToNext());
             cursor.close();
         }
@@ -516,18 +508,14 @@ public class CategoryActivity extends AppCompatActivity {
     private double calculateTotalExpense() {
         double total = 0.0;
         SQLiteDatabase db = events.getReadableDatabase();
-        String[] FROM = { MONEY, DATE };
+        String[] FROM = { MONEY };
 
-        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(selectedYear - 543, selectedMonth, 1);
-        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
-
-        // เลือกเฉพาะรายจ่าย (TYPE != 1)
-        String selection = "date BETWEEN ? AND ? AND type != 1";
-        String[] selectionArgs = { startDay, endDay };
+        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
+        String[] selectionArgs = { 
+            String.format("%02d", selectedMonth + 1), 
+            String.valueOf(selectedYear) 
+        };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
 
