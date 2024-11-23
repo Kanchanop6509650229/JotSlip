@@ -626,7 +626,7 @@ public class HistoryActivity extends AppCompatActivity {
             return;
         }
 
-        // ถ้าไม่มีข้อมูลในเดือนปัจจุบัน หาเดือนที่ใกล้เคียงที่สุด
+        // ถ้าไม่มีข้อมูลในเ��ือนปัจจุบัน หาเดือนที่ใกล้เคียงที่สุด
         int closestMonth = currentMonth;
         int closestYear = currentYear;
         int minDistance = Integer.MAX_VALUE;
@@ -1201,6 +1201,14 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateChartData();
+        updateDisplayTexts();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateChartData();
+        updateDisplayTexts();
     }
 
     class DecimalDigitsInputFilter implements InputFilter {
@@ -1261,7 +1269,7 @@ public class HistoryActivity extends AppCompatActivity {
 
         dialog.show();
 
-        // ตั้งค่าการทำงานของปุ่มใน dialog
+        // ตั้งค่าการทำงานของปุ่มน dialog
         Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
 
@@ -1280,13 +1288,28 @@ public class HistoryActivity extends AppCompatActivity {
             SQLiteDatabase db = events.getWritableDatabase();
             db.delete(TABLE_NAME, null, null);
 
-            // อัพเดทการแสดงผล
+            // อีเซ็ตค่าเริ่มต้น
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH);
+            selectedYear = calendar.get(Calendar.YEAR) + 543;
+
+            // รีเซ็ตการแสดงผลข้อมูล
+            income.setText("0.00 ฿");
+            outcome.setText("0.00 ฿");
+            remainAmount.setText("0.00 ฿");
+            remainAmount.setTextColor(getColor(R.color.green_500));
+
+            // รีเซ็ต RecyclerView
+            recyclerView.setAdapter(new SlipAdapter(new ArrayList<>()));
+
+            // อัพเดทการแสดงผลทั้งหมด
+            updateDisplayTexts();
             updateChartData();
 
             Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
-            Log.e("MainActivity", "Error resetting data: " + e.getMessage());
+            Log.e("HistoryActivity", "Error resetting data: " + e.getMessage());
         }
     }
 }

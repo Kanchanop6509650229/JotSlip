@@ -534,7 +534,7 @@ public class CategoryActivity extends AppCompatActivity {
                 long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
-                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE)); 
                 String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
                 String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
@@ -937,16 +937,42 @@ public class CategoryActivity extends AppCompatActivity {
             SQLiteDatabase db = events.getWritableDatabase();
             db.delete(TABLE_NAME, null, null);
 
-            // อัพเดทการแสดงผล
+            // อีเซ็ตค่าเริ่มต้น
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH);
+            selectedYear = calendar.get(Calendar.YEAR) + 543;
+            
+            // รีเซ็ตค่าตัวแปรที่เก็บข้อมูล
+            totalExpense = 0.0;
+            categoryExpenses.clear();
+
+            // อัพเดทการแสดงผลทั้งหมด
+            updateDisplayTexts();
             updateChartData();
             updateCategoryData();
             updateExpenseData();
-            updateDisplayTexts();
+
+            // รีเซ็ต PieChart
+            chart.clear();
+            chart.setData(null);
+            chart.setCenterText("รายจ่ายทั้งหมด\n0.00 ฿");
+            chart.invalidate();
+
+            // รีเซ็ต RecyclerView
+            categoryRecyclerView.setAdapter(new CategoryAdapter(new ArrayList<>(), false));
 
             Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
-            Log.e("MainActivity", "Error resetting data: " + e.getMessage());
+            Log.e("CategoryActivity", "Error resetting data: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateChartData();
+        updateCategoryData();
+        updateDisplayTexts();
     }
 }

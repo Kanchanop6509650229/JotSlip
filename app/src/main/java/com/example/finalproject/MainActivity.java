@@ -245,6 +245,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateBarChartData();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBarChartData();
+        updateCategoryData();
+        getRemainMoney();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateBarChartData();
+        updateCategoryData();
+        getRemainMoney();
+    }
+
     private void getRemainMoney() {
         Cursor cursor = getEvents();
         List<TransferSlip> slipList = new ArrayList<>();
@@ -636,7 +652,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             SQLiteDatabase db = events.getWritableDatabase();
             db.delete(TABLE_NAME, null, null);
 
-            // อัพเดทการแสดงผล
+            // อีเซ็ตการแสดงผลข้อมูล
+            remainAmount.setText("0฿");
+            remainAmount.setTextColor(getColor(R.color.white));
+
+            // รีเซ็ต RecyclerViews
+            recyclerView.setAdapter(new ListAdapter(new ArrayList<>(), true, this));
+            categoryRecyclerView.setAdapter(new CategoryAdapter(new ArrayList<>(), true));
+
+            // รีเซ็ต BarChart
+            BarChart barChart = findViewById(R.id.bar_chart);
+            barChart.clear();
+            barChart.setData(null);
+            barChart.invalidate();
+
+            // อัพเดทการแสดงผลทั้งหมด
             updateBarChartData();
             updateCategoryData();
             getRemainMoney();
