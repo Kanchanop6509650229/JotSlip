@@ -102,8 +102,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingHorizontal="@dimen/padding_medium"
-                            android:paddingTop="@dimen/padding_medium">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/ListHeader"
@@ -148,8 +147,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingHorizontal="@dimen/padding_medium"
-                            android:paddingTop="@dimen/padding_medium">
+                            android:padding="@dimen/padding_medium">
 
                             <TextView
                                 android:id="@+id/LastestHeader"
