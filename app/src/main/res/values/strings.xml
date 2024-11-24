@@ -43,4 +43,7 @@
     <string name="font_size_small">เล็ก</string>
     <string name="font_size_normal">ปกติ</string>
     <string name="font_size_large">ใหญ่</string>
+    <string name="category">หมวดหมู่</string>
+    <string name="date">วันที่</string>
+    <string name="time">เวลา</string>
 </resources>
