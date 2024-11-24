@@ -12,6 +12,7 @@ import static com.example.finalproject.Constants.TYPE;
 import static com.example.finalproject.Constants._ID;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -78,6 +80,78 @@ public class SlipInfoActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("รายละเอียดรายการ"); // เพิ่มชื่อ title
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // บันทึกสถานะการดูข้อมูล
+        saveViewingState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // โหลดข้อมูลใหม่
+        loadSlipData(slipId);
+        loadViewingState();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("slipId", slipId);
+        outState.putFloat("scrollPosition", getScrollPosition());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            slipId = savedInstanceState.getLong("slipId");
+            final float scrollPosition = savedInstanceState.getFloat("scrollPosition");
+            scrollToPosition(scrollPosition);
+        }
+    }
+
+    private void saveViewingState() {
+        SharedPreferences prefs = getSharedPreferences("SlipInfoState", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong("lastViewedSlipId", slipId);
+        editor.putFloat("scrollPosition", getScrollPosition());
+        editor.apply();
+    }
+
+    private void loadViewingState() {
+        SharedPreferences prefs = getSharedPreferences("SlipInfoState", MODE_PRIVATE);
+        float scrollPosition = prefs.getFloat("scrollPosition", 0);
+        scrollToPosition(scrollPosition);
+    }
+
+    private float getScrollPosition() {
+        // หากใช้ ScrollView
+        ScrollView scrollView = findViewById(R.id.info_scrollview);
+        return scrollView != null ? scrollView.getScrollY() : 0;
+    }
+
+    private void scrollToPosition(float position) {
+        ScrollView scrollView = findViewById(R.id.info_scrollview);
+        if (scrollView != null) {
+            scrollView.post(() -> scrollView.scrollTo(0, (int) position));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (events != null) {
+            events.close();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     @Override
@@ -134,9 +208,9 @@ public class SlipInfoActivity extends AppCompatActivity {
 
     private void loadSlipData(long id) {
         SQLiteDatabase db = events.getReadableDatabase();
-        String[] columns = {TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE};
+        String[] columns = { TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
         String selection = _ID + " = ?";
-        String[] selectionArgs = {String.valueOf(id)};
+        String[] selectionArgs = { String.valueOf(id) };
 
         Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
 
@@ -155,7 +229,7 @@ public class SlipInfoActivity extends AppCompatActivity {
             // Set data
             int type = cursor.getInt(cursor.getColumnIndex(TYPE));
             radioGroup.check(type == 1 ? R.id.radio_income : R.id.radio_outcome);
-            
+
             moneyText.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(MONEY))));
             typeText.setText(cursor.getString(cursor.getColumnIndex(CATEGORY)));
             descriptionText.setText(cursor.getString(cursor.getColumnIndex(DESCRIPTION)));
@@ -189,10 +263,12 @@ public class SlipInfoActivity extends AppCompatActivity {
 
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
+
         DecimalDigitsInputFilter(int digits, int digitsAfterZero) {
             mPattern = Pattern.compile("[0-9]{0," + (digits - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) +
                     "})?)||(\\.)?");
         }
+
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             Matcher matcher = mPattern.matcher(dest);

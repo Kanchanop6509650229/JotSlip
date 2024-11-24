@@ -8,6 +8,7 @@ import android.app.ActivityOptions;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -125,6 +126,86 @@ public class HistoryActivity extends AppCompatActivity {
         updateChartData();
 
         setupAddButton();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // บันทึกสถานะการแสดงผลปัจจุบัน
+        saveViewState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // โหลดสถานะและอัพเดทข้อมูล
+        loadViewState();
+        updateChartData();
+        updateDisplayTexts();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // บันทึกข้อมูลการแสดงผล
+        outState.putInt("selectedMonth", selectedMonth);
+        outState.putInt("selectedYear", selectedYear);
+        outState.putFloat("scrollPosition",
+                recyclerView.getLayoutManager() != null ? ((LinearLayoutManager) recyclerView.getLayoutManager())
+                        .findFirstVisibleItemPosition() : 0);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            selectedMonth = savedInstanceState.getInt("selectedMonth");
+            selectedYear = savedInstanceState.getInt("selectedYear");
+            final float scrollPosition = savedInstanceState.getFloat("scrollPosition");
+
+            // รอให้ RecyclerView พร้อมแล้วค่อยเลื่อนไปยังตำแหน่งที่บันทึกไว้
+            recyclerView.post(() -> {
+                if (recyclerView.getLayoutManager() != null) {
+                    ((LinearLayoutManager) recyclerView.getLayoutManager())
+                            .scrollToPosition((int) scrollPosition);
+                }
+            });
+        }
+    }
+
+    private void saveViewState() {
+        SharedPreferences prefs = getSharedPreferences("HistoryState", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("selectedMonth", selectedMonth);
+        editor.putInt("selectedYear", selectedYear);
+        if (recyclerView.getLayoutManager() != null) {
+            editor.putInt("scrollPosition",
+                    ((LinearLayoutManager) recyclerView.getLayoutManager())
+                            .findFirstVisibleItemPosition());
+        }
+        editor.apply();
+    }
+
+    private void loadViewState() {
+        SharedPreferences prefs = getSharedPreferences("HistoryState", MODE_PRIVATE);
+        selectedMonth = prefs.getInt("selectedMonth", selectedMonth);
+        selectedYear = prefs.getInt("selectedYear", selectedYear);
+        final int scrollPosition = prefs.getInt("scrollPosition", 0);
+
+        recyclerView.post(() -> {
+            if (recyclerView.getLayoutManager() != null) {
+                ((LinearLayoutManager) recyclerView.getLayoutManager())
+                        .scrollToPosition(scrollPosition);
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (events != null) {
+            events.close();
+        }
     }
 
     private void initializeViews() {
@@ -1195,13 +1276,6 @@ public class HistoryActivity extends AppCompatActivity {
             }
             return false;
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateChartData();
-        updateDisplayTexts();
     }
 
     @Override

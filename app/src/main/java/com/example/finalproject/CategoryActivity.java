@@ -16,6 +16,7 @@ import android.app.ActivityOptions;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -120,6 +121,98 @@ public class CategoryActivity extends AppCompatActivity {
 
         updateChartData();
         updateCategoryData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveCategoryState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadCategoryState();
+        updateChartData();
+        updateCategoryData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedMonth", selectedMonth);
+        outState.putInt("selectedYear", selectedYear);
+        outState.putFloat("scrollPosition",
+                categoryRecyclerView.getLayoutManager() != null
+                        ? ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                                .findFirstVisibleItemPosition()
+                        : 0);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            selectedMonth = savedInstanceState.getInt("selectedMonth");
+            selectedYear = savedInstanceState.getInt("selectedYear");
+            final float scrollPosition = savedInstanceState.getFloat("scrollPosition");
+
+            categoryRecyclerView.post(() -> {
+                if (categoryRecyclerView.getLayoutManager() != null) {
+                    ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                            .scrollToPosition((int) scrollPosition);
+                }
+            });
+        }
+    }
+
+    private void saveCategoryState() {
+        SharedPreferences prefs = getSharedPreferences("CategoryState", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("selectedMonth", selectedMonth);
+        editor.putInt("selectedYear", selectedYear);
+        if (categoryRecyclerView.getLayoutManager() != null) {
+            editor.putInt("scrollPosition",
+                    ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                            .findFirstVisibleItemPosition());
+        }
+        editor.apply();
+    }
+
+    private void loadCategoryState() {
+        SharedPreferences prefs = getSharedPreferences("CategoryState", MODE_PRIVATE);
+        selectedMonth = prefs.getInt("selectedMonth", selectedMonth);
+        selectedYear = prefs.getInt("selectedYear", selectedYear);
+        final int scrollPosition = prefs.getInt("scrollPosition", 0);
+
+        categoryRecyclerView.post(() -> {
+            if (categoryRecyclerView.getLayoutManager() != null) {
+                ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                        .scrollToPosition(scrollPosition);
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (events != null) {
+            events.close();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showExportDialog();
+            } else {
+                Toast.makeText(this, "ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void initializeViews() {
@@ -482,9 +575,9 @@ public class CategoryActivity extends AppCompatActivity {
 
         // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
         String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
-        String[] selectionArgs = { 
-            String.format("%02d", selectedMonth + 1), 
-            String.valueOf(selectedYear) 
+        String[] selectionArgs = {
+                String.format("%02d", selectedMonth + 1),
+                String.valueOf(selectedYear)
         };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
@@ -508,9 +601,9 @@ public class CategoryActivity extends AppCompatActivity {
 
         // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
         String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
-        String[] selectionArgs = { 
-            String.format("%02d", selectedMonth + 1), 
-            String.valueOf(selectedYear) 
+        String[] selectionArgs = {
+                String.format("%02d", selectedMonth + 1),
+                String.valueOf(selectedYear)
         };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
@@ -534,7 +627,7 @@ public class CategoryActivity extends AppCompatActivity {
                 long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
-                String dateStr = cursor.getString(cursor.getColumnIndex(DATE)); 
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
                 String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
                 String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
@@ -839,27 +932,6 @@ public class CategoryActivity extends AppCompatActivity {
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, ORDER_BY);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateChartData();
-        updateCategoryData();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showExportDialog();
-            } else {
-                Toast.makeText(this, "ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
 
@@ -941,7 +1013,7 @@ public class CategoryActivity extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
             selectedMonth = calendar.get(Calendar.MONTH);
             selectedYear = calendar.get(Calendar.YEAR) + 543;
-            
+
             // รีเซ็ตค่าตัวแปรที่เก็บข้อมูล
             totalExpense = 0.0;
             categoryExpenses.clear();

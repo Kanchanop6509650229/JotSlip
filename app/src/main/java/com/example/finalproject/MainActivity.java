@@ -12,7 +12,9 @@ import static com.example.finalproject.Constants.TIME;
 import static com.example.finalproject.Constants.TYPE;
 
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -246,6 +248,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        // บันทึก state ปัจจุบัน
+        saveCurrentState();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         updateBarChartData();
@@ -259,6 +268,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateBarChartData();
         updateCategoryData();
         getRemainMoney();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // กู้คืนข้อมูลหลังจาก configuration changes
+        if (savedInstanceState != null) {
+            String savedDate = savedInstanceState.getString("currentDate");
+            String savedTime = savedInstanceState.getString("currentTime");
+            // กู้คืนข้อมูลอื่นๆ
+        }
+    }
+
+    private void saveCurrentState() {
+        // บันทึก state ลง SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("AppState", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("hasUnsavedChanges", true);
+        // บันทึกข้อมูลอื่นๆ ที่จำเป็น
+        editor.apply();
+    }
+
+    private void loadSavedState() {
+        // โหลด state จาก SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("AppState", MODE_PRIVATE);
+        boolean hasUnsavedChanges = prefs.getBoolean("hasUnsavedChanges", false);
+        // โหลดข้อมูลอื่นๆ ที่บันทึกไว้
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (hasUnsavedChanges()) {
+            // แสดง dialog ยืนยันการออก
+            new AlertDialog.Builder(this)
+                    .setTitle("ยืนยันการออก")
+                    .setMessage("คุณต้องการออกจากแอปพลิเคชันหรือไม่?")
+                    .setPositiveButton("ใช่", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("ไม่", null)
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean hasUnsavedChanges() {
+        // ตรวจสอบว่ามีการเปลี่ยนแปลงที่ยังไม่ได้บันทึกหรือไม่
+        SharedPreferences prefs = getSharedPreferences("AppState", MODE_PRIVATE);
+        return prefs.getBoolean("hasUnsavedChanges", false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // ทำความสะอาดทรัพยากรต่างๆ
+        if (events != null) {
+            events.close();
+        }
+        // ยกเลิกการทำงานที่ค้างอยู่ทั้งหมด
+        clearAllPendingTasks();
+    }
+
+    private void clearAllPendingTasks() {
+        // ยกเลิกการทำงานที่ค้างอยู่ทั้งหมด เช่น AsyncTask, Handler, etc.
     }
 
     private void getRemainMoney() {

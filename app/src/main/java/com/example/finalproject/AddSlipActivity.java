@@ -14,9 +14,11 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -416,6 +418,96 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // บันทึกข้อมูลที่กำลังป้อน
+        saveDraftData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // บันทึกข้อมูลสำหรับ configuration changes
+        outState.putString("money", moneyEditText.getText().toString());
+        outState.putString("description", descriptionEditText.getText().toString());
+        outState.putString("date", btnDate.getText().toString());
+        outState.putString("time", btnTime.getText().toString());
+        outState.putString("receiver", receiverTextView.getText().toString());
+        if (currentBitmap != null) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            currentBitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+            outState.putByteArray("image", bos.toByteArray());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            moneyEditText.setText(savedInstanceState.getString("money", ""));
+            descriptionEditText.setText(savedInstanceState.getString("description", ""));
+            btnDate.setText(savedInstanceState.getString("date", getString(R.string.date_format)));
+            btnTime.setText(savedInstanceState.getString("time", getString(R.string.time_format)));
+            receiverTextView.setText(savedInstanceState.getString("receiver", ""));
+            byte[] imageBytes = savedInstanceState.getByteArray("image");
+            if (imageBytes != null) {
+                currentBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                updateImageView();
+            }
+        }
+    }
+
+    private void saveDraftData() {
+        SharedPreferences prefs = getSharedPreferences("AddSlipDraft", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("money", moneyEditText.getText().toString());
+        editor.putString("description", descriptionEditText.getText().toString());
+        editor.putString("date", btnDate.getText().toString());
+        editor.putString("time", btnTime.getText().toString());
+        editor.putString("receiver", receiverTextView.getText().toString());
+        editor.putBoolean("hasDraft", true);
+        editor.apply();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (hasUnsavedChanges()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("มีข้อมูลที่ยังไม่ได้บันทึก")
+                    .setMessage("ต้องการออกโดยไม่บันทึกข้อมูลหรือไม่?")
+                    .setPositiveButton("ออก", (dialog, which) -> {
+                        clearDraftData();
+                        finish();
+                    })
+                    .setNegativeButton("ยกเลิก", null)
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean hasUnsavedChanges() {
+        return !moneyEditText.getText().toString().isEmpty() ||
+                !descriptionEditText.getText().toString().isEmpty() ||
+                !btnDate.getText().toString().equals(getString(R.string.date_format)) ||
+                !btnTime.getText().toString().equals(getString(R.string.time_format)) ||
+                !receiverTextView.getText().toString().isEmpty() ||
+                currentBitmap != null;
+    }
+
+    private void clearDraftData() {
+        getSharedPreferences("AddSlipDraft", MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply();
     }
 
     private void updateImageView() {
