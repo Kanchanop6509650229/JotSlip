@@ -24,6 +24,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -35,6 +36,7 @@ import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -140,6 +142,8 @@ public class SlipInfoActivity extends AppCompatActivity {
 
         if (cursor != null && cursor.moveToFirst()) {
             // Get views
+            CardView imageCard = findViewById(R.id.image_card);
+            ImageView imageView = findViewById(R.id.gallery_btn);
             RadioGroup radioGroup = findViewById(R.id.radio_group);
             TextView moneyText = findViewById(R.id.add_money);
             TextView typeText = findViewById(R.id.type_text);
@@ -147,7 +151,6 @@ public class SlipInfoActivity extends AppCompatActivity {
             TextView dateText = findViewById(R.id.date_text);
             TextView timeText = findViewById(R.id.time_text);
             TextView receiverText = findViewById(R.id.receiver);
-            ImageView galleryImage = findViewById(R.id.gallery_btn);
 
             // Set data
             int type = cursor.getInt(cursor.getColumnIndex(TYPE));
@@ -167,14 +170,17 @@ public class SlipInfoActivity extends AppCompatActivity {
                     byte[] imageBytes = Base64.decode(imageString, Base64.DEFAULT);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
                     if (bitmap != null) {
-                        galleryImage.setImageBitmap(bitmap);
+                        imageCard.setVisibility(View.VISIBLE);
+                        imageView.setImageBitmap(bitmap);
+                    } else {
+                        imageCard.setVisibility(View.GONE);
                     }
                 } catch (Exception e) {
                     Log.e("SlipInfoActivity", "Error loading image: " + e.getMessage());
-                    galleryImage.setImageResource(android.R.drawable.ic_menu_gallery);
+                    imageCard.setVisibility(View.GONE);
                 }
             } else {
-                galleryImage.setImageResource(android.R.drawable.ic_menu_gallery);
+                imageCard.setVisibility(View.GONE);
             }
 
             cursor.close();

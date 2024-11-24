@@ -18,6 +18,9 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +31,7 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -95,6 +99,13 @@ public class HistoryActivity extends AppCompatActivity {
     private View homeNav;
     private ImageView homeIcon;
     private TextView homeText;
+    private View navCategory;
+    private ImageView categoryIcon;
+    private TextView categoryText;
+    private View navSettings;
+    private ImageView settingsIcon;
+    private TextView settingsText;
+
     private SwipeRefreshLayout swipeRefreshLayout;
     private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
@@ -139,6 +150,24 @@ public class HistoryActivity extends AppCompatActivity {
 
             Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
 
+            startActivity(intent, options);
+        });
+
+        navSettings = findViewById(R.id.nav_settings);
+        settingsIcon = findViewById(R.id.settings_icon);
+        settingsText = findViewById(R.id.settings_text);
+        settingsIcon.setColorFilter(getColor(R.color.gray));
+        settingsText.setTextColor(getColor(R.color.gray));
+
+        navSettings.setOnClickListener(v -> showSettingsDialog());
+
+        navCategory = findViewById(R.id.nav_category);
+        categoryIcon = findViewById(R.id.category_icon);
+        categoryText = findViewById(R.id.category_text);
+
+        navCategory.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CategoryActivity.class);
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
             startActivity(intent, options);
         });
 
@@ -227,22 +256,65 @@ public class HistoryActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
+        // ทำให้พื้นหลัง dialog โปร่งใส
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
         dialog.show();
 
         Button btnExportCsv = dialogView.findViewById(R.id.btnExportCsv);
         Button btnExportImage = dialogView.findViewById(R.id.btnExportImage);
 
+        // Set drawables tint to white
+        if (btnExportCsv.getCompoundDrawables()[0] != null) {
+            Drawable csvDrawable = btnExportCsv.getCompoundDrawables()[0].mutate();
+            csvDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+            btnExportCsv.setCompoundDrawables(csvDrawable, null, null, null);
+        }
+
+        if (btnExportImage.getCompoundDrawables()[0] != null) {
+            Drawable imgDrawable = btnExportImage.getCompoundDrawables()[0].mutate();
+            imgDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+            btnExportImage.setCompoundDrawables(imgDrawable, null, null, null);
+        }
+
         btnExportCsv.setOnClickListener(v -> {
             if (checkPermissionAndExport()) {
-                exportDataToCsv();
-                dialog.dismiss();
+                // Add click animation
+                v.animate()
+                        .scaleX(0.95f)
+                        .scaleY(0.95f)
+                        .setDuration(100)
+                        .withEndAction(() -> {
+                            v.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start();
+                            exportDataToCsv();
+                            dialog.dismiss();
+                        })
+                        .start();
             }
         });
 
         btnExportImage.setOnClickListener(v -> {
             if (checkPermissionAndExport()) {
-                exportDataToImage();
-                dialog.dismiss();
+                // Add click animation
+                v.animate()
+                        .scaleX(0.95f)
+                        .scaleY(0.95f)
+                        .setDuration(100)
+                        .withEndAction(() -> {
+                            v.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start();
+                            exportDataToImage();
+                            dialog.dismiss();
+                        })
+                        .start();
             }
         });
     }
@@ -291,75 +363,102 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void exportDataToImage() {
+        // เก็บขนาดเดิมของกราฟ
+        final ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
+        final int originalWidth = chart.getWidth();
+        final int originalHeight = chart.getHeight();
+
+        Map<String, Double> dailyBalances = new LinkedHashMap<>();
         double totalIncome = Double.parseDouble(income.getText().toString().replace(" ฿", ""));
         double totalExpense = Double.parseDouble(outcome.getText().toString().replace(" ฿", ""));
 
-        Map<String, Double> dailyBalances = new LinkedHashMap<>();
-        if (chart.getLineData() != null && !chart.getLineData().getDataSets().isEmpty()) {
-            ILineDataSet dataSet = chart.getLineData().getDataSets().get(0);
-            for (int i = 0; i < dataSet.getEntryCount(); i++) {
-                Entry entry = dataSet.getEntryForIndex(i);
-                String date = String.format("%02d/%02d/%d",
-                        (int) entry.getX(),
-                        selectedMonth + 1,
-                        selectedYear);
-                dailyBalances.put(date, (double) entry.getY());
-            }
-        }
-
-        Bitmap summaryImage = SummaryImageGenerator.generateHistorySummaryImage(
-                this,
-                monthText.getText().toString(),
-                yearText.getText().toString(),
-                totalIncome,
-                totalExpense,
-                chart,
-                dailyBalances);
-
-        // บันทึกไฟล์รูปภาพ
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                .format(new Date());
-        String fileName = String.format("history_summary_%s_%s_%s.jpg",
-                monthText.getText(), yearText.getText(), timestamp);
-
-        // บันทึกรูปภาพลงใน Gallery
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-            values.put(MediaStore.Images.Media.IS_PENDING, 1);
-        }
-
-        ContentResolver resolver = getContentResolver();
-        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
         try {
-            if (imageUri != null) {
-                try (OutputStream out = resolver.openOutputStream(imageUri)) {
-                    if (out != null) {
-                        summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            // คำนวณขนาดกราฟที่ต้องการ (ให้เต็มพื้นที่การ์ด)
+            int desiredWidth = chart.getWidth();
+            int desiredHeight = 250; // หรือขนาดที่ต้องการ
+
+            // กำหนดขนาดกราฟใหม่
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    desiredWidth,
+                    desiredHeight);
+            chart.setLayoutParams(params);
+
+            if (chart.getLineData() != null && !chart.getLineData().getDataSets().isEmpty()) {
+                ILineDataSet dataSet = chart.getLineData().getDataSets().get(0);
+                for (int i = 0; i < dataSet.getEntryCount(); i++) {
+                    Entry entry = dataSet.getEntryForIndex(i);
+                    String date = String.format("%02d/%02d/%d",
+                            (int) entry.getX(),
+                            selectedMonth + 1,
+                            selectedYear);
+                    dailyBalances.put(date, (double) entry.getY());
+                }
+            }
+
+            Bitmap summaryImage = SummaryImageGenerator.generateHistorySummaryImage(
+                    this,
+                    monthText.getText().toString(),
+                    yearText.getText().toString(),
+                    totalIncome,
+                    totalExpense,
+                    chart,
+                    dailyBalances);
+
+            // บันทึกไฟล์รูปภาพ
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                    .format(new Date());
+            String fileName = String.format("history_summary_%s_%s_%s.jpg",
+                    monthText.getText(), yearText.getText(), timestamp);
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            }
+
+            ContentResolver resolver = getContentResolver();
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            try {
+                if (imageUri != null) {
+                    try (OutputStream out = resolver.openOutputStream(imageUri)) {
+                        if (out != null) {
+                            summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        }
                     }
-                }
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    values.clear();
-                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
-                    resolver.update(imageUri, values, null, null);
-                }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        values.clear();
+                        values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                        resolver.update(imageUri, values, null, null);
+                    }
 
-                Toast.makeText(this,
-                        "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
-                        Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,
+                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
+                            Toast.LENGTH_LONG).show();
+                }
+            } catch (IOException e) {
+                if (imageUri != null) {
+                    resolver.delete(imageUri, null, null);
+                }
+                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+                Log.e("HistoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
-        } catch (IOException e) {
-            // ในกรณีที่เกิดข้อผิดพลาด ให้ลบไฟล์ที่ค้างอยู่
-            if (imageUri != null) {
-                resolver.delete(imageUri, null, null);
-            }
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
-            Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
+        } finally {
+            // คืนค่าขนาดกราฟกลับเป็นขนาดเดิม
+            chart.setLayoutParams(originalParams);
+            chart.getLayoutParams().width = originalWidth;
+            chart.getLayoutParams().height = originalHeight;
+
+            // บังคับให้วาดใหม่
+            chart.requestLayout();
+            chart.invalidate();
+
+            // เรียก updateChartData เพื่ออัพเดทข้อมูลและการแสดงผลใหม่
+            updateChartData();
         }
     }
 
@@ -465,7 +564,6 @@ public class HistoryActivity extends AppCompatActivity {
                 selectedMonth = findLatestMonthWithData(selectedYear);
                 updateDisplayTexts();
                 updateChartData();
-                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -476,7 +574,6 @@ public class HistoryActivity extends AppCompatActivity {
                 selectedMonth = findEarliestMonthWithData(selectedYear);
                 updateDisplayTexts();
                 updateChartData();
-                Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
             }
         });
 
@@ -493,7 +590,6 @@ public class HistoryActivity extends AppCompatActivity {
             }
             updateDisplayTexts();
             updateChartData();
-            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
 
         findViewById(R.id.nextMonth).setOnClickListener(v -> {
@@ -509,7 +605,6 @@ public class HistoryActivity extends AppCompatActivity {
             }
             updateDisplayTexts();
             updateChartData();
-            Log.d("MainActivity", "Moved to: " + (selectedMonth + 1) + "/" + selectedYear);
         });
     }
 
@@ -531,7 +626,7 @@ public class HistoryActivity extends AppCompatActivity {
             return;
         }
 
-        // ถ้าไม่มีข้อมูลในเดือนปัจจุบัน หาเดือนที่ใกล้เคียงที่สุด
+        // ถ้าไม่มีข้อมูลในเ��ือนปัจจุบัน หาเดือนที่ใกล้เคียงที่สุด
         int closestMonth = currentMonth;
         int closestYear = currentYear;
         int minDistance = Integer.MAX_VALUE;
@@ -1073,8 +1168,6 @@ public class HistoryActivity extends AppCompatActivity {
         String selection = "date BETWEEN ? AND ?";
         String[] selectionArgs = { startDay, endDay };
 
-        Log.d("MainActivity", "Querying for dates between: " + startDay + " and " + endDay);
-
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, ORDER_BY);
     }
 
@@ -1108,6 +1201,14 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateChartData();
+        updateDisplayTexts();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateChartData();
+        updateDisplayTexts();
     }
 
     class DecimalDigitsInputFilter implements InputFilter {
@@ -1130,5 +1231,85 @@ public class HistoryActivity extends AppCompatActivity {
     private String formatNumber(float number) {
         DecimalFormat df = new DecimalFormat("###,###,###,###.##");
         return df.format(number);
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
+
+        resetDataCard.setOnClickListener(v -> {
+            dialog.dismiss();
+            showResetConfirmationDialog();
+        });
+
+        dialog.show();
+    }
+
+    private void showResetConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // สร้าง AlertDialog แบบกำหนดเอง
+        View dialogView = getLayoutInflater().inflate(R.layout.reset_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // ทำให้พื้นหลัง dialog โปร่งใส
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
+
+        // ตั้งค่าการทำงานของปุ่มน dialog
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+
+        btnConfirm.setOnClickListener(v -> {
+            resetAllData();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    private void resetAllData() {
+        try {
+            // ลบข้อมูลในฐานข้อมูล
+            events = new EventsData(this);
+            SQLiteDatabase db = events.getWritableDatabase();
+            db.delete(TABLE_NAME, null, null);
+
+            // อีเซ็ตค่าเริ่มต้น
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH);
+            selectedYear = calendar.get(Calendar.YEAR) + 543;
+
+            // รีเซ็ตการแสดงผลข้อมูล
+            income.setText("0.00 ฿");
+            outcome.setText("0.00 ฿");
+            remainAmount.setText("0.00 ฿");
+            remainAmount.setTextColor(getColor(R.color.green_500));
+
+            // รีเซ็ต RecyclerView
+            recyclerView.setAdapter(new SlipAdapter(new ArrayList<>()));
+
+            // อัพเดทการแสดงผลทั้งหมด
+            updateDisplayTexts();
+            updateChartData();
+
+            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Log.e("HistoryActivity", "Error resetting data: " + e.getMessage());
+        }
     }
 }

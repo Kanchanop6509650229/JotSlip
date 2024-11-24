@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
     android:fitsSystemWindows="true"
     tools:context=".HistoryActivity">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="80dp">
+        android:layout_height="match_parent">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="80dp"
+            android:overScrollMode="never"
+            android:paddingBottom="@dimen/bottom_padding"
+            android:clipToPadding="false"
             tools:context=".HistoryActivity">
 
             <LinearLayout
@@ -25,214 +28,330 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/totalText"
+                <!-- Header Card -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ยอดรวม" />
-                <TextView
-                    android:id="@+id/totalRemain"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="0 ฿" />
-
-                <com.github.mikephil.charting.charts.BarChart
-                    android:id="@+id/bar_chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_margin="16dp"
-                    android:backgroundTint="@color/gray" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation"
+                    android:layout_marginTop="@dimen/padding_medium"
+                    android:layout_marginStart="@dimen/padding_medium"
+                    android:layout_marginEnd="@dimen/padding_medium">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/ListHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="ยอดใช้จ่าย 7 วันล่าสุด" />
-
-                        <TextView
-                            android:id="@+id/seeAllText2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:textColor="@color/green_500"
-                            android:text="ดูทั้งหมด" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="10dp"
-                        android:background="@drawable/rounded_background"
+                        android:layout_height="wrap_content"
+                        android:background="@color/green_500"
                         android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/totalText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:text="@string/totalText"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/totalRemain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:layout_marginBottom="@dimen/margin_medium"
+                            android:text="@string/totalRemain"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_large"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Chart Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/bar_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/bar_chart_height"
+                        android:layout_margin="@dimen/margin_medium" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Categories Section -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_medium">
+
+                            <TextView
+                                android:id="@+id/ListHeader"
+                                android:layout_width="@dimen/width"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/ListHeader"
+                                android:textSize="@dimen/text_size_medium"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/seeAllText2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/seeAllText"
+                                android:textColor="@color/green_500"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/category_list_item_view"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@null"
-                            android:clipToPadding="false"
-                            android:overScrollMode="never"
-                            android:scrollbars="none" />
-
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never" />
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                </LinearLayout>
-
-                <LinearLayout
+                <!-- Latest Transactions -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/LastestHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="ธุรกรรมล่าสุด" />
-
-                        <TextView
-                            android:id="@+id/seeAllText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:textColor="@color/green_500"
-                            android:text="ดูทั้งหมด" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="10dp"
-                        android:background="@drawable/rounded_background"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_medium">
+
+                            <TextView
+                                android:id="@+id/LastestHeader"
+                                android:layout_width="@dimen/width"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/LastestHeader"
+                                android:textSize="@dimen/text_size_medium"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/seeAllText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/seeAllText"
+                                android:textColor="@color/green_500"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/list_item_view"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@null"
-                            android:clipToPadding="false"
-                            android:overScrollMode="never"
-                            android:scrollbars="none" />
-
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never" />
                     </LinearLayout>
-
-                </LinearLayout>
-
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <LinearLayout
-        android:id="@+id/bottom_navigation"
+    <!-- Bottom Navigation -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:weightSum="3">
+        app:cardElevation="@dimen/card_elevation_medium">
 
         <LinearLayout
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
-            <ImageView
-                android:id="@+id/home_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:tint="@color/white"
-                android:src="@drawable/ic_home" />
+            <!-- Home Button -->
+            <FrameLayout
+                android:id="@+id/nav_home"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
 
-            <TextView
-                android:id="@+id/home_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ภาพรวม"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/home_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_home"
+                        app:tint="@color/green_500" />
+
+                    <TextView
+                        android:id="@+id/home_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/home_text"
+                        android:textColor="@color/green_500" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Category Button -->
+            <FrameLayout
+                android:id="@+id/nav_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/category_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_category"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/category_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="หมวดหมู่"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Add Button -->
+            <FrameLayout
+                android:id="@+id/nav_add"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageButton
+                    android:id="@+id/add_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_add_background"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </FrameLayout>
+
+            <!-- History Button -->
+            <FrameLayout
+                android:id="@+id/nav_history"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@android:id/icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_history"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@android:id/text1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/history"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Settings Button -->
+            <FrameLayout
+                android:id="@+id/nav_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/settings_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_settings"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/settings_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="ตั้งค่า"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_add"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageButton
-                android:id="@+id/add_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_add_background"
-                android:padding="8dp"
-                android:scaleType="fitCenter" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_history"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageView
-                android:id="@android:id/icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_history" />
-
-            <TextView
-                android:id="@android:id/text1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ประวัติ"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

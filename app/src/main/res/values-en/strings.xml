@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">Final Project</string>
+    <string name="date_format">dd/mm/yyyy</string>
+    <string name="time_format">HH:mm</string>
+    <string name="income">Income</string>
+    <string name="outcome">Expense</string>
+    <string name="cancel">X</string>
+    <string-array name="types_array">
+        <item>Others</item>
+        <item>Food/Beverage</item>
+        <item>Shopping</item>
+        <item>Family/Personal</item>
+        <item>Savings/Investment</item>
+        <item>Bill Payment</item>
+        <item>Entertainment</item>
+        <item>Gifts/Donations</item>
+        <item>Transportation</item>
+        <item>Education</item>
+        <item>Hotel/Travel</item>
+        <item>Insurance</item>
+        <item>Withdrawal</item>
+        <item>Loans/Installments</item>
+    </string-array>
+    <string name="totalText">Remaining Balance</string>
+    <string name="totalRemain">0 ฿</string>
+    <string name="ListHeader">Expenses for the Last 7 Days</string>
+    <string name="seeAllText">View All</string>
+    <string name="LastestHeader">Latest Transactions</string>
+    <string name="or">or</string>
+    <string name="home_text">Overview</string>
+    <string name="history">History</string>
+    <string name="transaction_type">Transaction Type</string>
+    <string name="amount">Amount</string>
+    <string name="description">Description</string>
+    <string name="recevier">Recevier</string>
+    <string name="submit">Submit</string>
+    <string name="settings">Settings</string>
+    <string name="language">Change Language</string>
+    <string name="font_size">Font Size</string>
+    <string name="reset_data">Reset All Data</string>
+    <string name="thai">Thai</string>
+    <string name="english">English</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_normal">Normal</string>
+    <string name="font_size_large">Large</string>
+</resources>

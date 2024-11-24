@@ -1,297 +1,445 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
     android:fitsSystemWindows="true"
     tools:context=".HistoryActivity">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="80dp">
+        android:layout_height="match_parent">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="80dp"
-            tools:context=".HistoryActivity">
+            android:overScrollMode="never"
+            android:paddingBottom="80dp"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <LinearLayout
+                <!-- Date Navigation Card -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp">
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp">
 
-                    <!-- Year Selection -->
-                    <LinearLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:padding="4dp">
+                        android:background="@color/green_500">
 
                         <ImageButton
-                            android:id="@+id/prevYear"
+                            android:id="@+id/exportButton"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
+                            android:layout_gravity="end"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@android:drawable/ic_media_previous" />
+                            android:padding="12dp"
+                            android:src="@android:drawable/ic_menu_share"
+                            app:tint="@color/white"/>
 
-                        <TextView
-                            android:id="@+id/yearText"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="24dp"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:orientation="vertical"
+                            android:padding="16dp">
 
-                        <ImageButton
-                            android:id="@+id/nextYear"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@android:drawable/ic_media_next" />
-                    </LinearLayout>
+                            <!-- Year Selection -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:padding="8dp">
 
-                    <!-- Month Selection -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:padding="4dp">
+                                <ImageButton
+                                    android:id="@+id/prevYear"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:src="@android:drawable/ic_media_previous"
+                                    app:tint="@color/white" />
 
-                        <ImageButton
-                            android:id="@+id/prevMonth"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@android:drawable/ic_media_previous" />
+                                <TextView
+                                    android:id="@+id/yearText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="24dp"
+                                    android:textColor="@color/white"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/monthText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="24dp"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                                <ImageButton
+                                    android:id="@+id/nextYear"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:src="@android:drawable/ic_media_next"
+                                    app:tint="@color/white" />
+                            </LinearLayout>
 
-                        <ImageButton
-                            android:id="@+id/nextMonth"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@android:drawable/ic_media_next" />
-                    </LinearLayout>
-                </LinearLayout>
+                            <!-- Month Selection -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:padding="8dp">
 
-                <LinearLayout
+                                <ImageButton
+                                    android:id="@+id/prevMonth"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:src="@android:drawable/ic_media_previous"
+                                    app:tint="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/monthText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="24dp"
+                                    android:textColor="@color/white"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <ImageButton
+                                    android:id="@+id/nextMonth"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:src="@android:drawable/ic_media_next"
+                                    app:tint="@color/white" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Summary Card -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp">
 
-                    <TableLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="vertical"
                         android:padding="16dp">
 
                         <TextView
                             android:id="@+id/remainAmountText"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_span="2"
-                            android:layout_weight="1"
                             android:gravity="center"
-                            android:text="ยอดคงเหลือ" />
-
+                            android:text="ยอดคงเหลือ"
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/remainAmount"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_span="2"
-                            android:layout_weight="1"
                             android:gravity="center"
-                            android:text="0 ฿" />
+                            android:text="0 ฿"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/green_500"
+                            android:layout_marginTop="8dp" />
 
-                        <TableRow
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
+                            android:orientation="horizontal"
+                            android:layout_marginTop="16dp">
 
-                            <TextView
-                                android:id="@+id/incomeText"
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="รายรับสุทธิ" />
+                                android:orientation="vertical"
+                                android:gravity="center">
 
-                            <TextView
-                                android:id="@+id/outcomeText"
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="รายรับสุทธิ"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/income"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0 ฿"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/green_500"
+                                    android:layout_marginTop="4dp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="?android:attr/listDivider" />
+
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="รายจ่ายสุทธิ" />
-                        </TableRow>
+                                android:orientation="vertical"
+                                android:gravity="center">
 
-                        <TableRow
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="รายจ่ายสุทธิ"
+                                    android:textSize="14sp" />
 
-                            <TextView
-                                android:id="@+id/income"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="0 ฿" />
+                                <TextView
+                                    android:id="@+id/outcome"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0 ฿"
+                                    android:textSize="18sp"
+                                    android:textColor="@color/red"
+                                    android:layout_marginTop="4dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                            <TextView
-                                android:id="@+id/outcome"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:text="0 ฿" />
-                        </TableRow>
-                    </TableLayout>
-
-                    <!-- Add divider after statistics section -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?android:attr/listDivider"/>
+                <!-- Chart Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp">
 
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/chart"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:layout_margin="16dp"
-                        android:backgroundTint="@color/gray" />
+                        android:layout_height="250dp"
+                        android:layout_margin="8dp" />
 
-                    <TableLayout
-                        android:id="@+id/tableContent"
+                </androidx.cardview.widget.CardView>
+
+                <!-- Transactions List -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:stretchColumns="*" />
+                        android:orientation="vertical"
+                        android:padding="3dp">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="true"
-                        android:scrollbars="vertical" />
-
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/exportButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_save"
-                    android:contentDescription="Export Data" />
-
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <LinearLayout
-        android:id="@+id/bottom_navigation"
+    <!-- Bottom Navigation -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:weightSum="3">
+        app:cardElevation="@dimen/card_elevation_medium">
 
         <LinearLayout
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
-            <ImageView
-                android:id="@+id/home_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home" />
+            <!-- Home Button -->
+            <FrameLayout
+                android:id="@+id/nav_home"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
 
-            <TextView
-                android:id="@+id/home_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ภาพรวม"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/home_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_home"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/home_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/home_text"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Category Button -->
+            <FrameLayout
+                android:id="@+id/nav_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/category_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_category"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/category_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="หมวดหมู่"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Add Button -->
+            <FrameLayout
+                android:id="@+id/nav_add"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageButton
+                    android:id="@+id/add_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_add_background"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </FrameLayout>
+
+            <!-- History Button -->
+            <FrameLayout
+                android:id="@+id/nav_history"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@android:id/icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_history"
+                        app:tint="@color/green_500" />
+
+                    <TextView
+                        android:id="@android:id/text1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="@string/history"
+                        android:textColor="@color/green_500" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Settings Button -->
+            <FrameLayout
+                android:id="@+id/nav_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <ImageView
+                        android:id="@+id/settings_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_settings"
+                        app:tint="@color/gray" />
+
+                    <TextView
+                        android:id="@+id/settings_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_smaller"
+                        android:text="ตั้งค่า"
+                        android:textColor="@color/gray" />
+                </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_add"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageButton
-                android:id="@+id/add_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_add_background"
-                android:padding="8dp"
-                android:scaleType="fitCenter" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_history"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-
-            <ImageView
-                android:id="@android:id/icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:tint="@color/white"
-                android:src="@drawable/ic_history" />
-
-            <TextView
-                android:id="@android:id/text1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:text="ประวัติ"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

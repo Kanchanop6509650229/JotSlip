@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,8 +32,10 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -90,6 +93,12 @@ public class CategoryActivity extends AppCompatActivity {
     private ImageView homeIcon;
     private TextView homeText;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View navCategory;
+    private ImageView categoryIcon;
+    private TextView categoryText;
+    private View navSettings;
+    private ImageView settingsIcon;
+    private TextView settingsText;
     private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
 
@@ -124,6 +133,24 @@ public class CategoryActivity extends AppCompatActivity {
 
         exportButton = findViewById(R.id.exportButton);
         events = new EventsData(this);
+
+        navSettings = findViewById(R.id.nav_settings);
+        settingsIcon = findViewById(R.id.settings_icon);
+        settingsText = findViewById(R.id.settings_text);
+        settingsIcon.setColorFilter(getColor(R.color.gray));
+        settingsText.setTextColor(getColor(R.color.gray));
+
+        navSettings.setOnClickListener(v -> showSettingsDialog());
+
+        navCategory = findViewById(R.id.nav_category);
+        categoryIcon = findViewById(R.id.category_icon);
+        categoryText = findViewById(R.id.category_text);
+
+        navCategory.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CategoryActivity.class);
+            Bundle options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent, options);
+        });
 
         setupNavigationViews();
     }
@@ -364,60 +391,87 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void exportDataToImage() {
+        // เก็บขนาดเดิมของกราฟ
+        final ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
+        final int originalWidth = chart.getWidth();
+        final int originalHeight = chart.getHeight();
+
         Map<String, Double> categoryExpenses = getCategoryExpenses();
         double totalExpense = calculateTotalExpense();
 
-        Bitmap summaryImage = SummaryImageGenerator.generateCategorySummaryImage(
-                this,
-                monthText.getText().toString(),
-                yearText.getText().toString(),
-                totalExpense,
-                chart,
-                categoryExpenses);
-
-        // บันทึกไฟล์รูปภาพ
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String fileName = String.format("category_summary_%s_%s_%s.jpg",
-                monthText.getText(), yearText.getText(), timestamp);
-
-        // บันทึกรูปภาพลงใน Gallery
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-            values.put(MediaStore.Images.Media.IS_PENDING, 1);
-        }
-
-        ContentResolver resolver = getContentResolver();
-        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
         try {
-            if (imageUri != null) {
-                try (OutputStream out = resolver.openOutputStream(imageUri)) {
-                    if (out != null) {
-                        summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            // คำนวณขนาดกราฟที่ต้องการ
+            int desiredWidth = chart.getWidth();
+            int desiredHeight = 300; // หรือขนาดที่ต้องการ
+
+            // กำหนดขนาดกราฟใหม่
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    desiredWidth,
+                    desiredHeight);
+            chart.setLayoutParams(params);
+
+            Bitmap summaryImage = SummaryImageGenerator.generateCategorySummaryImage(
+                    this,
+                    monthText.getText().toString(),
+                    yearText.getText().toString(),
+                    totalExpense,
+                    chart,
+                    categoryExpenses);
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                    .format(new Date());
+            String fileName = String.format("category_summary_%s_%s_%s.jpg",
+                    monthText.getText(), yearText.getText(), timestamp);
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            }
+
+            ContentResolver resolver = getContentResolver();
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            try {
+                if (imageUri != null) {
+                    try (OutputStream out = resolver.openOutputStream(imageUri)) {
+                        if (out != null) {
+                            summaryImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        }
                     }
-                }
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    values.clear();
-                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
-                    resolver.update(imageUri, values, null, null);
-                }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        values.clear();
+                        values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                        resolver.update(imageUri, values, null, null);
+                    }
 
-                Toast.makeText(this,
-                        "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
-                        Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,
+                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
+                            Toast.LENGTH_LONG).show();
+                }
+            } catch (IOException e) {
+                if (imageUri != null) {
+                    resolver.delete(imageUri, null, null);
+                }
+                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+                Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
-        } catch (IOException e) {
-            // ในกรณีที่เกิดข้อผิดพลาด ให้ลบไฟล์ที่ค้างอยู่
-            if (imageUri != null) {
-                resolver.delete(imageUri, null, null);
-            }
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
-            Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
+        } finally {
+            // คืนค่าขนาดกราฟกลับเป็นขนาดเดิม
+            chart.setLayoutParams(originalParams);
+            chart.getLayoutParams().width = originalWidth;
+            chart.getLayoutParams().height = originalHeight;
+
+            // บังคับให้วาดใหม่
+            chart.requestLayout();
+            chart.invalidate();
+
+            // เรียก updateChartData เพื่ออัพเดทข้อมูลและการแสดงผลใหม่
+            updateChartData();
         }
     }
 
@@ -426,17 +480,12 @@ public class CategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { TYPE, MONEY, DATE, CATEGORY };
 
-        // สร้างรูปแบบวันที่สำหรับการค้นหา
-        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(selectedYear - 543, selectedMonth, 1);
-        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
-
-        // ใช้การเปรียบเทียบวันที่โดยตรง และเลือกเฉพาะรายจ่าย (TYPE != 1)
-        String selection = "date BETWEEN ? AND ? AND type != 1";
-        String[] selectionArgs = { startDay, endDay };
+        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
+        String[] selectionArgs = { 
+            String.format("%02d", selectedMonth + 1), 
+            String.valueOf(selectedYear) 
+        };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
 
@@ -444,10 +493,7 @@ public class CategoryActivity extends AppCompatActivity {
             do {
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
-
-                // รวมยอดเงินตามหมวดหมู่
                 categoryExpenses.merge(category, money, Double::sum);
-
             } while (cursor.moveToNext());
             cursor.close();
         }
@@ -458,18 +504,14 @@ public class CategoryActivity extends AppCompatActivity {
     private double calculateTotalExpense() {
         double total = 0.0;
         SQLiteDatabase db = events.getReadableDatabase();
-        String[] FROM = { MONEY, DATE };
+        String[] FROM = { MONEY };
 
-        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(selectedYear - 543, selectedMonth, 1);
-        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
-
-        // เลือกเฉพาะรายจ่าย (TYPE != 1)
-        String selection = "date BETWEEN ? AND ? AND type != 1";
-        String[] selectionArgs = { startDay, endDay };
+        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
+        String[] selectionArgs = { 
+            String.format("%02d", selectedMonth + 1), 
+            String.valueOf(selectedYear) 
+        };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
 
@@ -487,23 +529,39 @@ public class CategoryActivity extends AppCompatActivity {
         Cursor cursor = getEvents();
         Map<String, Float> categoryExpenses = new HashMap<>();
         float totalExpense = 0f;
-
         if (cursor != null && cursor.moveToFirst()) {
             do {
+                long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE)); 
+                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
+                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
-
-                if (type != 1) { // Only count expenses
-                    float currentValue = categoryExpenses.getOrDefault(category, 0f);
-                    categoryExpenses.put(category, currentValue + money);
-                    totalExpense += money;
+                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
+                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+                try {
+                    String[] dateParts = dateStr.split("/");
+                    int day = Integer.parseInt(dateParts[0]);
+                    int month = Integer.parseInt(dateParts[1]);
+                    int year = Integer.parseInt(dateParts[2]);
+                    if (month == selectedMonth + 1 && year == selectedYear) {
+                        if (type != 1) { // Assuming type != 1 signifies an expense
+                            float currentValue = categoryExpenses.getOrDefault(category, 0f);
+                            float newValue = currentValue + money;
+                            categoryExpenses.put(category, newValue);
+                            totalExpense += money;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
                 }
             } while (cursor.moveToNext());
             cursor.close();
-
+            // Update chart with category data
             updateChartWithData(categoryExpenses, totalExpense);
         } else {
+            // Show empty chart
             chart.setData(null);
             chart.setCenterText("ไม่มีข้อมูลในเดือนนี้");
             chart.invalidate();
@@ -591,7 +649,7 @@ public class CategoryActivity extends AppCompatActivity {
                 }
             } while (cursor.moveToNext());
 
-            CategoryAdapter adapter = new CategoryAdapter(slipList);
+            CategoryAdapter adapter = new CategoryAdapter(slipList, false);
             categoryRecyclerView.setAdapter(adapter);
 
             cursor.close();
@@ -822,5 +880,99 @@ public class CategoryActivity extends AppCompatActivity {
     private String formatNumber(float number) {
         DecimalFormat df = new DecimalFormat("###,###,###,###.##");
         return df.format(number);
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
+
+        resetDataCard.setOnClickListener(v -> {
+            dialog.dismiss();
+            showResetConfirmationDialog();
+        });
+
+        dialog.show();
+    }
+
+    private void showResetConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // สร้าง AlertDialog แบบกำหนดเอง
+        View dialogView = getLayoutInflater().inflate(R.layout.reset_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // ทำให้พื้นหลัง dialog โปร่งใส
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
+
+        // ตั้งค่าการทำงานของปุ่มใน dialog
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+
+        btnConfirm.setOnClickListener(v -> {
+            resetAllData();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    private void resetAllData() {
+        try {
+            // ลบข้อมูลในฐานข้อมูล
+            events = new EventsData(this);
+            SQLiteDatabase db = events.getWritableDatabase();
+            db.delete(TABLE_NAME, null, null);
+
+            // อีเซ็ตค่าเริ่มต้น
+            Calendar calendar = Calendar.getInstance();
+            selectedMonth = calendar.get(Calendar.MONTH);
+            selectedYear = calendar.get(Calendar.YEAR) + 543;
+            
+            // รีเซ็ตค่าตัวแปรที่เก็บข้อมูล
+            totalExpense = 0.0;
+            categoryExpenses.clear();
+
+            // อัพเดทการแสดงผลทั้งหมด
+            updateDisplayTexts();
+            updateChartData();
+            updateCategoryData();
+            updateExpenseData();
+
+            // รีเซ็ต PieChart
+            chart.clear();
+            chart.setData(null);
+            chart.setCenterText("รายจ่ายทั้งหมด\n0.00 ฿");
+            chart.invalidate();
+
+            // รีเซ็ต RecyclerView
+            categoryRecyclerView.setAdapter(new CategoryAdapter(new ArrayList<>(), false));
+
+            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Log.e("CategoryActivity", "Error resetting data: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateChartData();
+        updateCategoryData();
+        updateDisplayTexts();
     }
 }
