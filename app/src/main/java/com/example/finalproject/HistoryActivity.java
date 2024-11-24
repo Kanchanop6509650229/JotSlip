@@ -106,6 +106,7 @@ public class HistoryActivity extends AppCompatActivity {
     private View navSettings;
     private ImageView settingsIcon;
     private TextView settingsText;
+    private SettingsManager settingsManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
@@ -114,6 +115,8 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settingsManager = new SettingsManager(this);
+        settingsManager.applyLanguage();
         setContentView(R.layout.history);
 
         events = new EventsData(this);
@@ -1308,8 +1311,8 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
@@ -1317,14 +1320,49 @@ public class HistoryActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
+        // ตั้งค่าการทำงานของปุ่มต่างๆ
+        View languageCard = dialogView.findViewById(R.id.languageCard);
         View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
 
+        // จัดการการเปลี่ยนภาษา
+        languageCard.setOnClickListener(v -> {
+            showLanguageDialog();
+            dialog.dismiss();
+        });
+
+        // จัดการการรีเซ็ตข้อมูล
         resetDataCard.setOnClickListener(v -> {
             dialog.dismiss();
             showResetConfirmationDialog();
         });
 
         dialog.show();
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = { getString(R.string.thai), getString(R.string.english) };
+        String currentLang = settingsManager.getCurrentLanguage();
+        int checkedItem = currentLang.equals("th") ? 0 : 1;
+
+        new AlertDialog.Builder(this)
+                .setTitle("เลือกภาษา")
+                .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? "th" : "en";
+                    if (!selectedLang.equals(currentLang)) {
+                        settingsManager.setLanguage(selectedLang);
+                        restartApp();
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton("ยกเลิก", null)
+                .show();
+    }
+
+    private void restartApp() {
+        Intent intent = new Intent(this, HistoryActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void showResetConfirmationDialog() {

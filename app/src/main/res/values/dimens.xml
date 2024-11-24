@@ -29,7 +29,7 @@
     <dimen name="bar_chart_height">220dp</dimen>
 
     <!-- Bottom Padding -->
-    <dimen name="bottom_padding">80dp</dimen>
+    <dimen name="bottom_padding">90dp</dimen>
 
     <dimen name="width">0dp</dimen>
 </resources>
