@@ -14,6 +14,7 @@
     <color name="ligth_gray">#E0E0E0</color>
     <color name="background_green">#f1f8e9</color>
     <color name="dark_green">#14891D</color>
+    <color name="card_light_gray">#F5F5F5</color>
 
 
 </resources>

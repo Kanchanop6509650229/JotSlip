@@ -4,79 +4,79 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="8dp">
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="@dimen/padding_large">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="ยืนยันการรีเซ็ตข้อมูล"
+            android:text="@string/confirm_reset"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_size_twenty"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:text="คุณต้องการลบข้อมูลทั้งหมดหรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/delete_confirmation"
             android:textAlignment="center"
             android:textColor="@android:color/darker_gray"
-            android:textSize="14sp" />
+            android:textSize="@dimen/text_size_small" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/margin_medium"
             android:gravity="center">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="16dp"
+                android:layout_marginEnd="@dimen/margin_small"
+                app:cardCornerRadius="@dimen/card_corner_radius_medium"
                 app:cardBackgroundColor="@color/red"
-                app:cardElevation="4dp">
+                app:cardElevation="@dimen/card_elevation_small">
 
                 <Button
                     android:id="@+id/btnConfirm"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ยืนยัน"
-                    android:textSize="16sp"
+                    android:text="@string/confirm"
+                    android:textSize="@dimen/text_size"
                     android:textColor="@color/white"
-                    android:paddingVertical="16dp"
+                    android:paddingVertical="@dimen/padding_medium"
                     android:background="?attr/selectableItemBackground"/>
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="16dp"
+                android:layout_marginStart="@dimen/margin_small"
+                app:cardCornerRadius="@dimen/card_corner_radius_medium"
                 app:cardBackgroundColor="@color/green_500"
-                app:cardElevation="4dp">
+                app:cardElevation="@dimen/card_elevation_small">
 
                 <Button
                     android:id="@+id/btnCancel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ยกเลิก"
-                    android:textSize="16sp"
+                    android:text="@string/cancel_text"
+                    android:textSize="@dimen/text_size"
                     android:textColor="@color/white"
-                    android:paddingVertical="16dp"
+                    android:paddingVertical="@dimen/padding_medium"
                     android:background="?attr/selectableItemBackground"/>
 
             </androidx.cardview.widget.CardView>

@@ -3,55 +3,55 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="8dp">
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="@dimen/padding_large">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_size_twenty"
             android:textStyle="bold"
             android:textColor="@color/black"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="@dimen/margin_medium"/>
 
         <!-- Language Settings -->
         <androidx.cardview.widget.CardView
             android:id="@+id/languageCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="@dimen/card_elevation_smaller"
             android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="@dimen/padding_medium"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/layout_twentyfour"
+                    android:layout_height="@dimen/layout_twentyfour"
                     android:src="@android:drawable/ic_menu_sort_alphabetically"
                     app:tint="@color/green_500"/>
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/width"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
                     android:text="@string/language"
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/text_size"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -60,32 +60,32 @@
             android:id="@+id/resetDataCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="@dimen/card_elevation_smaller"
             android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="@dimen/padding_medium"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/layout_twentyfour"
+                    android:layout_height="@dimen/layout_twentyfour"
                     android:src="@android:drawable/ic_menu_delete"
                     app:tint="@color/red"/>
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/width"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/margin_medium"
                     android:text="@string/reset_data"
                     android:textColor="@color/red"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/text_size"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>

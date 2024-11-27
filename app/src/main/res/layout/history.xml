@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:paddingBottom="80dp"
+            android:paddingBottom="@dimen/padding_bottom"
             android:clipToPadding="false">
 
             <LinearLayout
@@ -31,10 +31,10 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginHorizontal="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp">
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginHorizontal="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -43,11 +43,11 @@
 
                         <ImageButton
                             android:id="@+id/exportButton"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
+                            android:layout_width="@dimen/layout_fortyeight"
+                            android:layout_height="@dimen/layout_fortyeight"
                             android:layout_gravity="end"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:padding="12dp"
+                            android:padding="@dimen/padding"
                             android:src="@android:drawable/ic_menu_share"
                             app:tint="@color/white"/>
 
@@ -55,7 +55,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="@dimen/padding_medium">
 
                             <!-- Year Selection -->
                             <LinearLayout
@@ -63,7 +63,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
                                 android:orientation="horizontal"
-                                android:padding="8dp">
+                                android:padding="@dimen/padding_small">
 
                                 <ImageButton
                                     android:id="@+id/prevYear"
@@ -77,9 +77,9 @@
                                     android:id="@+id/yearText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginHorizontal="24dp"
+                                    android:layout_marginHorizontal="@dimen/margin_large"
                                     android:textColor="@color/white"
-                                    android:textSize="18sp"
+                                    android:textSize="@dimen/text_size_medium"
                                     android:textStyle="bold" />
 
                                 <ImageButton
@@ -97,7 +97,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
                                 android:orientation="horizontal"
-                                android:padding="8dp">
+                                android:padding="@dimen/padding_small">
 
                                 <ImageButton
                                     android:id="@+id/prevMonth"
@@ -111,9 +111,9 @@
                                     android:id="@+id/monthText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginHorizontal="24dp"
+                                    android:layout_marginHorizontal="@dimen/margin_medium"
                                     android:textColor="@color/white"
-                                    android:textSize="18sp"
+                                    android:textSize="@dimen/text_size_medium"
                                     android:textStyle="bold" />
 
                                 <ImageButton
@@ -132,42 +132,42 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp">
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="@dimen/padding_medium">
 
                         <TextView
                             android:id="@+id/remainAmountText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="ยอดคงเหลือ"
-                            android:textSize="16sp" />
+                            android:text="@string/totalText"
+                            android:textSize="@dimen/text_size" />
 
                         <TextView
                             android:id="@+id/remainAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="0 ฿"
-                            android:textSize="24sp"
+                            android:text="@string/totalRemain"
+                            android:textSize="@dimen/text_size_large"
                             android:textStyle="bold"
                             android:textColor="@color/green_500"
-                            android:layout_marginTop="8dp" />
+                            android:layout_marginTop="@dimen/margin_small" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginTop="16dp">
+                            android:layout_marginTop="@dimen/margin_medium">
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -179,26 +179,26 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="รายรับสุทธิ"
-                                    android:textSize="14sp" />
+                                    android:text="@string/net_income"
+                                    android:textSize="@dimen/text_size_small" />
 
                                 <TextView
                                     android:id="@+id/income"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0 ฿"
+                                    android:text="@string/totalRemain"
                                     android:textSize="18sp"
                                     android:textColor="@color/green_500"
                                     android:layout_marginTop="4dp" />
                             </LinearLayout>
 
                             <View
-                                android:layout_width="1dp"
+                                android:layout_width="@dimen/layout_one"
                                 android:layout_height="match_parent"
                                 android:background="?android:attr/listDivider" />
 
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="@dimen/width"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
@@ -207,17 +207,17 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="รายจ่ายสุทธิ"
-                                    android:textSize="14sp" />
+                                    android:text="@string/net_expense"
+                                    android:textSize="@dimen/text_size_small" />
 
                                 <TextView
                                     android:id="@+id/outcome"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0 ฿"
-                                    android:textSize="18sp"
+                                    android:text="@string/totalRemain"
+                                    android:textSize="@dimen/text_size_medium"
                                     android:textColor="@color/red"
-                                    android:layout_marginTop="4dp" />
+                                    android:layout_marginTop="@dimen/margin_smaller" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -227,17 +227,17 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp">
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:layout_marginEnd="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/chart"
                         android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:layout_margin="8dp" />
+                        android:layout_height="@dimen/layout_twofivezero"
+                        android:layout_margin="@dimen/margin_small" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -245,15 +245,15 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp">
+                    android:layout_margin="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="3dp">
+                        android:padding="@dimen/padding_three">
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recycler_view"
@@ -349,7 +349,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="หมวดหมู่"
+                        android:text="@string/category"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
@@ -357,7 +357,7 @@
             <!-- Add Button -->
             <FrameLayout
                 android:id="@+id/nav_add"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground">
@@ -375,7 +375,7 @@
             <!-- History Button -->
             <FrameLayout
                 android:id="@+id/nav_history"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -411,7 +411,7 @@
             <!-- Settings Button -->
             <FrameLayout
                 android:id="@+id/nav_settings"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -439,7 +439,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="ตั้งค่า"
+                        android:text="@string/settings"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>

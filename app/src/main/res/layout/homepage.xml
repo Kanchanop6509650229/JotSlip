@@ -261,7 +261,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="หมวดหมู่"
+                        android:text="@string/category"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
@@ -351,7 +351,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="ตั้งค่า"
+                        android:text="@string/settings"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>

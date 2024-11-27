@@ -52,4 +52,13 @@
     <string name="export_subtitle">กรุณาเลือกรูปแบบที่ต้องการส่งออกข้อมูล</string>
     <string name="export_csv">CSV</string>
     <string name="export_image">รูปภาพ</string>
+    <string name="twentysix">26</string>
+    <string name="month">เดือน</string>
+    <string name="net_income">รายรับสุทธิ</string>
+    <string name="net_expense">รายจ่ายสุทธิ</string>
+    <string name="additional_notes">บันทึกเพิ่มเติม</string>
+    <string name="confirm_reset">ยืนยันการรีเซ็ตข้อมูล</string>
+    <string name="delete_confirmation">คุณต้องการลบข้อมูลทั้งหมดหรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้</string>
+    <string name="confirm">ยืนยัน</string>
+    <string name="cancel_text">ยกเลิก</string>
 </resources>

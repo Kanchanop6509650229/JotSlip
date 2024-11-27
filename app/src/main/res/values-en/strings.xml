@@ -52,4 +52,13 @@
     <string name="export_subtitle">Please select the format you want to export</string>
     <string name="export_csv">CSV</string>
     <string name="export_image">Image</string>
+    <string name="twentysix">26</string>
+    <string name="month">Month</string>
+    <string name="net_income">Net Income</string>
+    <string name="net_expense">Net Expense</string>
+    <string name="additional_notes">Additional Notes</string>
+    <string name="confirm_reset">Confirm Data Reset</string>
+    <string name="delete_confirmation">Are you sure you want to delete all data?\nThis action cannot be undone.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel_text">Cancel</string>
 </resources>
