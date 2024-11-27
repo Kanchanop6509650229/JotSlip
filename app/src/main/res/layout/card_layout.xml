@@ -30,7 +30,7 @@
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/twentysix"
+                android:text="@string/no_data"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_twentyeight"
                 android:textStyle="bold" />

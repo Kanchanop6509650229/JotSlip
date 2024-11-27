@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/confirm_reset"
+            android:text="@string/reset_confirm_title"
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_twenty"
             android:textStyle="bold" />
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginTop="@dimen/margin_small"
-            android:text="@string/delete_confirmation"
+            android:text="@string/reset_confirm_message"
             android:textAlignment="center"
             android:textColor="@android:color/darker_gray"
             android:textSize="@dimen/text_size_small" />

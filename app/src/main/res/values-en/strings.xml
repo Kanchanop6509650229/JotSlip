@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Final Project</string>
+    <string name="app_name">JotSlip</string>
     <string name="date_format">dd/mm/yyyy</string>
     <string name="time_format">HH:mm</string>
     <string name="income">Income</string>
@@ -7,23 +7,23 @@
     <string name="cancel">X</string>
     <string-array name="types_array">
         <item>Others</item>
-        <item>Food/Beverage</item>
+        <item>Food/Drink</item>
         <item>Shopping</item>
         <item>Family/Personal</item>
         <item>Savings/Investment</item>
         <item>Bill Payment</item>
         <item>Entertainment</item>
-        <item>Gifts/Donations</item>
-        <item>Transportation</item>
+        <item>Gifts/Donation</item>
+        <item>Travel</item>
         <item>Education</item>
-        <item>Hotel/Travel</item>
+        <item>Hotel/Tourism</item>
         <item>Insurance</item>
         <item>Withdrawal</item>
-        <item>Loans/Installments</item>
+        <item>Credit/Hire Purchase</item>
     </string-array>
     <string name="totalText">Remaining Balance</string>
     <string name="totalRemain">0 ฿</string>
-    <string name="ListHeader">Expenses for the Last 7 Days</string>
+    <string name="ListHeader">Last 7 Days Expenses</string>
     <string name="seeAllText">View All</string>
     <string name="LastestHeader">Latest Transactions</string>
     <string name="or">or</string>
@@ -32,33 +32,62 @@
     <string name="transaction_type">Transaction Type</string>
     <string name="amount">Amount</string>
     <string name="description">Description</string>
-    <string name="recevier">Recevier</string>
-    <string name="submit">Submit</string>
+    <string name="receiver">Receiver</string>
+    <string name="submit">Confirm</string>
     <string name="settings">Settings</string>
     <string name="language">Change Language</string>
     <string name="font_size">Font Size</string>
     <string name="reset_data">Reset All Data</string>
     <string name="thai">Thai</string>
     <string name="english">English</string>
-    <string name="font_size_small">Small</string>
-    <string name="font_size_normal">Normal</string>
-    <string name="font_size_large">Large</string>
-    <string name="category">Category่</string>
-    <string name="date">Date</string>
-    <string name="time">Time</string>
-    <string name="category_name">Category Name</string>
-    <string name="percent">0 %</string>
-    <string name="export_title">Choose Export Format</string>
-    <string name="export_subtitle">Please select the format you want to export</string>
-    <string name="export_csv">CSV</string>
-    <string name="export_image">Image</string>
-    <string name="twentysix">26</string>
-    <string name="month">Month</string>
+    <string name="upload_image_desc">Upload Image</string>
+    <string name="remove_image">Remove Image</string>
+    <string name="transaction_type_label">Transaction Type</string>
+    <string name="amount_hint">Amount</string>
+    <string name="category_label">Category</string>
+    <string name="description_hint">Description</string>
+    <string name="receiver_hint">Receiver</string>
+    <string name="save_success">Data saved successfully</string>
+    <string name="load_image_error">Unable to load image</string>
+    <string name="storage_permission_required">Storage access permission required</string>
+    <string name="choose_image">Choose image from</string>
+    <string name="category_chart_title">Expense Summary by Category</string>
+    <string name="total_expense">Total Expenses</string>
+    <string name="export_success">Image saved to gallery</string>
+    <string name="export_error">Error saving image</string>
+    <string name="no_data">No data for this month</string>
+    <string name="balance">Balance</string>
     <string name="net_income">Net Income</string>
     <string name="net_expense">Net Expense</string>
-    <string name="additional_notes">Additional Notes</string>
-    <string name="confirm_reset">Confirm Data Reset</string>
-    <string name="delete_confirmation">Are you sure you want to delete all data?\nThis action cannot be undone.</string>
+    <string name="balance_changes">Balance Change Graph</string>
+    <string name="export_title">Select Export Format</string>
+    <string name="export_desc">Please select the data export format</string>
+    <string name="overview_total">Total Overview</string>
+    <string name="seven_days">Last 7 Days</string>
+    <string name="today">Today</string>
+    <string name="no_extra_note">No additional notes</string>
+    <string name="settings_title">Settings</string>
+    <string name="reset_confirm_title">Confirm Data Reset</string>
+    <string name="reset_confirm_message">Do you want to delete all data?\nThis action cannot be undone</string>
     <string name="confirm">Confirm</string>
     <string name="cancel_text">Cancel</string>
+    <string name="reset_data_success">Data reset successfully</string>
+    <string name="reset_data_error">Error resetting data</string>
+    <string name="error_invalid_amount">Amount must be greater than 0</string>
+    <string name="error_max_amount">Amount must not exceed 99,999,999.99</string>
+    <string name="error_required_type">Please select income/expense type</string>
+    <string name="error_required_category">Please select a category</string>
+    <string name="error_required_date">Please select a date</string>
+    <string name="error_required_time">Please select a time</string>
+    <string name="error_invalid_time">Invalid time format</string>
+    <string name="error_future_date">Date and time must not be in the future</string>
+    <string name="error_description_length">Description must not exceed 100 characters</string>
+    <string name="error_receiver_length">Receiver name must not exceed 50 characters</string>
+    <string name="month">Month</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="percent">0 %</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_image">Image</string>
+    <string name="category_name">Category Name</string>
 </resources>

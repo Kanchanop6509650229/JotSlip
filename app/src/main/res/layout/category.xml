@@ -249,7 +249,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="@string/category"
+                        android:text="@string/category_label"
                         android:textColor="@color/green_500" />
                 </LinearLayout>
             </FrameLayout>

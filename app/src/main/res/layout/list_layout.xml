@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray"
                 android:textSize="@dimen/text_size_small"
-                android:text="@string/additional_notes" />
+                android:text="@string/no_extra_note" />
         </LinearLayout>
 
         <TextView

@@ -40,7 +40,7 @@
                 android:textSize="@dimen/text_size"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:text="@string/category_name" />
+                android:text="@string/category_label" />
 
             <TextView
                 android:id="@+id/transactionAmount"
