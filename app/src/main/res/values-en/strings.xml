@@ -46,4 +46,7 @@
     <string name="category">Category่</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
+    <string name="category_name">Category Name</string>
+    <string name="bath">0 ฿</string>
+    <string name="percen">0 %</string>
 </resources>

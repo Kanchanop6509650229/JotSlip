@@ -46,4 +46,7 @@
     <string name="category">หมวดหมู่</string>
     <string name="date">วันที่</string>
     <string name="time">เวลา</string>
+    <string name="category_name">ชื่อหมวดหมู่</string>
+    <string name="bath">0 ฿</string>
+    <string name="percen">0 %</string>
 </resources>
