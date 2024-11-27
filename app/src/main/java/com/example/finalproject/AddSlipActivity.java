@@ -125,24 +125,24 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         // 1. Check radio button selection
         RadioGroup radioGroup = findViewById(R.id.radio_group);
         if (radioGroup.getCheckedRadioButtonId() == -1) {
-            errorMessage = "กรุณาเลือกประเภทรายรับ/รายจ่าย";
+            errorMessage = getString(R.string.error_required_type);
         }
 
         // 2. Check money input
         if (errorMessage == null) {
             String moneyStr = moneyEditText.getText().toString().trim();
             if (moneyStr.isEmpty()) {
-                errorMessage = "กรุณากรอกจำนวนเงิน";
+                errorMessage = getString(R.string.error_required_amount);
             } else {
                 try {
                     double money = Double.parseDouble(moneyStr);
                     if (money <= 0) {
-                        errorMessage = "จำนวนเงินต้องมากกว่า 0";
+                        errorMessage = getString(R.string.error_invalid_amount);
                     } else if (money > 99999999.99) {
-                        errorMessage = "จำนวนเงินต้องไม่เกิน 99,999,999.99";
+                        errorMessage = getString(R.string.error_max_amount);
                     }
                 } catch (NumberFormatException e) {
-                    errorMessage = "รูปแบบจำนวนเงินไม่ถูกต้อง";
+                    errorMessage = getString(R.string.error_invalid_amount_format);
                 }
             }
         }
@@ -151,7 +151,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         if (errorMessage == null) {
             if (spinner.getSelectedItem() == null ||
                     spinner.getSelectedItem().toString().trim().isEmpty()) {
-                errorMessage = "กรุณาเลือกประเภท";
+                errorMessage = getString(R.string.error_required_category);
             }
         }
 
@@ -162,11 +162,11 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
             // First check if date is selected
             if (dateStr.equals(getString(R.string.date_format))) {
-                errorMessage = "กรุณาเลือกวันที่";
+                errorMessage = getString(R.string.error_required_date);
             }
             // Then check if time is selected
             else if (timeStr.equals(getString(R.string.time_format))) {
-                errorMessage = "กรุณาเลือกเวลา";
+                errorMessage = getString(R.string.error_required_time);
             }
             // If both are selected, validate format and future date
             else {
@@ -186,11 +186,11 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                     // Validate date format
                     if (day < 1 || day > 31 || month < 1 || month > 12 ||
                             yearBE < 2500 || yearBE > 2600) {
-                        errorMessage = "รูปแบบวันที่ไม่ถูกต้อง";
+                        errorMessage = getString(R.string.error_invalid_date_format);
                     }
                     // Validate time format
                     else if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-                        errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                        errorMessage = getString(R.string.error_invalid_time);
                     }
                     // Check if date and time is in the future
                     else {
@@ -202,11 +202,11 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                         now.set(Calendar.MILLISECOND, 0);
 
                         if (inputDateTime.after(now)) {
-                            errorMessage = "วันที่และเวลาต้องไม่เป็นอนาคต";
+                            errorMessage = getString(R.string.error_future_date);
                         }
                     }
                 } catch (Exception e) {
-                    errorMessage = "รูปแบบวันที่หรือเวลาไม่ถูกต้อง";
+                    errorMessage = getString(R.string.error_invalid_date_time);
                 }
             }
         }
@@ -215,7 +215,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         if (errorMessage == null) {
             String timeStr = btnTime.getText().toString();
             if (timeStr.equals(getString(R.string.time_format))) {
-                errorMessage = "กรุณาเลือกเวลา";
+                errorMessage = getString(R.string.error_required_time);
             } else {
                 try {
                     String[] timeParts = timeStr.split(":");
@@ -223,10 +223,10 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                     int minute = Integer.parseInt(timeParts[1]);
 
                     if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-                        errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                        errorMessage = getString(R.string.error_invalid_time);
                     }
                 } catch (Exception e) {
-                    errorMessage = "รูปแบบเวลาไม่ถูกต้อง";
+                    errorMessage = getString(R.string.error_invalid_time);
                 }
             }
         }
@@ -235,7 +235,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         if (errorMessage == null) {
             String description = descriptionEditText.getText().toString().trim();
             if (!description.isEmpty() && description.length() > 100) {
-                errorMessage = "รายละเอียดต้องไม่เกิน 100 ตัวอักษร";
+                errorMessage = getString(R.string.error_description_length);
             }
         }
 
@@ -243,7 +243,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         if (errorMessage == null) {
             String receiver = receiverTextView.getText().toString().trim();
             if (!receiver.isEmpty() && receiver.length() > 50) {
-                errorMessage = "ชื่อผู้รับต้องไม่เกิน 50 ตัวอักษร";
+                errorMessage = getString(R.string.error_receiver_length);
             }
         }
 
@@ -276,7 +276,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
                     } catch (Exception e) {
                         Log.e("AddSlipActivity", "Error loading image: " + e.getMessage());
-                        Toast.makeText(this, "ไม่สามารถโหลดรูปภาพได้", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.load_image_error), Toast.LENGTH_SHORT).show();
                         resetImageView();
                     }
                 }
@@ -402,14 +402,14 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                     addEvent();
 
                     // Log success
-                    Log.d("SQLite_Save", "Transaction saved successfully");
-                    Toast.makeText(AddSlipActivity.this, "บันทึกข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+                    Log.d("SQLite_Save", getString(R.string.save_success));
+                    Toast.makeText(AddSlipActivity.this, getString(R.string.save_success), Toast.LENGTH_SHORT).show();
                     finish(); // Close activity after successful save
 
                 } catch (Exception e) {
                     // Log any errors
                     Log.e("SQLite_Save", "Error saving transaction: " + e.getMessage());
-                    Toast.makeText(AddSlipActivity.this, "เกิดข้อผิดพลาดในการบันทึก: " + e.getMessage(),
+                    Toast.makeText(AddSlipActivity.this, getString(R.string.error_save_transaction, e.getMessage()),
                             Toast.LENGTH_LONG).show();
                 } finally {
                     if (events != null) {
@@ -481,13 +481,13 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     public void onBackPressed() {
         if (hasUnsavedChanges()) {
             new AlertDialog.Builder(this)
-                    .setTitle("มีข้อมูลที่ยังไม่ได้บันทึก")
-                    .setMessage("ต้องการออกโดยไม่บันทึกข้อมูลหรือไม่?")
-                    .setPositiveButton("ออก", (dialog, which) -> {
+                    .setTitle(getString(R.string.unsaved_changes_title))
+                    .setMessage(getString(R.string.unsaved_changes_message))
+                    .setPositiveButton(getString(R.string.exit), (dialog, which) -> {
                         clearDraftData();
                         finish();
                     })
-                    .setNegativeButton("ยกเลิก", null)
+                    .setNegativeButton(getString(R.string.cancel_text), null)
                     .show();
         } else {
             super.onBackPressed();
@@ -559,21 +559,21 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                 if (shouldShowRequestPermissionRationale(permissions[0])) {
                     // ผู้ใช้ปฏิเสธครั้งแรก แสดงคำอธิบายเพิ่มเติม
                     new AlertDialog.Builder(this)
-                            .setTitle("ต้องการสิทธิ์การเข้าถึง")
-                            .setMessage("แอปจำเป็นต้องเข้าถึงรูปภาพเพื่อสแกนสลิป")
-                            .setPositiveButton("ตั้งค่า", (dialog, which) -> {
+                            .setTitle(getString(R.string.permission_title))
+                            .setMessage(getString(R.string.permission_message))
+                            .setPositiveButton(getString(R.string.settings), (dialog, which) -> {
                                 dialog.dismiss();
                                 checkAndRequestPermissions();
                             })
-                            .setNegativeButton("ยกเลิก", (dialog, which) -> dialog.dismiss())
+                            .setNegativeButton(getString(R.string.cancel_text), (dialog, which) -> dialog.dismiss())
                             .create()
                             .show();
                 } else {
                     // ผู้ใช้เลือก "Don't ask again" แสดงข้อความแนะนำให้ไปตั้งค่า
                     new AlertDialog.Builder(this)
-                            .setTitle("ต้องการสิทธิ์การเข้าถึง")
-                            .setMessage("กรุณาอนุญาตการเข้าถึงรูปภาพในการตั้งค่าแอปพลิเคชัน")
-                            .setPositiveButton("ไปที่ตั้งค่า", (dialog, which) -> {
+                            .setTitle(getString(R.string.permission_title))
+                            .setMessage(getString(R.string.permission_settings_message))
+                            .setPositiveButton(getString(R.string.go_to_settings), (dialog, which) -> {
                                 dialog.dismiss();
                                 // เปิดหน้าตั้งค่าแอป
                                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -581,7 +581,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                                 intent.setData(uri);
                                 startActivity(intent);
                             })
-                            .setNegativeButton("ยกเลิก", (dialog, which) -> dialog.dismiss())
+                            .setNegativeButton(getString(R.string.cancel_text), (dialog, which) -> dialog.dismiss())
                             .create()
                             .show();
                 }
@@ -592,7 +592,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        Intent chooser = Intent.createChooser(intent, "เลือกรูปภาพจาก");
+        Intent chooser = Intent.createChooser(intent, getString(R.string.choose_image));
         activityResultLauncher3.launch(chooser);
     }
 
@@ -713,7 +713,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
                 public void onError(String error) {
                     runOnUiThread(() -> {
                         Toast.makeText(AddSlipActivity.this,
-                                "เกิดข้อผิดพลาด: " + error,
+                                getString(R.string.error_processing_slip) + ": " + error,
                                 Toast.LENGTH_LONG).show();
                     });
                 }

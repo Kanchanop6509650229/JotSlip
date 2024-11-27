@@ -100,9 +100,7 @@ public class CategoryActivity extends AppCompatActivity {
     private View navSettings;
     private ImageView settingsIcon;
     private TextView settingsText;
-    private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
-
+    private String[] months;
     private double totalExpense = 0.0;
     private Map<String, Double> categoryExpenses = new HashMap<>();
     private SettingsManager settingsManager;
@@ -115,6 +113,7 @@ public class CategoryActivity extends AppCompatActivity {
         settingsManager.applyLanguage();
         setContentView(R.layout.category);
 
+        months = getResources().getStringArray(R.array.months_array);
         initializeViews();
         setupSwipeRefresh();
         setupNavigation();
@@ -212,8 +211,7 @@ public class CategoryActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showExportDialog();
             } else {
-                Toast.makeText(this, "ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.storage_permission_required), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -417,7 +415,7 @@ public class CategoryActivity extends AppCompatActivity {
         chart.setHoleRadius(58f);
         chart.setTransparentCircleRadius(61f);
         chart.setDrawCenterText(true);
-        chart.setCenterText("รายจ่ายทั้งหมด");
+        chart.setCenterText(getString(R.string.chart_center_text));
         chart.setRotationEnabled(true);
         chart.setHighlightPerTapEnabled(true);
 
@@ -545,15 +543,13 @@ public class CategoryActivity extends AppCompatActivity {
                         resolver.update(imageUri, values, null, null);
                     }
 
-                    Toast.makeText(this,
-                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.save_image_success), Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 if (imageUri != null) {
                     resolver.delete(imageUri, null, null);
                 }
-                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.save_image_error), Toast.LENGTH_SHORT).show();
                 Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
         } finally {
@@ -589,6 +585,7 @@ public class CategoryActivity extends AppCompatActivity {
             do {
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+
                 categoryExpenses.merge(category, money, Double::sum);
             } while (cursor.moveToNext());
             cursor.close();
@@ -659,7 +656,7 @@ public class CategoryActivity extends AppCompatActivity {
         } else {
             // Show empty chart
             chart.setData(null);
-            chart.setCenterText("ไม่มีข้อมูลในเดือนนี้");
+            chart.setCenterText(getString(R.string.no_data_this_month));
             chart.invalidate();
         }
     }
@@ -701,7 +698,7 @@ public class CategoryActivity extends AppCompatActivity {
         data.setValueTextSize(11f);
         data.setValueTextColor(Color.WHITE);
 
-        chart.setCenterText(String.format("รายจ่ายทั้งหมด\n%.2f ฿", totalExpense));
+        chart.setCenterText(String.format(getString(R.string.total_expense_format), totalExpense));
         chart.setCenterTextSize(14f);
         chart.setData(data);
         chart.invalidate();
@@ -773,7 +770,7 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void updateDisplayTexts() {
-        monthText.setText(MONTHS[selectedMonth]);
+        monthText.setText(months[selectedMonth]);
         yearText.setText(String.valueOf(selectedYear));
     }
 
@@ -992,7 +989,7 @@ public class CategoryActivity extends AppCompatActivity {
         int checkedItem = currentLang.equals("th") ? 0 : 1;
 
         new AlertDialog.Builder(this)
-                .setTitle("เลือกภาษา")
+                .setTitle(getString(R.string.language))
                 .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
                     String selectedLang = (which == 0) ? "th" : "en";
                     if (!selectedLang.equals(currentLang)) {
@@ -1001,7 +998,7 @@ public class CategoryActivity extends AppCompatActivity {
                     }
                     dialog.dismiss();
                 })
-                .setNegativeButton("ยกเลิก", null)
+                .setNegativeButton(getString(R.string.cancel_text), null)
                 .show();
     }
 
@@ -1065,15 +1062,15 @@ public class CategoryActivity extends AppCompatActivity {
             // รีเซ็ต PieChart
             chart.clear();
             chart.setData(null);
-            chart.setCenterText("รายจ่ายทั้งหมด\n0.00 ฿");
+            chart.setCenterText(getString(R.string.chart_center_text));
             chart.invalidate();
 
             // รีเซ็ต RecyclerView
             categoryRecyclerView.setAdapter(new CategoryAdapter(new ArrayList<>(), false));
 
-            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_data_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_data_error), Toast.LENGTH_SHORT).show();
             Log.e("CategoryActivity", "Error resetting data: " + e.getMessage());
         }
     }

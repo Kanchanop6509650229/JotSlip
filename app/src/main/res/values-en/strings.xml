@@ -49,7 +49,7 @@
     <string name="receiver_hint">Receiver</string>
     <string name="save_success">Data saved successfully</string>
     <string name="load_image_error">Unable to load image</string>
-    <string name="storage_permission_required">Storage access permission required</string>
+    <string name="storage_permission_required">Storage access permission required to save file</string>
     <string name="choose_image">Choose image from</string>
     <string name="category_chart_title">Expense Summary by Category</string>
     <string name="total_expense">Total Expenses</string>
@@ -67,10 +67,11 @@
     <string name="today">Today</string>
     <string name="no_extra_note">No additional notes</string>
     <string name="settings_title">Settings</string>
-    <string name="reset_confirm_title">Confirm Data Reset</string>
-    <string name="reset_confirm_message">Do you want to delete all data?\nThis action cannot be undone</string>
-    <string name="confirm">Confirm</string>
-    <string name="cancel_text">Cancel</string>
+    <string name="reset_confirm_title">Confirm DataReset</string>
+    <string name="reset_confirm_message">Are you sure you want to reset all data?\nThis action cannot be undone</string>
+    <string name="reset_confirm_positive">Reset</string>
+    <string name="reset_confirm_negative">Cancel</string>
+    <string name="reset_success">Data reset successful</string>
     <string name="reset_data_success">Data reset successfully</string>
     <string name="reset_data_error">Error resetting data</string>
     <string name="error_invalid_amount">Amount must be greater than 0</string>
@@ -90,4 +91,36 @@
     <string name="export_csv">CSV</string>
     <string name="export_image">Image</string>
     <string name="category_name">Category Name</string>
+    <string name="error_required_amount">Please enter amount</string>
+    <string name="error_invalid_amount_format">Invalid amount format</string>
+    <string name="unsaved_changes_title">Unsaved Changes</string>
+    <string name="unsaved_changes_message">Do you want to exit without saving?</string>
+    <string name="exit">Exit</string>
+    <string name="error_invalid_date_format">Invalid date format</string>
+    <string name="error_processing_slip">Error processing slip</string>
+    <string name="error_save_transaction">Error saving transaction: </string>
+    <string name="error_invalid_date_time">Invalid date or time format</string>
+    <string name="permission_title">Access Permission Required</string>
+    <string name="permission_message">The app needs access to images to scan slips</string>
+    <string name="permission_settings_message">Please allow image access in the app settings</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="chart_center_text">Total Expenses</string>
+    <string name="save_image_success">Image saved to gallery</string>
+    <string name="save_image_error">Error saving image</string>
+    <string name="no_data_this_month">No data for this month</string>
+    <string-array name="months_array">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string name="total_expense_format">Total Expenses\n%.2f ฿</string>
 </resources>

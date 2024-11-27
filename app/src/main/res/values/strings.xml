@@ -49,7 +49,7 @@
     <string name="receiver_hint">ผู้รับ</string>
     <string name="save_success">บันทึกข้อมูลสำเร็จ</string>
     <string name="load_image_error">ไม่สามารถโหลดรูปภาพได้</string>
-    <string name="storage_permission_required">ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บ</string>
+    <string name="storage_permission_required">ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์</string>
     <string name="choose_image">เลือกรูปภาพจาก</string>
     <string name="category_chart_title">สรุปค่าใช้จ่ายตามหมวดหมู่</string>
     <string name="total_expense">ค่าใช้จ่ายรวมทั้งหมด</string>
@@ -90,4 +90,39 @@
     <string name="export_csv">CSV</string>
     <string name="export_image">รูปภาพ</string>
     <string name="category_name">ชื่อหมวดหมู่</string>
+    <string name="error_required_amount">กรุณากรอกจำนวนเงิน</string>
+    <string name="error_invalid_amount_format">รูปแบบจำนวนเงินไม่ถูกต้อง</string>
+    <string name="unsaved_changes_title">มีข้อมูลที่ยังไม่ได้บันทึก</string>
+    <string name="unsaved_changes_message">ต้องการออกโดยไม่บันทึกข้อมูลหรือไม่?</string>
+    <string name="exit">ออก</string>
+    <string name="error_invalid_date_format">รูปแบบวันที่ไม่ถูกต้อง</string>
+    <string name="error_processing_slip">เกิดข้อผิดพลาดในการประมวลผลสลิป</string>
+    <string name="error_save_transaction">เกิดข้อผิดพลาดในการบันทึก: </string>
+    <string name="error_invalid_date_time">รูปแบบวันที่หรือเวลาไม่ถูกต้อง</string>
+    <string name="permission_title">ต้องการสิทธิ์การเข้าถึง</string>
+    <string name="permission_message">แอปจำเป็นต้องเข้าถึงรูปภาพเพื่อสแกนสลิป</string>
+    <string name="permission_settings_message">กรุณาอนุญาตการเข้าถึงรูปภาพในการตั้งค่าแอปพลิเคชัน</string>
+    <string name="go_to_settings">ไปที่ตั้งค่า</string>
+    <string name="chart_center_text">รายจ่ายทั้งหมด</string>
+    <string name="save_image_success">บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว</string>
+    <string name="save_image_error">เกิดข้อผิดพลาดในการบันทึกรูปภาพ</string>
+    <string name="no_data_this_month">ไม่มีข้อมูลในเดือนนี้</string>
+    <string-array name="months_array">
+        <item>มกราคม</item>
+        <item>กุมภาพันธ์</item>
+        <item>มีนาคม</item>
+        <item>เมษายน</item>
+        <item>พฤษภาคม</item>
+        <item>มิถุนายน</item>
+        <item>กรกฎาคม</item>
+        <item>สิงหาคม</item>
+        <item>กันยายน</item>
+        <item>ตุลาคม</item>
+        <item>พฤศจิกายน</item>
+        <item>ธันวาคม</item>
+    </string-array>
+    <string name="total_expense_format">รายจ่ายทั้งหมด\n%.2f ฿</string>
+    <string name="reset_success">รีเซ็ตข้อมูลสำเร็จ</string>
+    <string name="reset_confirm_positive">รีเซ็ต</string>
+    <string name="reset_confirm_negative">ยกเลิก</string>
 </resources>
