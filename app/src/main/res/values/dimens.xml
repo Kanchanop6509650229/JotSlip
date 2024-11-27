@@ -27,6 +27,7 @@
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_20">20sp</dimen>
     <dimen name="text_size_large">36sp</dimen>
 
     <!-- Bar Chart -->

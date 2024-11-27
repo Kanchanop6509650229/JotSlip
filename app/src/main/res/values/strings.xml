@@ -49,4 +49,8 @@
     <string name="category_name">ชื่อหมวดหมู่</string>
     <string name="bath">0 ฿</string>
     <string name="percen">0 %</string>
+    <string name="export_title">เลือกรูปแบบการส่งออก</string>
+    <string name="export_subtitle">กรุณาเลือกรูปแบบที่ต้องการส่งออกข้อมูล</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_image">รูปภาพ</string>
 </resources>
