@@ -46,4 +46,10 @@
     <string name="category">Category่</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
+    <string name="category_name">Category Name</string>
+    <string name="percent">0 %</string>
+    <string name="export_title">Choose Export Format</string>
+    <string name="export_subtitle">Please select the format you want to export</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_image">Image</string>
 </resources>
