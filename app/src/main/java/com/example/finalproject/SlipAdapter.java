@@ -1,6 +1,8 @@
 package com.example.finalproject;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -21,11 +23,12 @@ public class SlipAdapter extends RecyclerView.Adapter<SlipAdapter.ViewHolder> {
     private List<TransferSlip> dataSet;
     private List<List<TransferSlip>> groupedSlips;
     private MyClickListener mCallback;
+    private Context context;
 
     public SlipAdapter(List<TransferSlip> myDataSet) {
         this.dataSet = myDataSet;
         groupSlipsByDate();
-    }
+    }   
 
     private void groupSlipsByDate() {
         groupedSlips = new ArrayList<>();

@@ -125,4 +125,18 @@
     <string name="reset_success">รีเซ็ตข้อมูลสำเร็จ</string>
     <string name="reset_confirm_positive">รีเซ็ต</string>
     <string name="reset_confirm_negative">ยกเลิก</string>
+    <string name="category_others">อื่นๆ</string>
+    <string name="category_food">อาหาร/เครื่องดื่ม</string>
+    <string name="category_shopping">ช็อปปิ้ง</string>
+    <string name="category_family">ครอบครัว/ส่วนตัว</string>
+    <string name="category_savings">ออมเงิน/ลงทุน</string>
+    <string name="category_bills">ชำระบิล</string>
+    <string name="category_entertainment">บันเทิง</string>
+    <string name="category_gifts">ของขวัญ/บริจาค</string>
+    <string name="category_travel">ค่าเดินทาง</string>
+    <string name="category_education">การศึกษา</string>
+    <string name="category_hotel">โรงแรม/ท่องเที่ยว</string>
+    <string name="category_insurance">ประกัน</string>
+    <string name="category_withdrawal">ถอนเงิน</string>
+    <string name="category_credit">สินเชื่อ/เช่าซื้อ</string>
 </resources>

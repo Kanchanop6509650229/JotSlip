@@ -304,13 +304,31 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
         // ในเมธอด onCreate ของ AddSlipActivity
         spinner = findViewById(R.id.type_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.types_array,
-                android.R.layout.simple_spinner_item);
 
-        // สร้าง custom layout สำหรับ dropdown items
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Add items in display order
+        String[] categoryKeys = {
+                CategoryConstants.CATEGORY_OTHERS,
+                CategoryConstants.CATEGORY_FOOD,
+                CategoryConstants.CATEGORY_SHOPPING,
+                CategoryConstants.CATEGORY_FAMILY,
+                CategoryConstants.CATEGORY_SAVINGS,
+                CategoryConstants.CATEGORY_BILLS,
+                CategoryConstants.CATEGORY_ENTERTAINMENT,
+                CategoryConstants.CATEGORY_GIFTS,
+                CategoryConstants.CATEGORY_TRAVEL,
+                CategoryConstants.CATEGORY_EDUCATION,
+                CategoryConstants.CATEGORY_HOTEL,
+                CategoryConstants.CATEGORY_INSURANCE,
+                CategoryConstants.CATEGORY_WITHDRAWAL,
+                CategoryConstants.CATEGORY_CREDIT,
+        };
+
+        for (String key : categoryKeys) {
+            adapter.add(getString(CategoryConstants.getDisplayStringResource(key)));
+        }
         spinner.setAdapter(adapter);
 
         // กำหนดสีเมื่อเลือก item
@@ -604,6 +622,8 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
 
     private void addEvent() {
         String imageString = null;
+        String displayCategory = spinner.getSelectedItem().toString();
+        String categoryKey = CategoryConstants.getCategoryKey(displayCategory);
 
         if (currentBitmap != null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -622,7 +642,7 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
         values.put(TYPE, isIncome ? 1 : 0);
         values.put(IMAGE, imageString);
         values.put(MONEY, moneyEditText.getText().toString());
-        values.put(CATEGORY, spinner.getSelectedItem().toString());
+        values.put(CATEGORY, categoryKey);
         values.put(DESCRIPTION, descriptionEditText.getText().toString());
         values.put(DATE, btnDate.getText().toString());
         values.put(TIME, btnTime.getText().toString());

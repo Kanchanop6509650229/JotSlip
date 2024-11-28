@@ -123,4 +123,18 @@
         <item>December</item>
     </string-array>
     <string name="total_expense_format">Total Expenses\n%.2f ฿</string>
+    <string name="category_others">Others</string>
+    <string name="category_food">Food/Drink</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_family">Family/Personal</string>
+    <string name="category_savings">Savings/Investment</string>
+    <string name="category_bills">Bill Payment</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_gifts">Gifts/Donation</string>
+    <string name="category_travel">Travel</string>
+    <string name="category_education">Education</string>
+    <string name="category_hotel">Hotel/Tourism</string>
+    <string name="category_insurance">Insurance</string>
+    <string name="category_withdrawal">Withdrawal</string>
+    <string name="category_credit">Credit/Hire Purchase</string>
 </resources>

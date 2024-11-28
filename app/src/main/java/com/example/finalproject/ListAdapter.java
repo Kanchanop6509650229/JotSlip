@@ -58,7 +58,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         holder.categoryIcon.setImageResource(iconResId);
 
         // Set category name
-        holder.categoryName.setText(slip.getCategory());
+        String categoryKey = slip.getCategory();
+        holder.categoryName.setText(holder.itemView.getContext().getString(
+                CategoryConstants.getDisplayStringResource(categoryKey)
+        ));
 
         if (isFromMainActivity) {
             // แยกวันที่และเวลาจาก dateTime
@@ -110,33 +113,33 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         });
     }
 
-    private int getCategoryIcon(String category) {
-        switch (category) {
-            case "อาหาร/เครื่องดื่ม":
+    private int getCategoryIcon(String categoryKey) {
+        switch (categoryKey) {
+            case CategoryConstants.CATEGORY_FOOD:
                 return R.mipmap.foodandbaverages;
-            case "ช็อปปิ้ง":
+            case CategoryConstants.CATEGORY_SHOPPING:
                 return R.mipmap.shopping;
-            case "ครอบครัว/ส่วนตัว":
+            case CategoryConstants.CATEGORY_FAMILY:
                 return R.mipmap.family;
-            case "ออมเงิน/ลงทุน":
+            case CategoryConstants.CATEGORY_SAVINGS:
                 return R.mipmap.saving;
-            case "ชำระบิล":
+            case CategoryConstants.CATEGORY_BILLS:
                 return R.mipmap.bill;
-            case "บันเทิง":
+            case CategoryConstants.CATEGORY_ENTERTAINMENT:
                 return R.mipmap.entertainment;
-            case "ของขวัญ/บริจาค":
+            case CategoryConstants.CATEGORY_GIFTS:
                 return R.mipmap.gift;
-            case "ค่าเดินทาง":
+            case CategoryConstants.CATEGORY_TRAVEL:
                 return R.mipmap.transportation;
-            case "การศึกษา":
+            case CategoryConstants.CATEGORY_EDUCATION:
                 return R.mipmap.education;
-            case "โรงแรม/ท่องเที่ยว":
+            case CategoryConstants.CATEGORY_HOTEL:
                 return R.mipmap.travelandtourism;
-            case "ประกัน":
+            case CategoryConstants.CATEGORY_INSURANCE:
                 return R.mipmap.insuarance;
-            case "ถอนเงิน":
+            case CategoryConstants.CATEGORY_WITHDRAWAL:
                 return R.mipmap.withdrawal;
-            case "สินเชื่อ/เช่าซื้อ":
+            case CategoryConstants.CATEGORY_CREDIT:
                 return R.mipmap.loan;
             default:
                 return R.mipmap.others;

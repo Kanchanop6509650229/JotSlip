@@ -54,11 +54,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         groupedData = new ArrayList<>();
 
         for (TransferSlip slip : dataSet) {
-            String category = slip.getCategory();
-            if (!categoryGroups.containsKey(category)) {
-                categoryGroups.put(category, new CategoryGroup(category));
+            // Get localized category name from the key
+            String categoryKey = slip.getCategory();
+            if (!categoryGroups.containsKey(categoryKey)) {
+                categoryGroups.put(categoryKey, new CategoryGroup(categoryKey));
             }
-            categoryGroups.get(category).addSlip(slip);
+            categoryGroups.get(categoryKey).addSlip(slip);
         }
 
         for (CategoryGroup group : categoryGroups.values()) {
@@ -78,7 +79,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         int iconResId = getCategoryIcon(group.getCategory());
         holder.categoryIcon.setImageResource(iconResId);
 
-        holder.categoryName.setText(group.getCategory());
+        // Set category name using localized string
+        holder.categoryName.setText(holder.itemView.getContext().getString(
+                CategoryConstants.getDisplayStringResource(group.getCategory())
+        ));
+
         holder.transactionAmount.setText(String.format("- %.2f ฿", group.getTotalAmount()));
         holder.transactionAmount.setTextColor(holder.itemView.getContext()
                 .getResources().getColor(android.R.color.holo_red_dark));
@@ -89,7 +94,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         double percentage = (group.getTotalAmount() / totalExpense) * 100;
         holder.transactionPercent.setText(String.format("%.1f%%", percentage));
 
-        // Only set click listener if in MainActivity
         if (isInMainActivity) {
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(v.getContext(), CategoryActivity.class);
@@ -99,33 +103,33 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         }
     }
 
-    private int getCategoryIcon(String category) {
-        switch (category) {
-            case "อาหาร/เครื่องดื่ม":
+    private int getCategoryIcon(String categoryKey) {
+        switch (categoryKey) {
+            case CategoryConstants.CATEGORY_FOOD:
                 return R.mipmap.foodandbaverages;
-            case "ช็อปปิ้ง":
+            case CategoryConstants.CATEGORY_SHOPPING:
                 return R.mipmap.shopping;
-            case "ครอบครัว/ส่วนตัว":
+            case CategoryConstants.CATEGORY_FAMILY:
                 return R.mipmap.family;
-            case "ออมเงิน/ลงทุน":
+            case CategoryConstants.CATEGORY_SAVINGS:
                 return R.mipmap.saving;
-            case "ชำระบิล":
+            case CategoryConstants.CATEGORY_BILLS:
                 return R.mipmap.bill;
-            case "บันเทิง":
+            case CategoryConstants.CATEGORY_ENTERTAINMENT:
                 return R.mipmap.entertainment;
-            case "ของขวัญ/บริจาค":
+            case CategoryConstants.CATEGORY_GIFTS:
                 return R.mipmap.gift;
-            case "ค่าเดินทาง":
+            case CategoryConstants.CATEGORY_TRAVEL:
                 return R.mipmap.transportation;
-            case "การศึกษา":
+            case CategoryConstants.CATEGORY_EDUCATION:
                 return R.mipmap.education;
-            case "โรงแรม/ท่องเที่ยว":
+            case CategoryConstants.CATEGORY_HOTEL:
                 return R.mipmap.travelandtourism;
-            case "ประกัน":
+            case CategoryConstants.CATEGORY_INSURANCE:
                 return R.mipmap.insuarance;
-            case "ถอนเงิน":
+            case CategoryConstants.CATEGORY_WITHDRAWAL:
                 return R.mipmap.withdrawal;
-            case "สินเชื่อ/เช่าซื้อ":
+            case CategoryConstants.CATEGORY_CREDIT:
                 return R.mipmap.loan;
             default:
                 return R.mipmap.others;

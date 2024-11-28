@@ -622,27 +622,25 @@ public class CategoryActivity extends AppCompatActivity {
         Cursor cursor = getEvents();
         Map<String, Float> categoryExpenses = new HashMap<>();
         float totalExpense = 0f;
+
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
+                String categoryKey = cursor.getString(cursor.getColumnIndex(CATEGORY));
                 String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
-                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
-                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
-                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
-                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
-                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+
                 try {
                     String[] dateParts = dateStr.split("/");
                     int day = Integer.parseInt(dateParts[0]);
                     int month = Integer.parseInt(dateParts[1]);
                     int year = Integer.parseInt(dateParts[2]);
+
                     if (month == selectedMonth + 1 && year == selectedYear) {
-                        if (type != 1) { // Assuming type != 1 signifies an expense
-                            float currentValue = categoryExpenses.getOrDefault(category, 0f);
-                            float newValue = currentValue + money;
-                            categoryExpenses.put(category, newValue);
+                        if (type != 1) { // Not income
+                            // Use category key as map key
+                            float currentValue = categoryExpenses.getOrDefault(categoryKey, 0f);
+                            categoryExpenses.put(categoryKey, currentValue + money);
                             totalExpense += money;
                         }
                     }
@@ -651,8 +649,53 @@ public class CategoryActivity extends AppCompatActivity {
                 }
             } while (cursor.moveToNext());
             cursor.close();
-            // Update chart with category data
-            updateChartWithData(categoryExpenses, totalExpense);
+        }
+
+        // Update chart with category data
+        if (totalExpense > 0) {
+            ArrayList<PieEntry> entries = new ArrayList<>();
+            ArrayList<Integer> colors = new ArrayList<>();
+
+            int[] CHART_COLORS = new int[] {
+                    Color.rgb(64, 89, 128), Color.rgb(149, 165, 124),
+                    Color.rgb(217, 184, 162), Color.rgb(191, 134, 134),
+                    Color.rgb(179, 48, 80), Color.rgb(193, 37, 82),
+                    Color.rgb(255, 102, 0), Color.rgb(245, 199, 0),
+                    Color.rgb(106, 150, 31), Color.rgb(179, 100, 53)
+            };
+
+            int colorIndex = 0;
+            for (Map.Entry<String, Float> entry : categoryExpenses.entrySet()) {
+                float percentage = (entry.getValue() / totalExpense) * 100;
+                if (percentage > 0) {
+                    // Get localized category name for display
+                    String localizedCategory = getString(CategoryConstants.getDisplayStringResource(entry.getKey()));
+                    entries.add(new PieEntry(entry.getValue(), localizedCategory));
+                    colors.add(CHART_COLORS[colorIndex % CHART_COLORS.length]);
+                    colorIndex++;
+                }
+            }
+
+            PieDataSet dataSet = new PieDataSet(entries, "");
+            dataSet.setColors(colors);
+            dataSet.setSliceSpace(3f);
+            dataSet.setSelectionShift(5f);
+
+            PieData data = new PieData(dataSet);
+            float finalTotalExpense = totalExpense;
+            data.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return String.format("%.1f%%", (value / finalTotalExpense) * 100);
+                }
+            });
+            data.setValueTextSize(11f);
+            data.setValueTextColor(Color.WHITE);
+
+            chart.setCenterText(String.format(getString(R.string.total_expense_format), totalExpense));
+            chart.setCenterTextSize(14f);
+            chart.setData(data);
+            chart.invalidate();
         } else {
             // Show empty chart
             chart.setData(null);
@@ -759,7 +802,8 @@ public class CategoryActivity extends AppCompatActivity {
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 if (type != 1) {
                     double amount = cursor.getDouble(cursor.getColumnIndex(MONEY));
-                    String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                    String category_raw = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                    String category = getString(CategoryConstants.getDisplayStringResource(category_raw));
 
                     totalExpense += amount;
                     categoryExpenses.merge(category, amount, Double::sum);
