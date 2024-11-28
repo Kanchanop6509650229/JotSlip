@@ -11,8 +11,11 @@ import static com.example.finalproject.Constants.TABLE_NAME;
 import static com.example.finalproject.Constants.TIME;
 import static com.example.finalproject.Constants.TYPE;
 
+import android.view.ViewGroup;
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View navSettings;
     private ImageView settingsIcon;
     private TextView settingsText;
+    private SettingsManager settingsManager;
 
     private static final String PREF_NAME = "AppSettings";
     private static final String PREF_LANGUAGE = "language";
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        settingsManager = new SettingsManager(this);
+        settingsManager.applyLanguage();
         setContentView(R.layout.homepage);
 
         events = new EventsData(this);
@@ -246,6 +252,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        // บันทึก state ปัจจุบัน
+        saveCurrentState();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         updateBarChartData();
@@ -259,6 +272,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateBarChartData();
         updateCategoryData();
         getRemainMoney();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // กู้คืนข้อมูลหลังจาก configuration changes
+        if (savedInstanceState != null) {
+            String savedDate = savedInstanceState.getString("currentDate");
+            String savedTime = savedInstanceState.getString("currentTime");
+            // กู้คืนข้อมูลอื่นๆ
+        }
+    }
+
+    private void saveCurrentState() {
+        // บันทึก state ลง SharedPreferences
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.app_state_prefs), MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("hasUnsavedChanges", true);
+        // บันทึกข้อมูลอื่นๆ ที่จำเป็น
+        editor.apply();
+    }
+
+    private void loadSavedState() {
+        // โหลด state จาก SharedPreferences
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.app_state_prefs), MODE_PRIVATE);
+        boolean hasUnsavedChanges = prefs.getBoolean("hasUnsavedChanges", false);
+        // โหลดข้อมูลอื่นๆ ที่บันทึกไว้
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (hasUnsavedChanges()) {
+            // แสดง dialog ยืนยันการออก
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.exit_confirmation_title))
+                    .setMessage(getString(R.string.exit_confirmation_message))
+                    .setPositiveButton(getString(R.string.yes), (dialog, which) -> finish())
+                    .setNegativeButton(getString(R.string.no), null)
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean hasUnsavedChanges() {
+        // ตรวจสอบว่ามีการเปลี่ยนแปลงที่ยังไม่ได้บันทึกหรือไม่
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.app_state_prefs), MODE_PRIVATE);
+        return prefs.getBoolean("hasUnsavedChanges", false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // ทำความสะอาดทรัพยากรต่างๆ
+        if (events != null) {
+            events.close();
+        }
+        // ยกเลิกการทำงานที่ค้างอยู่ทั้งหมด
+        clearAllPendingTasks();
+    }
+
+    private void clearAllPendingTasks() {
+        // ยกเลิกการทำงานที่ค้างอยู่ทั้งหมด เช่น AsyncTask, Handler, etc.
     }
 
     private void getRemainMoney() {
@@ -514,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cal.add(Calendar.DAY_OF_MONTH, 1); // เพิ่มวันทีละ 1 วัน
         }
 
-        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "รายรับ");
+        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, getString(R.string.chart_income));
         incomeDataSet.setColor(Color.GREEN);
         incomeDataSet.setDrawValues(true);
         incomeDataSet.setValueFormatter(new ValueFormatter() {
@@ -526,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, "รายจ่าย");
+        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, getString(R.string.chart_expense));
         expenseDataSet.setColor(Color.RED);
         expenseDataSet.setDrawValues(true);
         expenseDataSet.setValueFormatter(new ValueFormatter() {
@@ -598,8 +679,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
@@ -607,14 +688,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
+        // ตั้งค่าการทำงานของปุ่มต่างๆ
+        View languageCard = dialogView.findViewById(R.id.languageCard);
         View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
 
+        // จัดการการเปลี่ยนภาษา
+        languageCard.setOnClickListener(v -> {
+            showLanguageDialog();
+            dialog.dismiss();
+        });
+
+        // จัดการการรีเซ็ตข้อมูล
         resetDataCard.setOnClickListener(v -> {
             dialog.dismiss();
             showResetConfirmationDialog();
         });
 
         dialog.show();
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = { getString(R.string.thai), getString(R.string.english) };
+        String currentLang = settingsManager.getCurrentLanguage();
+        int checkedItem = currentLang.equals("th") ? 0 : 1;
+
+        new AlertDialog.Builder(this)
+                .setTitle("เลือกภาษา")
+                .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? "th" : "en";
+                    if (!selectedLang.equals(currentLang)) {
+                        settingsManager.setLanguage(selectedLang);
+                        restartApp();
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton("ยกเลิก", null)
+                .show();
+    }
+
+    private void restartApp() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void showResetConfirmationDialog() {
@@ -653,7 +769,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             db.delete(TABLE_NAME, null, null);
 
             // อีเซ็ตการแสดงผลข้อมูล
-            remainAmount.setText("0฿");
+            remainAmount.setText(getString(R.string.currency_zero));
             remainAmount.setTextColor(getColor(R.color.white));
 
             // รีเซ็ต RecyclerViews
@@ -671,9 +787,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             updateCategoryData();
             getRemainMoney();
 
-            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_error), Toast.LENGTH_SHORT).show();
             Log.e("MainActivity", "Error resetting data: " + e.getMessage());
         }
     }

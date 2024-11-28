@@ -1,6 +1,8 @@
 package com.example.finalproject;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -21,11 +23,12 @@ public class SlipAdapter extends RecyclerView.Adapter<SlipAdapter.ViewHolder> {
     private List<TransferSlip> dataSet;
     private List<List<TransferSlip>> groupedSlips;
     private MyClickListener mCallback;
+    private Context context;
 
     public SlipAdapter(List<TransferSlip> myDataSet) {
         this.dataSet = myDataSet;
         groupSlipsByDate();
-    }
+    }   
 
     private void groupSlipsByDate() {
         groupedSlips = new ArrayList<>();
@@ -76,18 +79,15 @@ public class SlipAdapter extends RecyclerView.Adapter<SlipAdapter.ViewHolder> {
                     if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                         calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
                         calendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH)) {
-                        holder.day.setText("วันนี้");
+                        holder.day.setText(holder.itemView.getContext().getString(R.string.today));
                     } else {
-                        String[] thaiDays = {"อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"};
+                        String[] thaiDays = holder.itemView.getContext().getResources().getStringArray(R.array.days_of_week);
                         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-                        holder.day.setText("วัน" + thaiDays[dayOfWeek]);
+                        holder.day.setText(holder.itemView.getContext().getString(R.string.day_prefix) + thaiDays[dayOfWeek]);
                     }
 
-                    String[] thaiMonths = {
-                        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-                    };
-                    String monthYear = thaiMonths[month] + " " + dateComponents[2];
+                    String[] months = holder.itemView.getContext().getResources().getStringArray(R.array.months_array);
+                    String monthYear = months[month] + " " + dateComponents[2];
                     if (dateTimeComponents.length > 1) {
                         monthYear += " " + dateTimeComponents[1];
                     }
@@ -112,12 +112,14 @@ public class SlipAdapter extends RecyclerView.Adapter<SlipAdapter.ViewHolder> {
                         holder.totalAmountPerDay.setTextColor(holder.itemView.getContext()
                             .getResources().getColor(android.R.color.holo_red_dark));
                     }
-                    holder.totalAmountPerDay.setText(String.format("%.2f ฿", totalAmount));
+                    holder.totalAmountPerDay.setText(String.format(
+                        holder.itemView.getContext().getString(R.string.amount_format_with_currency), 
+                        totalAmount));
 
                 } catch (NumberFormatException e) {
                     Log.e("SlipAdapter", "Error parsing date: " + e.getMessage());
-                    holder.day.setText("วันที่");
-                    holder.monthYearTime.setText("เดือน/ปี");
+                    holder.day.setText(holder.itemView.getContext().getString(R.string.default_date));
+                    holder.monthYearTime.setText(holder.itemView.getContext().getString(R.string.default_month_year));
                 }
             }
         }

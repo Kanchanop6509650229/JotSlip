@@ -6,40 +6,40 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="@dimen/margin_medium"
+    android:layout_marginVertical="@dimen/margin_small"
     android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
+    app:cardCornerRadius="@dimen/card_corner_radius_medium"
+    app:cardElevation="@dimen/card_elevation_small"
     app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/padding_medium">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingVertical="8dp">
+            android:paddingVertical="@dimen/padding_small">
 
             <TextView
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="26"
+                android:text="@string/no_data"
                 android:textColor="@color/black"
-                android:textSize="28sp"
+                android:textSize="@dimen/text_size_twentyeight"
                 android:textStyle="bold" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="@dimen/margin_medium"
+                android:layout_marginEnd="@dimen/margin_medium"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -47,34 +47,34 @@
                     android:id="@+id/day"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="วันที่"
+                    android:text="@string/date"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/text_size" />
 
                 <TextView
                     android:id="@+id/monthYearTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="เดือน"
+                    android:text="@string/month"
                     android:textColor="@color/gray"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_size_small" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/totalAmountPerDay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 ฿"
+                android:text="@string/totalRemain"
                 android:textColor="@color/green_500"
-                android:textSize="20sp"
+                android:textSize="@dimen/text_size_twenty"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/layout_one"
             android:layout_marginVertical="8dp"
-            android:background="#E0E0E0"/>
+            android:background="@color/ligth_gray"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_item_view"

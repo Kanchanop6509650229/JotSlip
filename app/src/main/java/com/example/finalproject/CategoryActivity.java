@@ -16,6 +16,7 @@ import android.app.ActivityOptions;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -99,18 +100,20 @@ public class CategoryActivity extends AppCompatActivity {
     private View navSettings;
     private ImageView settingsIcon;
     private TextView settingsText;
-    private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
-
+    private String[] months;
     private double totalExpense = 0.0;
     private Map<String, Double> categoryExpenses = new HashMap<>();
+    private SettingsManager settingsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        settingsManager = new SettingsManager(this);
+        settingsManager.applyLanguage();
         setContentView(R.layout.category);
 
+        months = getResources().getStringArray(R.array.months_array);
         initializeViews();
         setupSwipeRefresh();
         setupNavigation();
@@ -120,6 +123,97 @@ public class CategoryActivity extends AppCompatActivity {
 
         updateChartData();
         updateCategoryData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveCategoryState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadCategoryState();
+        updateChartData();
+        updateCategoryData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedMonth", selectedMonth);
+        outState.putInt("selectedYear", selectedYear);
+        outState.putFloat("scrollPosition",
+                categoryRecyclerView.getLayoutManager() != null
+                        ? ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                                .findFirstVisibleItemPosition()
+                        : 0);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            selectedMonth = savedInstanceState.getInt("selectedMonth");
+            selectedYear = savedInstanceState.getInt("selectedYear");
+            final float scrollPosition = savedInstanceState.getFloat("scrollPosition");
+
+            categoryRecyclerView.post(() -> {
+                if (categoryRecyclerView.getLayoutManager() != null) {
+                    ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                            .scrollToPosition((int) scrollPosition);
+                }
+            });
+        }
+    }
+
+    private void saveCategoryState() {
+        SharedPreferences prefs = getSharedPreferences("CategoryState", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("selectedMonth", selectedMonth);
+        editor.putInt("selectedYear", selectedYear);
+        if (categoryRecyclerView.getLayoutManager() != null) {
+            editor.putInt("scrollPosition",
+                    ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                            .findFirstVisibleItemPosition());
+        }
+        editor.apply();
+    }
+
+    private void loadCategoryState() {
+        SharedPreferences prefs = getSharedPreferences("CategoryState", MODE_PRIVATE);
+        selectedMonth = prefs.getInt("selectedMonth", selectedMonth);
+        selectedYear = prefs.getInt("selectedYear", selectedYear);
+        final int scrollPosition = prefs.getInt("scrollPosition", 0);
+
+        categoryRecyclerView.post(() -> {
+            if (categoryRecyclerView.getLayoutManager() != null) {
+                ((LinearLayoutManager) categoryRecyclerView.getLayoutManager())
+                        .scrollToPosition(scrollPosition);
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (events != null) {
+            events.close();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showExportDialog();
+            } else {
+                Toast.makeText(this, getString(R.string.storage_permission_required), Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void initializeViews() {
@@ -321,7 +415,7 @@ public class CategoryActivity extends AppCompatActivity {
         chart.setHoleRadius(58f);
         chart.setTransparentCircleRadius(61f);
         chart.setDrawCenterText(true);
-        chart.setCenterText("รายจ่ายทั้งหมด");
+        chart.setCenterText(getString(R.string.chart_center_text));
         chart.setRotationEnabled(true);
         chart.setHighlightPerTapEnabled(true);
 
@@ -391,7 +485,7 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void exportDataToImage() {
-        // เก็บขนาดเดิมของกราฟ
+        // Save the original chart size
         final ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
         final int originalWidth = chart.getWidth();
         final int originalHeight = chart.getHeight();
@@ -400,11 +494,11 @@ public class CategoryActivity extends AppCompatActivity {
         double totalExpense = calculateTotalExpense();
 
         try {
-            // คำนวณขนาดกราฟที่ต้องการ
+            // Calculate the desired chart size
             int desiredWidth = chart.getWidth();
-            int desiredHeight = 300; // หรือขนาดที่ต้องการ
+            int desiredHeight = 300; // or the desired height
 
-            // กำหนดขนาดกราฟใหม่
+            // Set the new chart size
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
                     desiredWidth,
                     desiredHeight);
@@ -449,28 +543,26 @@ public class CategoryActivity extends AppCompatActivity {
                         resolver.update(imageUri, values, null, null);
                     }
 
-                    Toast.makeText(this,
-                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.save_image_success), Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 if (imageUri != null) {
                     resolver.delete(imageUri, null, null);
                 }
-                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
-                Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
+                Log.e("CategoryActivity", getString(R.string.error_saving_image_gallery, e.getMessage()));
+                Toast.makeText(this, getString(R.string.save_image_error), Toast.LENGTH_SHORT).show();
             }
         } finally {
-            // คืนค่าขนาดกราฟกลับเป็นขนาดเดิม
+            // Restore the original chart size
             chart.setLayoutParams(originalParams);
             chart.getLayoutParams().width = originalWidth;
             chart.getLayoutParams().height = originalHeight;
 
-            // บังคับให้วาดใหม่
+            // Force a redraw
             chart.requestLayout();
             chart.invalidate();
 
-            // เรียก updateChartData เพื่ออัพเดทข้อมูลและการแสดงผลใหม่
+            // Call updateChartData to update the data and display
             updateChartData();
         }
     }
@@ -480,11 +572,11 @@ public class CategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { TYPE, MONEY, DATE, CATEGORY };
 
-        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        // Use direct month and year comparison from substring
         String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
-        String[] selectionArgs = { 
-            String.format("%02d", selectedMonth + 1), 
-            String.valueOf(selectedYear) 
+        String[] selectionArgs = {
+                String.format("%02d", selectedMonth + 1),
+                String.valueOf(selectedYear)
         };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
@@ -493,6 +585,7 @@ public class CategoryActivity extends AppCompatActivity {
             do {
                 double money = cursor.getDouble(cursor.getColumnIndex(MONEY));
                 String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+
                 categoryExpenses.merge(category, money, Double::sum);
             } while (cursor.moveToNext());
             cursor.close();
@@ -506,11 +599,11 @@ public class CategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { MONEY };
 
-        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        // Use direct month and year comparison from substring
         String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
-        String[] selectionArgs = { 
-            String.format("%02d", selectedMonth + 1), 
-            String.valueOf(selectedYear) 
+        String[] selectionArgs = {
+                String.format("%02d", selectedMonth + 1),
+                String.valueOf(selectedYear)
         };
 
         Cursor cursor = db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, null);
@@ -529,41 +622,84 @@ public class CategoryActivity extends AppCompatActivity {
         Cursor cursor = getEvents();
         Map<String, Float> categoryExpenses = new HashMap<>();
         float totalExpense = 0f;
+
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                long id = cursor.getLong(cursor.getColumnIndex(_ID));
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 float money = cursor.getFloat(cursor.getColumnIndex(MONEY));
-                String dateStr = cursor.getString(cursor.getColumnIndex(DATE)); 
-                String timeStr = cursor.getString(cursor.getColumnIndex(TIME));
-                String description = cursor.getString(cursor.getColumnIndex(DESCRIPTION));
-                String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
-                String receiver = cursor.getString(cursor.getColumnIndex(RECEIVER));
-                String image = cursor.getString(cursor.getColumnIndex(IMAGE));
+                String categoryKey = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                String dateStr = cursor.getString(cursor.getColumnIndex(DATE));
+
                 try {
                     String[] dateParts = dateStr.split("/");
                     int day = Integer.parseInt(dateParts[0]);
                     int month = Integer.parseInt(dateParts[1]);
                     int year = Integer.parseInt(dateParts[2]);
+
                     if (month == selectedMonth + 1 && year == selectedYear) {
-                        if (type != 1) { // Assuming type != 1 signifies an expense
-                            float currentValue = categoryExpenses.getOrDefault(category, 0f);
-                            float newValue = currentValue + money;
-                            categoryExpenses.put(category, newValue);
+                        if (type != 1) { // Not income
+                            // Use category key as map key
+                            float currentValue = categoryExpenses.getOrDefault(categoryKey, 0f);
+                            categoryExpenses.put(categoryKey, currentValue + money);
                             totalExpense += money;
                         }
                     }
                 } catch (Exception e) {
-                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
+                    Log.e("CategoryActivity", getString(R.string.error_parsing_date, dateStr), e);
                 }
             } while (cursor.moveToNext());
             cursor.close();
-            // Update chart with category data
-            updateChartWithData(categoryExpenses, totalExpense);
+        }
+
+        // Update chart with category data
+        if (totalExpense > 0) {
+            ArrayList<PieEntry> entries = new ArrayList<>();
+            ArrayList<Integer> colors = new ArrayList<>();
+
+            int[] CHART_COLORS = new int[] {
+                    Color.rgb(64, 89, 128), Color.rgb(149, 165, 124),
+                    Color.rgb(217, 184, 162), Color.rgb(191, 134, 134),
+                    Color.rgb(179, 48, 80), Color.rgb(193, 37, 82),
+                    Color.rgb(255, 102, 0), Color.rgb(245, 199, 0),
+                    Color.rgb(106, 150, 31), Color.rgb(179, 100, 53)
+            };
+
+            int colorIndex = 0;
+            for (Map.Entry<String, Float> entry : categoryExpenses.entrySet()) {
+                float percentage = (entry.getValue() / totalExpense) * 100;
+                if (percentage > 0) {
+                    // Get localized category name for display
+                    String localizedCategory = getString(CategoryConstants.getDisplayStringResource(entry.getKey()));
+                    entries.add(new PieEntry(entry.getValue(), localizedCategory));
+                    colors.add(CHART_COLORS[colorIndex % CHART_COLORS.length]);
+                    colorIndex++;
+                }
+            }
+
+            PieDataSet dataSet = new PieDataSet(entries, "");
+            dataSet.setColors(colors);
+            dataSet.setSliceSpace(3f);
+            dataSet.setSelectionShift(5f);
+
+            PieData data = new PieData(dataSet);
+            float finalTotalExpense = totalExpense;
+            data.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return String.format("%.1f%%", (value / finalTotalExpense) * 100);
+                }
+            });
+            data.setValueTextSize(11f);
+            data.setValueTextColor(Color.WHITE);
+
+            chart.setCenterText(String.format(getString(R.string.total_expense_format), totalExpense));
+            chart.setCenterTextSize(14f);
+            chart.setData(data);
+            chart.invalidate();
         } else {
             // Show empty chart
             chart.setData(null);
-            chart.setCenterText("ไม่มีข้อมูลในเดือนนี้");
+            chart.setCenterText(getString(R.string.no_data_this_month));
             chart.invalidate();
         }
     }
@@ -605,7 +741,7 @@ public class CategoryActivity extends AppCompatActivity {
         data.setValueTextSize(11f);
         data.setValueTextColor(Color.WHITE);
 
-        chart.setCenterText(String.format("รายจ่ายทั้งหมด\n%.2f ฿", totalExpense));
+        chart.setCenterText(String.format(getString(R.string.total_expense_format), totalExpense));
         chart.setCenterTextSize(14f);
         chart.setData(data);
         chart.invalidate();
@@ -645,7 +781,7 @@ public class CategoryActivity extends AppCompatActivity {
                         slipList.add(slip);
                     }
                 } catch (Exception e) {
-                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
+                    Log.e("CategoryActivity", getString(R.string.error_parsing_date, dateStr), e);
                 }
             } while (cursor.moveToNext());
 
@@ -666,7 +802,8 @@ public class CategoryActivity extends AppCompatActivity {
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 if (type != 1) {
                     double amount = cursor.getDouble(cursor.getColumnIndex(MONEY));
-                    String category = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                    String category_raw = cursor.getString(cursor.getColumnIndex(CATEGORY));
+                    String category = getString(CategoryConstants.getDisplayStringResource(category_raw));
 
                     totalExpense += amount;
                     categoryExpenses.merge(category, amount, Double::sum);
@@ -677,7 +814,7 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void updateDisplayTexts() {
-        monthText.setText(MONTHS[selectedMonth]);
+        monthText.setText(months[selectedMonth]);
         yearText.setText(String.valueOf(selectedYear));
     }
 
@@ -839,27 +976,6 @@ public class CategoryActivity extends AppCompatActivity {
         return db.query(TABLE_NAME, FROM, selection, selectionArgs, null, null, ORDER_BY);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateChartData();
-        updateCategoryData();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showExportDialog();
-            } else {
-                Toast.makeText(this, "ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
     class DecimalDigitsInputFilter implements InputFilter {
         private Pattern mPattern;
 
@@ -883,8 +999,8 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
@@ -892,8 +1008,17 @@ public class CategoryActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
+        // Set up button functionality
+        View languageCard = dialogView.findViewById(R.id.languageCard);
         View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
 
+        // Handle language change
+        languageCard.setOnClickListener(v -> {
+            showLanguageDialog();
+            dialog.dismiss();
+        });
+
+        // Handle data reset
         resetDataCard.setOnClickListener(v -> {
             dialog.dismiss();
             showResetConfirmationDialog();
@@ -902,23 +1027,49 @@ public class CategoryActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void showLanguageDialog() {
+        String[] languages = { getString(R.string.thai), getString(R.string.english) };
+        String currentLang = settingsManager.getCurrentLanguage();
+        int checkedItem = currentLang.equals("th") ? 0 : 1;
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.language))
+                .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? "th" : "en";
+                    if (!selectedLang.equals(currentLang)) {
+                        settingsManager.setLanguage(selectedLang);
+                        restartApp();
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton(getString(R.string.cancel_text), null)
+                .show();
+    }
+
+    private void restartApp() {
+        Intent intent = new Intent(this, CategoryActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
     private void showResetConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        // สร้าง AlertDialog แบบกำหนดเอง
+        // Create a custom AlertDialog
         View dialogView = getLayoutInflater().inflate(R.layout.reset_dialog, null);
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
 
-        // ทำให้พื้นหลัง dialog โปร่งใส
+        // Make the dialog background transparent
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
         dialog.show();
 
-        // ตั้งค่าการทำงานของปุ่มใน dialog
+        // Set up button functionality in the dialog
         Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
 
@@ -932,38 +1083,38 @@ public class CategoryActivity extends AppCompatActivity {
 
     private void resetAllData() {
         try {
-            // ลบข้อมูลในฐานข้อมูล
+            // Delete data from the database
             events = new EventsData(this);
             SQLiteDatabase db = events.getWritableDatabase();
             db.delete(TABLE_NAME, null, null);
 
-            // อีเซ็ตค่าเริ่มต้น
+            // Reset initial values
             Calendar calendar = Calendar.getInstance();
             selectedMonth = calendar.get(Calendar.MONTH);
             selectedYear = calendar.get(Calendar.YEAR) + 543;
-            
-            // รีเซ็ตค่าตัวแปรที่เก็บข้อมูล
+
+            // Reset data variables
             totalExpense = 0.0;
             categoryExpenses.clear();
 
-            // อัพเดทการแสดงผลทั้งหมด
+            // Update all displays
             updateDisplayTexts();
             updateChartData();
             updateCategoryData();
             updateExpenseData();
 
-            // รีเซ็ต PieChart
+            // Reset the PieChart
             chart.clear();
             chart.setData(null);
-            chart.setCenterText("รายจ่ายทั้งหมด\n0.00 ฿");
+            chart.setCenterText(getString(R.string.chart_center_text));
             chart.invalidate();
 
-            // รีเซ็ต RecyclerView
+            // Reset the RecyclerView
             categoryRecyclerView.setAdapter(new CategoryAdapter(new ArrayList<>(), false));
 
-            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_data_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_data_error), Toast.LENGTH_SHORT).show();
             Log.e("CategoryActivity", "Error resetting data: " + e.getMessage());
         }
     }

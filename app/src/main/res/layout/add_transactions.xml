@@ -73,7 +73,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ประเภทธุรกรรม"
+                    android:text="@string/transaction_type"
                     android:textColor="@color/gray"
                     android:textSize="14sp"
                     android:layout_marginBottom="12dp"/>
@@ -135,7 +135,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/thaibath"
-                    android:tint="@color/green_500" />
+                    app:tint="@color/green_500" />
 
                 <EditText
                     android:id="@+id/add_money"
@@ -145,7 +145,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="จำนวนเงิน"
+                    android:hint="@string/amount"
                     android:inputType="numberDecimal"
                     android:textColorHint="@color/gray" />
 
@@ -182,7 +182,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/category"
-                    android:tint="@color/green_500" />
+                    app:tint="@color/green_500" />
 
                 <Spinner
                     android:id="@+id/type_spinner"
@@ -214,7 +214,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/detail"
-                    android:tint="@color/green_500" />
+                    app:tint="@color/green_500" />
 
                 <EditText
                     android:id="@+id/description"
@@ -224,7 +224,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="รายละเอียด"
+                    android:hint="@string/description"
                     android:inputType="text"
                     android:textColorHint="@color/gray" />
 
@@ -261,7 +261,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/calendar2"
-                    android:tint="@color/green_500" />
+                    app:tint="@color/green_500" />
 
                 <Button
                     android:id="@+id/date_btn"
@@ -310,7 +310,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/clock"
-                    android:tint="@color/green_500" />
+                    app:tint="@color/green_500" />
 
                 <Button
                     android:id="@+id/time_btn"
@@ -359,7 +359,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/people1"
-                    android:tint="@color/green_500" />
+                    app:tint="@color/green_500" />
 
                 <EditText
                     android:id="@+id/receiver"
@@ -369,7 +369,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="ผู้รับ"
+                    android:hint="@string/receiver"
                     android:inputType="text"
                     android:textColorHint="@color/gray" />
 
@@ -393,7 +393,7 @@
             android:layout_height="wrap_content"
             android:background="@color/green_500"
             android:padding="16dp"
-            android:text="Submit"
+            android:text="@string/submit"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:cornerRadius="24dp" />

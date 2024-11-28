@@ -32,15 +32,187 @@
     <string name="transaction_type">ประเภทธุรกรรม</string>
     <string name="amount">จำนวนเงิน</string>
     <string name="description">รายละเอียด</string>
-    <string name="recevier">ผู้รับ</string>
+    <string name="receiver">ผู้รับ</string>
     <string name="submit">ยืนยัน</string>
     <string name="settings">การตั้งค่า</string>
     <string name="language">เปลี่ยนภาษา</string>
     <string name="font_size">ขนาดตัวอักษร</string>
     <string name="reset_data">รีเซ็ตข้อมูลทั้งหมด</string>
     <string name="thai">ไทย</string>
-    <string name="english">English</string>
-    <string name="font_size_small">เล็ก</string>
-    <string name="font_size_normal">ปกติ</string>
-    <string name="font_size_large">ใหญ่</string>
+    <string name="english">อังกฤษ</string>
+    <string name="upload_image_desc">อัพโหลดรูปภาพ</string>
+    <string name="remove_image">ลบรูปภาพ</string>
+    <string name="transaction_type_label">ประเภทธุรกรรม</string>
+    <string name="amount_hint">จำนวนเงิน</string>
+    <string name="category_label">หมวดหมู่</string>
+    <string name="description_hint">รายละเอียด</string>
+    <string name="receiver_hint">ผู้รับ</string>
+    <string name="save_success">บันทึกข้อมูลสำเร็จ</string>
+    <string name="load_image_error">ไม่สามารถโหลดรูปภาพได้</string>
+    <string name="storage_permission_required">ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์</string>
+    <string name="choose_image">เลือกรูปภาพจาก</string>
+    <string name="category_chart_title">สรุปค่าใช้จ่ายตามหมวดหมู่</string>
+    <string name="total_expense">ค่าใช้จ่ายรวมทั้งหมด</string>
+    <string name="export_success">บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว</string>
+    <string name="export_error">เกิดข้อผิดพลาดในการบันทึกรูปภาพ</string>
+    <string name="no_data">ไม่มีข้อมูลในเดือนนี้</string>
+    <string name="balance">ยอดคงเหลือ</string>
+    <string name="net_income">รายรับสุทธิ</string>
+    <string name="net_expense">รายจ่ายสุทธิ</string>
+    <string name="balance_changes">กราฟแสดงการเปลี่ยนแปลง</string>
+    <string name="export_title">เลือกรูปแบบการส่งออก</string>
+    <string name="export_desc">กรุณาเลือกรูปแบบที่ต้องการส่งออกข้อมูล</string>
+    <string name="overview_total">ยอดรวมทั้งหมด</string>
+    <string name="seven_days">รายการย้อนหลัง 7 วัน</string>
+    <string name="today">วันนี้</string>
+    <string name="no_extra_note">ไม่มีบันทึกเพิ่มเติม</string>
+    <string name="settings_title">การตั้งค่า</string>
+    <string name="reset_confirm_title">ยืนยันการรีเซ็ตข้อมูล</string>
+    <string name="reset_confirm_message">คุณต้องการลบข้อมูลทั้งหมดหรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้</string>
+    <string name="confirm">ยืนยัน</string>
+    <string name="cancel_text">ยกเลิก</string>
+    <string name="reset_data_success">รีเซ็ตข้อมูลสำเร็จ</string>
+    <string name="reset_data_error">เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล</string>
+    <string name="error_invalid_amount">จำนวนเงินต้องมากกว่า 0</string>
+    <string name="error_max_amount">จำนวนเงินต้องไม่เกิน 99,999,999.99</string>
+    <string name="error_required_type">กรุณาเลือกประเภทรายรับ/รายจ่าย</string>
+    <string name="error_required_category">กรุณาเลือกหมวดหมู่</string>
+    <string name="error_required_date">กรุณาเลือกวันที่</string>
+    <string name="error_required_time">กรุณาเลือกเวลา</string>
+    <string name="error_invalid_time">รูปแบบเวลาไม่ถูกต้อง</string>
+    <string name="error_future_date">วันที่และเวลาต้องไม่เป็นอนาคต</string>
+    <string name="error_description_length">รายละเอียดต้องไม่เกิน 100 ตัวอักษร</string>
+    <string name="error_receiver_length">ชื่อผู้รับต้องไม่เกิน 50 ตัวอักษร</string>
+    <string name="month">เดือน</string>
+    <string name="date">วันที่</string>
+    <string name="time">เวลา</string>
+    <string name="percent">0 %</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_image">รูปภาพ</string>
+    <string name="category_name">ชื่อหมวดหมู่</string>
+    <string name="error_required_amount">กรุณากรอกจำนวนเงิน</string>
+    <string name="error_invalid_amount_format">รูปแบบจำนวนเงินไม่ถูกต้อง</string>
+    <string name="unsaved_changes_title">มีข้อมูลที่ยังไม่ได้บันทึก</string>
+    <string name="unsaved_changes_message">ต้องการออกโดยไม่บันทึกข้อมูลหรือไม่?</string>
+    <string name="exit">ออก</string>
+    <string name="error_invalid_date_format">รูปแบบวันที่ไม่ถูกต้อง</string>
+    <string name="error_processing_slip">เกิดข้อผิดพลาดในการประมวลผลสลิป</string>
+    <string name="error_save_transaction">เกิดข้อผิดพลาดในการบันทึก: </string>
+    <string name="error_invalid_date_time">รูปแบบวันที่หรือเวลาไม่ถูกต้อง</string>
+    <string name="permission_title">ต้องการสิทธิ์การเข้าถึง</string>
+    <string name="permission_message">แอปจำเป็นต้องเข้าถึงรูปภาพเพื่อสแกนสลิป</string>
+    <string name="permission_settings_message">กรุณาอนุญาตการเข้าถึงรูปภาพในการตั้งค่าแอปพลิเคชัน</string>
+    <string name="go_to_settings">ไปที่ตั้งค่า</string>
+    <string name="chart_center_text">รายจ่ายทั้งหมด</string>
+    <string name="save_image_success">บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว</string>
+    <string name="save_image_error">เกิดข้อผิดพลาดในการบันทึกรูปภาพ</string>
+    <string name="no_data_this_month">ไม่มีข้อมูลในเดือนนี้</string>
+    <string-array name="months_array">
+        <item></item>
+        <item>มกราคม</item>
+        <item>กุมภาพันธ์</item>
+        <item>มีนาคม</item>
+        <item>เมษายน</item>
+        <item>พฤษภาคม</item>
+        <item>มิถุนายน</item>
+        <item>กรกฎาคม</item>
+        <item>สิงหาคม</item>
+        <item>กันยายน</item>
+        <item>ตุลาคม</item>
+        <item>พฤศจิกายน</item>
+        <item>ธันวาคม</item>
+    </string-array>
+    <string name="total_expense_format">รายจ่ายทั้งหมด\n%.2f ฿</string>
+    <string name="reset_success">รีเซ็ตข้อมูลสำเร็จ</string>
+    <string name="reset_confirm_positive">รีเซ็ต</string>
+    <string name="reset_confirm_negative">ยกเลิก</string>
+    <string name="category_others">อื่นๆ</string>
+    <string name="category_food">อาหาร/เครื่องดื่ม</string>
+    <string name="category_shopping">ช็อปปิ้ง</string>
+    <string name="category_family">ครอบครัว/ส่วนตัว</string>
+    <string name="category_savings">ออมเงิน/ลงทุน</string>
+    <string name="category_bills">ชำระบิล</string>
+    <string name="category_entertainment">บันเทิง</string>
+    <string name="category_gifts">ของขวัญ/บริจาค</string>
+    <string name="category_travel">ค่าเดินทาง</string>
+    <string name="category_education">การศึกษา</string>
+    <string name="category_hotel">โรงแรม/ท่องเที่ยว</string>
+    <string name="category_insurance">ประกัน</string>
+    <string name="category_withdrawal">ถอนเงิน</string>
+    <string name="category_credit">สินเชื่อ/เช่าซื้อ</string>
+    <string name="error_saving_image_gallery">เกิดข้อผิดพลาดในการบันทึกรูปภาพลงในแกลเลอรี่: %1$s</string>
+    <string name="error_parsing_date">เกิดข้อผิดพลาดในการแปลงวันที่: %1$s</string>
+    <string name="currency_format">- %.2f ฿</string>
+    <string name="percentage_format">%.1f%%</string>
+    <string name="income_type_comment">รายรับ</string>
+    <string name="export_monthly_report">รายงานประจำเดือน: %1$s %2$s</string>
+    <string name="export_summary">สรุปรวม:</string>
+    <string name="export_total_income">รายรับรวม</string>
+    <string name="export_total_expense">รายจ่ายรวม</string>
+    <string name="export_balance">คงเหลือ</string>
+    <string name="export_daily_balance_title">ข้อมูลกราฟยอดคงเหลือรายวัน:</string>
+    <string name="export_daily_balance_header">วันที่,ยอดคงเหลือ</string>
+    <string name="export_transactions_title">รายการธุรกรรมทั้งหมด:</string>
+    <string name="export_transactions_header">วันที่,เวลา,ประเภท,หมวดหมู่,จำนวนเงิน,รายละเอียด,ผู้รับ/จ่าย</string>
+    <string name="export_income_type">รายรับ</string>
+    <string name="export_expense_type">รายจ่าย</string>
+    <string name="export_success_message">ส่งออกข้อมูลสำเร็จ\nบันทึกไว้ที่: %1$s</string>
+    <string name="export_error_message">เกิดข้อผิดพลาดในการส่งออกข้อมูล</string>
+    <string name="export_error_log">Error exporting %1$s data: %2$s</string>
+    <string name="export_category_report">รายงานสรุปตามหมวดหมู่ประจำเดือน: %1$s %2$s</string>
+    <string name="export_total_expense_summary">รายจ่ายรวมทั้งหมด: %1$.2f</string>
+    <string name="export_category_header">หมวดหมู่,จำนวนเงิน,เปอร์เซ็นต์</string>
+    <string name="export_percentage_format">%.1f%%</string>
+    <string name="history_state_prefs">HistoryState</string>
+    <string name="history_file_name_format">history_summary_%1$s_%2$s_%3$s.jpg</string>
+    <string name="history_date_format">%02d/%02d/%d</string>
+    <string name="history_income_type_comment">รายรับ</string>
+    <string name="history_expense_type_comment">รายจ่าย</string>
+    <string name="history_no_data">ไม่มีข้อมูลในเดือนนี้</string>
+    <string name="dialog_cancel">ยกเลิก</string>
+    <string name="dialog_language_title">เลือกภาษา</string>
+    <string name="chart_trend_decrease">ลดลง</string>
+    <string name="chart_trend_increase">เพิ่มขึ้น</string>
+    <string name="no_description">ไม่มีบันทึกเพิ่มเติม</string>
+    <string name="amount_format_positive">+ %.2f ฿</string>
+    <string name="amount_format_negative">- %.2f ฿</string>
+    <string name="date_format_string">%s %s %s</string>
+    <string name="app_state_prefs">AppState</string>
+    <string name="exit_confirmation_title">ยืนยันการออก</string>
+    <string name="exit_confirmation_message">คุณต้องการออกจากแอปพลิเคชันหรือไม่?</string>
+    <string name="yes">ใช่</string>
+    <string name="no">ไม่</string>
+    <string name="home_currency_format">%s ฿</string>
+    <string name="chart_income">รายรับ</string>
+    <string name="chart_expense">รายจ่าย</string>
+    <string name="reset_error">เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล</string>
+    <string name="currency_zero">0฿</string>
+    <string name="day_prefix">วัน</string>
+    <string name="default_date">วันที่</string>
+    <string name="default_month_year">เดือน/ปี</string>
+    <string name="amount_format_with_currency">%.2f ฿</string>
+    <string-array name="days_of_week">
+        <item>อาทิตย์</item>
+        <item>จันทร์</item>
+        <item>อังคาร</item>
+        <item>พุธ</item>
+        <item>พฤหัสบดี</item>
+        <item>ศุกร์</item>
+        <item>เสาร์</item>
+    </string-array>
+    <string name="slip_details_title">รายละเอียดรายการ</string>
+    <string name="slip_info_state">SlipInfoState</string>
+    <string name="delete">ลบ</string>
+    <string name="delete_confirmation_title">ยืนยันการลบ</string>
+    <string name="delete_confirmation_message">คุณต้องการลบรายการนี้ใช่หรือไม่?</string>
+    <string name="summary_title">สรุปรายรับ-รายจ่าย</string>
+    <string name="summary_month_prefix">ประจำเดือน</string>
+    <string name="summary_income">รายรับ</string>
+    <string name="summary_expense">รายจ่าย</string>
+    <string name="summary_balance">คงเหลือ</string>
+    <string name="summary_chart_title">กราฟแสดงการเปลี่ยนแปลง</string>
+    <string name="summary_created">Created:</string>
+    <string name="summary_generated">Generated by JotSlip</string>
+    <string name="category_summary_title">สรุปค่าใช้จ่ายตามหมวดหมู่</string>
+    <string name="summary_total_expense">ค่าใช้จ่ายรวมทั้งหมด</string>
 </resources>

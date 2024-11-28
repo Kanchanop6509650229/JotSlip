@@ -210,7 +210,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/home_icon"
@@ -245,7 +246,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/category_icon"
@@ -259,7 +261,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="หมวดหมู่"
+                        android:text="@string/category_label"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
@@ -298,7 +300,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@android:id/icon"
@@ -333,7 +336,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/settings_icon"
@@ -347,7 +351,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="ตั้งค่า"
+                        android:text="@string/settings"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>

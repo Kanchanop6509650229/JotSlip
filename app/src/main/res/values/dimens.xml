@@ -8,6 +8,7 @@
     <dimen name="margin_horizontal">20dp</dimen>
 
     <!-- Paddings -->
+    <dimen name="padding_three">3dp</dimen>
     <dimen name="padding_smaller">4dp</dimen>
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding">12dp</dimen>
@@ -15,21 +16,35 @@
     <dimen name="padding_large">24dp</dimen>
 
     <!-- Card specifics -->
+    <dimen name="card_corner_radius_small">12dp</dimen>
+    <dimen name="card_corner_radius_medium">16dp</dimen>
     <dimen name="card_corner_radius">24dp</dimen>
+    <dimen name="none_card_elevation">0dp</dimen>
     <dimen name="card_elevation">8dp</dimen>
+    <dimen name="card_elevation_smaller">2dp</dimen>
     <dimen name="card_elevation_small">4dp</dimen>
     <dimen name="card_elevation_medium">16dp</dimen>
 
     <!-- Text Sizes -->
     <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_twenty">20sp</dimen>
+    <dimen name="text_size_twentyeight">28sp</dimen>
     <dimen name="text_size_large">36sp</dimen>
 
     <!-- Bar Chart -->
     <dimen name="bar_chart_height">220dp</dimen>
 
     <!-- Bottom Padding -->
-    <dimen name="bottom_padding">80dp</dimen>
+    <dimen name="padding_bottom">80dp</dimen>
+    <dimen name="bottom_padding">90dp</dimen>
 
+    <!-- Misc Layouts -->
     <dimen name="width">0dp</dimen>
+    <dimen name="layout_twentyfour">24dp</dimen>
+    <dimen name="layout_fortyeight">48dp</dimen>
+    <dimen name="min_high">300dp</dimen>
+    <dimen name="layout_one">1dp</dimen>
+    <dimen name="layout_twofivezero">250dp</dimen>
 </resources>

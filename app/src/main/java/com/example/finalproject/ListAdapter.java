@@ -58,7 +58,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         holder.categoryIcon.setImageResource(iconResId);
 
         // Set category name
-        holder.categoryName.setText(slip.getCategory());
+        String categoryKey = slip.getCategory();
+        holder.categoryName.setText(holder.itemView.getContext().getString(
+                CategoryConstants.getDisplayStringResource(categoryKey)
+        ));
 
         if (isFromMainActivity) {
             // แยกวันที่และเวลาจาก dateTime
@@ -66,16 +69,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             if (dateTimeParts.length > 0) {
                 String[] dateParts = dateTimeParts[0].split("/");
                 if (dateParts.length == 3) {
-                    // แปลงรูปแบบวันที่เป็น "dd เดือน พ.ศ."
-                    String[] thaiMonths = { "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
+                    // Get month names from resources
+                    String[] thaiMonths = holder.itemView.getContext().getResources().getStringArray(R.array.months_array);
 
                     String day = dateParts[0];
                     int monthIndex = Integer.parseInt(dateParts[1]);
                     String month = thaiMonths[monthIndex];
                     String year = dateParts[2];
 
-                    holder.transactionNote.setText(String.format("%s %s %s", day, month, year));
+                    holder.transactionNote.setText(String.format(
+                            holder.itemView.getContext().getString(R.string.date_format_string),
+                            day, month, year));
                 }
             }
         } else {
@@ -84,20 +88,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             if (description != null && !description.isEmpty()) {
                 holder.transactionNote.setText(description);
             } else {
-                holder.transactionNote.setText("ไม่มีบันทึกเพิ่มเติม");
+                holder.transactionNote.setText(holder.itemView.getContext().getString(R.string.no_description));
             }
         }
 
         // Set amount with proper formatting and color based on type
         String amount;
+        Context context = holder.itemView.getContext();
         if (slip.getType() == 1) { // รายรับ
-            amount = String.format("+ %.2f ฿", slip.getAmount());
-            holder.transactionAmount.setTextColor(holder.itemView.getContext()
-                    .getResources().getColor(android.R.color.holo_green_dark));
+            amount = String.format(context.getString(R.string.amount_format_positive), slip.getAmount());
+            holder.transactionAmount.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
         } else { // รายจ่าย
-            amount = String.format("- %.2f ฿", slip.getAmount());
-            holder.transactionAmount.setTextColor(holder.itemView.getContext()
-                    .getResources().getColor(android.R.color.holo_red_dark));
+            amount = String.format(context.getString(R.string.amount_format_negative), slip.getAmount());
+            holder.transactionAmount.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         }
         holder.transactionAmount.setText(amount);
 
@@ -110,33 +113,33 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         });
     }
 
-    private int getCategoryIcon(String category) {
-        switch (category) {
-            case "อาหาร/เครื่องดื่ม":
+    private int getCategoryIcon(String categoryKey) {
+        switch (categoryKey) {
+            case CategoryConstants.CATEGORY_FOOD:
                 return R.mipmap.foodandbaverages;
-            case "ช็อปปิ้ง":
+            case CategoryConstants.CATEGORY_SHOPPING:
                 return R.mipmap.shopping;
-            case "ครอบครัว/ส่วนตัว":
+            case CategoryConstants.CATEGORY_FAMILY:
                 return R.mipmap.family;
-            case "ออมเงิน/ลงทุน":
+            case CategoryConstants.CATEGORY_SAVINGS:
                 return R.mipmap.saving;
-            case "ชำระบิล":
+            case CategoryConstants.CATEGORY_BILLS:
                 return R.mipmap.bill;
-            case "บันเทิง":
+            case CategoryConstants.CATEGORY_ENTERTAINMENT:
                 return R.mipmap.entertainment;
-            case "ของขวัญ/บริจาค":
+            case CategoryConstants.CATEGORY_GIFTS:
                 return R.mipmap.gift;
-            case "ค่าเดินทาง":
+            case CategoryConstants.CATEGORY_TRAVEL:
                 return R.mipmap.transportation;
-            case "การศึกษา":
+            case CategoryConstants.CATEGORY_EDUCATION:
                 return R.mipmap.education;
-            case "โรงแรม/ท่องเที่ยว":
+            case CategoryConstants.CATEGORY_HOTEL:
                 return R.mipmap.travelandtourism;
-            case "ประกัน":
+            case CategoryConstants.CATEGORY_INSURANCE:
                 return R.mipmap.insuarance;
-            case "ถอนเงิน":
+            case CategoryConstants.CATEGORY_WITHDRAWAL:
                 return R.mipmap.withdrawal;
-            case "สินเชื่อ/เช่าซื้อ":
+            case CategoryConstants.CATEGORY_CREDIT:
                 return R.mipmap.loan;
             default:
                 return R.mipmap.others;

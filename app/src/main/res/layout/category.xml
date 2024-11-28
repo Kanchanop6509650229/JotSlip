@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:paddingBottom="80dp">
+            android:paddingBottom="@dimen/bottom_padding">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -31,10 +31,10 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginHorizontal="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp">
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginHorizontal="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -43,11 +43,11 @@
 
                         <ImageButton
                             android:id="@+id/exportButton"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
+                            android:layout_width="@dimen/layout_fortyeight"
+                            android:layout_height="@dimen/layout_fortyeight"
                             android:layout_gravity="end"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:padding="12dp"
+                            android:padding="@dimen/padding"
                             android:src="@android:drawable/ic_menu_share"
                             app:tint="@color/white"/>
 
@@ -55,7 +55,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="16dp">
+                            android:padding="@dimen/padding_medium">
 
                             <!-- Year Selection -->
                             <LinearLayout
@@ -63,7 +63,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
                                 android:orientation="horizontal"
-                                android:padding="8dp">
+                                android:padding="@dimen/padding_small">
 
                                 <ImageButton
                                     android:id="@+id/prevYear"
@@ -79,7 +79,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginHorizontal="24dp"
                                     android:textColor="@color/white"
-                                    android:textSize="18sp"
+                                    android:textSize="@dimen/text_size_medium"
                                     android:textStyle="bold" />
 
                                 <ImageButton
@@ -97,7 +97,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
                                 android:orientation="horizontal"
-                                android:padding="8dp">
+                                android:padding="@dimen/padding_small">
 
                                 <ImageButton
                                     android:id="@+id/prevMonth"
@@ -113,7 +113,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginHorizontal="24dp"
                                     android:textColor="@color/white"
-                                    android:textSize="18sp"
+                                    android:textSize="@dimen/text_size_medium"
                                     android:textStyle="bold" />
 
                                 <ImageButton
@@ -132,26 +132,26 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginHorizontal="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_marginHorizontal="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
 
                     <com.github.mikephil.charting.charts.PieChart
                         android:id="@+id/chart"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="300dp"
-                        android:layout_margin="16dp" />
+                        android:minHeight="@dimen/min_high"
+                        android:layout_margin="@dimen/margin_medium" />
                 </androidx.cardview.widget.CardView>
 
                 <!-- Categories List Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_margin="@dimen/margin_medium"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation_small">
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/category_list_item_view"
@@ -160,7 +160,7 @@
                         android:clipToPadding="false"
                         android:nestedScrollingEnabled="false"
                         android:overScrollMode="never"
-                        android:padding="8dp" />
+                        android:padding="@dimen/padding_small" />
 
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
@@ -185,7 +185,7 @@
             <!-- Home Button -->
             <FrameLayout
                 android:id="@+id/nav_home"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -198,7 +198,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/home_icon"
@@ -220,7 +221,7 @@
             <!-- Category Button -->
             <FrameLayout
                 android:id="@+id/nav_category"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -233,7 +234,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/category_icon"
@@ -247,7 +249,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="หมวดหมู่"
+                        android:text="@string/category_label"
                         android:textColor="@color/green_500" />
                 </LinearLayout>
             </FrameLayout>
@@ -255,7 +257,7 @@
             <!-- Add Button -->
             <FrameLayout
                 android:id="@+id/nav_add"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground">
@@ -273,7 +275,7 @@
             <!-- History Button -->
             <FrameLayout
                 android:id="@+id/nav_history"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -286,7 +288,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@android:id/icon"
@@ -308,7 +311,7 @@
             <!-- Settings Button -->
             <FrameLayout
                 android:id="@+id/nav_settings"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/width"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
@@ -321,7 +324,8 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_medium">
+                    android:paddingVertical="@dimen/padding_medium"
+                    android:paddingHorizontal="@dimen/padding_small">
 
                     <ImageView
                         android:id="@+id/settings_icon"
@@ -335,7 +339,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/margin_smaller"
-                        android:text="ตั้งค่า"
+                        android:text="@string/settings"
                         android:textColor="@color/gray" />
                 </LinearLayout>
             </FrameLayout>
