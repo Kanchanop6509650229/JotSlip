@@ -69,16 +69,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             if (dateTimeParts.length > 0) {
                 String[] dateParts = dateTimeParts[0].split("/");
                 if (dateParts.length == 3) {
-                    // แปลงรูปแบบวันที่เป็น "dd เดือน พ.ศ."
-                    String[] thaiMonths = { "", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
+                    // Get month names from resources
+                    String[] thaiMonths = holder.itemView.getContext().getResources().getStringArray(R.array.months_array);
 
                     String day = dateParts[0];
                     int monthIndex = Integer.parseInt(dateParts[1]);
                     String month = thaiMonths[monthIndex];
                     String year = dateParts[2];
 
-                    holder.transactionNote.setText(String.format("%s %s %s", day, month, year));
+                    holder.transactionNote.setText(String.format(
+                            holder.itemView.getContext().getString(R.string.date_format_string),
+                            day, month, year));
                 }
             }
         } else {
@@ -87,20 +88,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             if (description != null && !description.isEmpty()) {
                 holder.transactionNote.setText(description);
             } else {
-                holder.transactionNote.setText("ไม่มีบันทึกเพิ่มเติม");
+                holder.transactionNote.setText(holder.itemView.getContext().getString(R.string.no_description));
             }
         }
 
         // Set amount with proper formatting and color based on type
         String amount;
+        Context context = holder.itemView.getContext();
         if (slip.getType() == 1) { // รายรับ
-            amount = String.format("+ %.2f ฿", slip.getAmount());
-            holder.transactionAmount.setTextColor(holder.itemView.getContext()
-                    .getResources().getColor(android.R.color.holo_green_dark));
+            amount = String.format(context.getString(R.string.amount_format_positive), slip.getAmount());
+            holder.transactionAmount.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
         } else { // รายจ่าย
-            amount = String.format("- %.2f ฿", slip.getAmount());
-            holder.transactionAmount.setTextColor(holder.itemView.getContext()
-                    .getResources().getColor(android.R.color.holo_red_dark));
+            amount = String.format(context.getString(R.string.amount_format_negative), slip.getAmount());
+            holder.transactionAmount.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         }
         holder.transactionAmount.setText(amount);
 

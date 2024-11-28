@@ -84,7 +84,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 CategoryConstants.getDisplayStringResource(group.getCategory())
         ));
 
-        holder.transactionAmount.setText(String.format("- %.2f ฿", group.getTotalAmount()));
+        holder.transactionAmount.setText(String.format(
+                holder.itemView.getContext().getString(R.string.currency_format),
+                group.getTotalAmount()));
         holder.transactionAmount.setTextColor(holder.itemView.getContext()
                 .getResources().getColor(android.R.color.holo_red_dark));
 
@@ -92,7 +94,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 .mapToDouble(CategoryGroup::getTotalAmount)
                 .sum();
         double percentage = (group.getTotalAmount() / totalExpense) * 100;
-        holder.transactionPercent.setText(String.format("%.1f%%", percentage));
+        holder.transactionPercent.setText(String.format(
+                holder.itemView.getContext().getString(R.string.percentage_format),
+                percentage));
 
         if (isInMainActivity) {
             holder.itemView.setOnClickListener(v -> {
@@ -183,7 +187,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         public void addSlip(TransferSlip slip) {
             slips.add(slip);
-            if (slip.getType() != 1) { // รายรับ
+            if (slip.getType() != 1) { // Income
                 totalExpense += slip.getAmount();
             }
         }

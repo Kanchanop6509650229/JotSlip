@@ -485,7 +485,7 @@ public class CategoryActivity extends AppCompatActivity {
     }
 
     private void exportDataToImage() {
-        // เก็บขนาดเดิมของกราฟ
+        // Save the original chart size
         final ViewGroup.LayoutParams originalParams = chart.getLayoutParams();
         final int originalWidth = chart.getWidth();
         final int originalHeight = chart.getHeight();
@@ -494,11 +494,11 @@ public class CategoryActivity extends AppCompatActivity {
         double totalExpense = calculateTotalExpense();
 
         try {
-            // คำนวณขนาดกราฟที่ต้องการ
+            // Calculate the desired chart size
             int desiredWidth = chart.getWidth();
-            int desiredHeight = 300; // หรือขนาดที่ต้องการ
+            int desiredHeight = 300; // or the desired height
 
-            // กำหนดขนาดกราฟใหม่
+            // Set the new chart size
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
                     desiredWidth,
                     desiredHeight);
@@ -549,20 +549,20 @@ public class CategoryActivity extends AppCompatActivity {
                 if (imageUri != null) {
                     resolver.delete(imageUri, null, null);
                 }
+                Log.e("CategoryActivity", getString(R.string.error_saving_image_gallery, e.getMessage()));
                 Toast.makeText(this, getString(R.string.save_image_error), Toast.LENGTH_SHORT).show();
-                Log.e("CategoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
         } finally {
-            // คืนค่าขนาดกราฟกลับเป็นขนาดเดิม
+            // Restore the original chart size
             chart.setLayoutParams(originalParams);
             chart.getLayoutParams().width = originalWidth;
             chart.getLayoutParams().height = originalHeight;
 
-            // บังคับให้วาดใหม่
+            // Force a redraw
             chart.requestLayout();
             chart.invalidate();
 
-            // เรียก updateChartData เพื่ออัพเดทข้อมูลและการแสดงผลใหม่
+            // Call updateChartData to update the data and display
             updateChartData();
         }
     }
@@ -572,7 +572,7 @@ public class CategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { TYPE, MONEY, DATE, CATEGORY };
 
-        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        // Use direct month and year comparison from substring
         String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
         String[] selectionArgs = {
                 String.format("%02d", selectedMonth + 1),
@@ -599,7 +599,7 @@ public class CategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { MONEY };
 
-        // ใช้การเปรียบเทียบเดือนและปีโดยตรงจาก substring
+        // Use direct month and year comparison from substring
         String selection = "substr(date, 4, 2) = ? AND substr(date, -4) = ? AND type != 1";
         String[] selectionArgs = {
                 String.format("%02d", selectedMonth + 1),
@@ -645,7 +645,7 @@ public class CategoryActivity extends AppCompatActivity {
                         }
                     }
                 } catch (Exception e) {
-                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
+                    Log.e("CategoryActivity", getString(R.string.error_parsing_date, dateStr), e);
                 }
             } while (cursor.moveToNext());
             cursor.close();
@@ -781,7 +781,7 @@ public class CategoryActivity extends AppCompatActivity {
                         slipList.add(slip);
                     }
                 } catch (Exception e) {
-                    Log.e("CategoryActivity", "Error parsing date: " + dateStr, e);
+                    Log.e("CategoryActivity", getString(R.string.error_parsing_date, dateStr), e);
                 }
             } while (cursor.moveToNext());
 
@@ -1008,17 +1008,17 @@ public class CategoryActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // ตั้งค่าการทำงานของปุ่มต่างๆ
+        // Set up button functionality
         View languageCard = dialogView.findViewById(R.id.languageCard);
         View resetDataCard = dialogView.findViewById(R.id.resetDataCard);
 
-        // จัดการการเปลี่ยนภาษา
+        // Handle language change
         languageCard.setOnClickListener(v -> {
             showLanguageDialog();
             dialog.dismiss();
         });
 
-        // จัดการการรีเซ็ตข้อมูล
+        // Handle data reset
         resetDataCard.setOnClickListener(v -> {
             dialog.dismiss();
             showResetConfirmationDialog();
@@ -1056,20 +1056,20 @@ public class CategoryActivity extends AppCompatActivity {
     private void showResetConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        // สร้าง AlertDialog แบบกำหนดเอง
+        // Create a custom AlertDialog
         View dialogView = getLayoutInflater().inflate(R.layout.reset_dialog, null);
         builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
 
-        // ทำให้พื้นหลัง dialog โปร่งใส
+        // Make the dialog background transparent
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
         dialog.show();
 
-        // ตั้งค่าการทำงานของปุ่มใน dialog
+        // Set up button functionality in the dialog
         Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
 
@@ -1083,33 +1083,33 @@ public class CategoryActivity extends AppCompatActivity {
 
     private void resetAllData() {
         try {
-            // ลบข้อมูลในฐานข้อมูล
+            // Delete data from the database
             events = new EventsData(this);
             SQLiteDatabase db = events.getWritableDatabase();
             db.delete(TABLE_NAME, null, null);
 
-            // อีเซ็ตค่าเริ่มต้น
+            // Reset initial values
             Calendar calendar = Calendar.getInstance();
             selectedMonth = calendar.get(Calendar.MONTH);
             selectedYear = calendar.get(Calendar.YEAR) + 543;
 
-            // รีเซ็ตค่าตัวแปรที่เก็บข้อมูล
+            // Reset data variables
             totalExpense = 0.0;
             categoryExpenses.clear();
 
-            // อัพเดทการแสดงผลทั้งหมด
+            // Update all displays
             updateDisplayTexts();
             updateChartData();
             updateCategoryData();
             updateExpenseData();
 
-            // รีเซ็ต PieChart
+            // Reset the PieChart
             chart.clear();
             chart.setData(null);
             chart.setCenterText(getString(R.string.chart_center_text));
             chart.invalidate();
 
-            // รีเซ็ต RecyclerView
+            // Reset the RecyclerView
             categoryRecyclerView.setAdapter(new CategoryAdapter(new ArrayList<>(), false));
 
             Toast.makeText(this, getString(R.string.reset_data_success), Toast.LENGTH_SHORT).show();

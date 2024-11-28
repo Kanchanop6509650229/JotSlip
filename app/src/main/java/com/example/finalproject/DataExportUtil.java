@@ -39,15 +39,18 @@ public class DataExportUtil {
             FileWriter writer = new FileWriter(csvFile);
 
             // Write header and summary
-            writer.append("รายงานประจำเดือน: " + month + " " + year + "\n\n");
-            writer.append("สรุปรวม:\n");
-            writer.append("รายรับรวม,").append(String.format("%.2f", totalIncome)).append("\n");
-            writer.append("รายจ่ายรวม,").append(String.format("%.2f", totalExpense)).append("\n");
-            writer.append("คงเหลือ,").append(String.format("%.2f", totalIncome - totalExpense)).append("\n\n");
+            writer.append(context.getString(R.string.export_monthly_report, month, year)).append("\n\n");
+            writer.append(context.getString(R.string.export_summary)).append("\n");
+            writer.append(context.getString(R.string.export_total_income)).append(",")
+                    .append(String.format("%.2f", totalIncome)).append("\n");
+            writer.append(context.getString(R.string.export_total_expense)).append(",")
+                    .append(String.format("%.2f", totalExpense)).append("\n");
+            writer.append(context.getString(R.string.export_balance)).append(",")
+                    .append(String.format("%.2f", totalIncome - totalExpense)).append("\n\n");
 
             // Write daily balance data
-            writer.append("ข้อมูลกราฟยอดคงเหลือรายวัน:\n");
-            writer.append("วันที่,ยอดคงเหลือ\n");
+            writer.append(context.getString(R.string.export_daily_balance_title)).append("\n");
+            writer.append(context.getString(R.string.export_daily_balance_header)).append("\n");
             for (Map.Entry<String, Double> entry : dailyBalances.entrySet()) {
                 writer.append(entry.getKey()).append(",")
                         .append(String.format("%.2f", entry.getValue())).append("\n");
@@ -55,15 +58,17 @@ public class DataExportUtil {
             writer.append("\n");
 
             // Write transactions header
-            writer.append("รายการธุรกรรมทั้งหมด:\n");
-            writer.append("วันที่,เวลา,ประเภท,หมวดหมู่,จำนวนเงิน,รายละเอียด,ผู้รับ/จ่าย\n");
+            writer.append(context.getString(R.string.export_transactions_title)).append("\n");
+            writer.append(context.getString(R.string.export_transactions_header)).append("\n");
 
             // Write transaction data
             for (TransferSlip slip : transactions) {
                 String[] dateTime = slip.getDateTime().split(" ");
-                writer.append(dateTime[0]).append(","); // วันที่
-                writer.append(dateTime[1]).append(","); // เวลา
-                writer.append(slip.getType() == 1 ? "รายรับ" : "รายจ่าย").append(",");
+                writer.append(dateTime[0]).append(","); // Date
+                writer.append(dateTime[1]).append(","); // Time
+                writer.append(slip.getType() == 1 ? 
+                        context.getString(R.string.export_income_type) : 
+                        context.getString(R.string.export_expense_type)).append(",");
                 writer.append(slip.getCategory()).append(",");
                 writer.append(String.format("%.2f", slip.getAmount())).append(",");
                 writer.append(slip.getDescription().replace(",", ";")).append(",");
@@ -74,12 +79,12 @@ public class DataExportUtil {
             writer.close();
 
             Toast.makeText(context,
-                    "ส่งออกข้อมูลสำเร็จ\nบันทึกไว้ที่: " + downloadsDir.getAbsolutePath(),
+                    context.getString(R.string.export_success_message, downloadsDir.getAbsolutePath()),
                     Toast.LENGTH_LONG).show();
 
         } catch (IOException e) {
-            Log.e("DataExportUtil", "Error exporting history data: " + e.getMessage());
-            Toast.makeText(context, "เกิดข้อผิดพลาดในการส่งออกข้อมูล", Toast.LENGTH_SHORT).show();
+            Log.e("DataExportUtil", context.getString(R.string.export_error_log, "history", e.getMessage()));
+            Toast.makeText(context, context.getString(R.string.export_error_message), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -98,28 +103,28 @@ public class DataExportUtil {
             FileWriter writer = new FileWriter(csvFile);
 
             // Write header
-            writer.append("รายงานสรุปตามหมวดหมู่ประจำเดือน: " + month + " " + year + "\n\n");
-            writer.append("รายจ่ายรวมทั้งหมด: " + String.format("%.2f", totalExpense) + "\n\n");
+            writer.append(context.getString(R.string.export_category_report, month, year)).append("\n\n");
+            writer.append(context.getString(R.string.export_total_expense_summary, totalExpense)).append("\n\n");
 
             // Write category breakdown
-            writer.append("หมวดหมู่,จำนวนเงิน,เปอร์เซ็นต์\n");
+            writer.append(context.getString(R.string.export_category_header)).append("\n");
             for (Map.Entry<String, Double> entry : categoryExpenses.entrySet()) {
                 double percentage = (entry.getValue() / totalExpense) * 100;
                 writer.append(entry.getKey()).append(",");
                 writer.append(String.format("%.2f", entry.getValue())).append(",");
-                writer.append(String.format("%.1f%%", percentage)).append("\n");
+                writer.append(String.format(context.getString(R.string.export_percentage_format), percentage)).append("\n");
             }
 
             writer.flush();
             writer.close();
 
             Toast.makeText(context,
-                    "ส่งออกข้อมูลสำเร็จ\nบันทึกไว้ที่: " + downloadsDir.getAbsolutePath(),
+                    context.getString(R.string.export_success_message, downloadsDir.getAbsolutePath()),
                     Toast.LENGTH_LONG).show();
 
         } catch (IOException e) {
-            Log.e("DataExportUtil", "Error exporting category data: " + e.getMessage());
-            Toast.makeText(context, "เกิดข้อผิดพลาดในการส่งออกข้อมูล", Toast.LENGTH_SHORT).show();
+            Log.e("DataExportUtil", context.getString(R.string.export_error_log, "category", e.getMessage()));
+            Toast.makeText(context, context.getString(R.string.export_error_message), Toast.LENGTH_SHORT).show();
         }
     }
 

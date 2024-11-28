@@ -79,20 +79,18 @@ public class SlipInfoActivity extends AppCompatActivity {
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("รายละเอียดรายการ"); // เพิ่มชื่อ title
+        getSupportActionBar().setTitle(getString(R.string.slip_details_title));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // บันทึกสถานะการดูข้อมูล
         saveViewingState();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // โหลดข้อมูลใหม่
         loadSlipData(slipId);
         loadViewingState();
     }
@@ -115,7 +113,7 @@ public class SlipInfoActivity extends AppCompatActivity {
     }
 
     private void saveViewingState() {
-        SharedPreferences prefs = getSharedPreferences("SlipInfoState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.slip_info_state), MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong("lastViewedSlipId", slipId);
         editor.putFloat("scrollPosition", getScrollPosition());
@@ -123,7 +121,7 @@ public class SlipInfoActivity extends AppCompatActivity {
     }
 
     private void loadViewingState() {
-        SharedPreferences prefs = getSharedPreferences("SlipInfoState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.slip_info_state), MODE_PRIVATE);
         float scrollPosition = prefs.getFloat("scrollPosition", 0);
         scrollToPosition(scrollPosition);
     }
@@ -156,8 +154,7 @@ public class SlipInfoActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // เพิ่มปุ่มลบในแถบด้านบน
-        MenuItem deleteItem = menu.add(Menu.NONE, 1, Menu.NONE, "ลบ");
+        MenuItem deleteItem = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.delete));
         deleteItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         deleteItem.setIcon(android.R.drawable.ic_menu_delete);
         return true;
@@ -174,15 +171,15 @@ public class SlipInfoActivity extends AppCompatActivity {
 
     private void showDeleteConfirmationDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("ยืนยันการลบ")
-                .setMessage("คุณต้องการลบรายการนี้ใช่หรือไม่?")
-                .setPositiveButton("ลบ", new DialogInterface.OnClickListener() {
+                .setTitle(getString(R.string.delete_confirmation_title))
+                .setMessage(getString(R.string.delete_confirmation_message))
+                .setPositiveButton(getString(R.string.delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         deleteSlip();
                     }
                 })
-                .setNegativeButton("ยกเลิก", null)
+                .setNegativeButton(getString(R.string.cancel_text), null)
                 .show();
     }
 

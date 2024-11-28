@@ -109,8 +109,7 @@ public class HistoryActivity extends AppCompatActivity {
     private SettingsManager settingsManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private final String[] MONTHS = new String[] { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
+    private String[] MONTHS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +117,9 @@ public class HistoryActivity extends AppCompatActivity {
         settingsManager = new SettingsManager(this);
         settingsManager.applyLanguage();
         setContentView(R.layout.history);
+
+        // Initialize months array from resources
+        MONTHS = getResources().getStringArray(R.array.months_array);
 
         events = new EventsData(this);
 
@@ -177,7 +179,7 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void saveViewState() {
-        SharedPreferences prefs = getSharedPreferences("HistoryState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.history_state_prefs), MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("selectedMonth", selectedMonth);
         editor.putInt("selectedYear", selectedYear);
@@ -190,7 +192,7 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void loadViewState() {
-        SharedPreferences prefs = getSharedPreferences("HistoryState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.history_state_prefs), MODE_PRIVATE);
         selectedMonth = prefs.getInt("selectedMonth", selectedMonth);
         selectedYear = prefs.getInt("selectedYear", selectedYear);
         final int scrollPosition = prefs.getInt("scrollPosition", 0);
@@ -328,7 +330,7 @@ public class HistoryActivity extends AppCompatActivity {
                 exportData();
             } else {
                 Toast.makeText(this,
-                        "ต้องการสิทธิ์ในการเข้าถึงพื้นที่จัดเก็บเพื่อบันทึกไฟล์",
+                        getString(R.string.storage_permission_required),
                         Toast.LENGTH_LONG).show();
             }
         }
@@ -491,7 +493,7 @@ public class HistoryActivity extends AppCompatActivity {
             // บันทึกไฟล์รูปภาพ
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                     .format(new Date());
-            String fileName = String.format("history_summary_%s_%s_%s.jpg",
+            String fileName = String.format(getString(R.string.history_file_name_format),
                     monthText.getText(), yearText.getText(), timestamp);
 
             ContentValues values = new ContentValues();
@@ -521,14 +523,14 @@ public class HistoryActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(this,
-                            "บันทึกรูปภาพไว้ในแกลเลอรี่แล้ว",
+                            getString(R.string.save_image_success),
                             Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 if (imageUri != null) {
                     resolver.delete(imageUri, null, null);
                 }
-                Toast.makeText(this, "เกิดข้อผิดพลาดในการบันทึกรูปภาพ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.save_image_error), Toast.LENGTH_SHORT).show();
                 Log.e("HistoryActivity", "Error saving image to gallery: " + e.getMessage());
             }
         } finally {
@@ -560,12 +562,14 @@ public class HistoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
         String[] FROM = { _ID, TYPE, MONEY, DATE, TIME, DESCRIPTION, CATEGORY, RECEIVER, IMAGE };
 
-        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
+        String startDay = String.format(getString(R.string.history_date_format),
+                1, selectedMonth + 1, selectedYear);
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(selectedYear - 543, selectedMonth, 1);
         int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
+        String endDay = String.format(getString(R.string.history_date_format),
+                lastDay, selectedMonth + 1, selectedYear);
 
         String selection = "date BETWEEN ? AND ?";
         String[] selectionArgs = { startDay, endDay };
@@ -841,9 +845,6 @@ public class HistoryActivity extends AppCompatActivity {
         TextView monthText = findViewById(R.id.monthText);
         TextView yearText = findViewById(R.id.yearText);
 
-        String[] MONTHS = { "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม" };
-
         monthText.setText(MONTHS[selectedMonth]);
         yearText.setText(String.valueOf(selectedYear));
     }
@@ -1056,7 +1057,7 @@ public class HistoryActivity extends AppCompatActivity {
         List<ILineDataSet> dataSets = new ArrayList<>();
 
         // Create DataSets for up and down trends - always create both even if empty
-        LineDataSet upDataSet = new LineDataSet(new ArrayList<>(), "เพิ่มขึ้น");
+        LineDataSet upDataSet = new LineDataSet(new ArrayList<>(), getString(R.string.chart_trend_increase));
         upDataSet.setColor(Color.GREEN);
         upDataSet.setLineWidth(2f);
         upDataSet.setDrawCircles(false);
@@ -1064,7 +1065,7 @@ public class HistoryActivity extends AppCompatActivity {
         upDataSet.setMode(LineDataSet.Mode.LINEAR);
         dataSets.add(upDataSet);
 
-        LineDataSet downDataSet = new LineDataSet(new ArrayList<>(), "ลดลง");
+        LineDataSet downDataSet = new LineDataSet(new ArrayList<>(), getString(R.string.chart_trend_decrease));
         downDataSet.setColor(Color.RED);
         downDataSet.setLineWidth(2f);
         downDataSet.setDrawCircles(false);
@@ -1225,7 +1226,7 @@ public class HistoryActivity extends AppCompatActivity {
 
         // Handle empty state
         if (combinedEntries.isEmpty()) {
-            chart.setNoDataText("ไม่มีข้อมูลในเดือนนี้");
+            chart.setNoDataText(getString(R.string.history_no_data));
             chart.setNoDataTextColor(Color.GRAY);
         }
 
@@ -1241,12 +1242,14 @@ public class HistoryActivity extends AppCompatActivity {
         SQLiteDatabase db = events.getReadableDatabase();
 
         // สร้างรูปแบบวันที่สำหรับการค้นหา
-        String startDay = String.format("01/%02d/%d", selectedMonth + 1, selectedYear);
+        String startDay = String.format(getString(R.string.history_date_format),
+                1, selectedMonth + 1, selectedYear);
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(selectedYear - 543, selectedMonth, 1);
         int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String endDay = String.format("%02d/%02d/%d", lastDay, selectedMonth + 1, selectedYear);
+        String endDay = String.format(getString(R.string.history_date_format),
+                lastDay, selectedMonth + 1, selectedYear);
 
         // ใช้การเปรียบเทียบวันที่โดยตรง
         String selection = "date BETWEEN ? AND ?";
@@ -1345,7 +1348,7 @@ public class HistoryActivity extends AppCompatActivity {
         int checkedItem = currentLang.equals("th") ? 0 : 1;
 
         new AlertDialog.Builder(this)
-                .setTitle("เลือกภาษา")
+                .setTitle(getString(R.string.dialog_language_title))
                 .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
                     String selectedLang = (which == 0) ? "th" : "en";
                     if (!selectedLang.equals(currentLang)) {
@@ -1354,7 +1357,7 @@ public class HistoryActivity extends AppCompatActivity {
                     }
                     dialog.dismiss();
                 })
-                .setNegativeButton("ยกเลิก", null)
+                .setNegativeButton(getString(R.string.dialog_cancel), null)
                 .show();
     }
 
@@ -1418,9 +1421,9 @@ public class HistoryActivity extends AppCompatActivity {
             updateDisplayTexts();
             updateChartData();
 
-            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_data_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_data_error), Toast.LENGTH_SHORT).show();
             Log.e("HistoryActivity", "Error resetting data: " + e.getMessage());
         }
     }

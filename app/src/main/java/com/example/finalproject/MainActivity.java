@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void saveCurrentState() {
         // บันทึก state ลง SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("AppState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.app_state_prefs), MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("hasUnsavedChanges", true);
         // บันทึกข้อมูลอื่นๆ ที่จำเป็น
@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void loadSavedState() {
         // โหลด state จาก SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("AppState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.app_state_prefs), MODE_PRIVATE);
         boolean hasUnsavedChanges = prefs.getBoolean("hasUnsavedChanges", false);
         // โหลดข้อมูลอื่นๆ ที่บันทึกไว้
     }
@@ -311,15 +311,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (hasUnsavedChanges()) {
             // แสดง dialog ยืนยันการออก
             new AlertDialog.Builder(this)
-                    .setTitle("ยืนยันการออก")
-                    .setMessage("คุณต้องการออกจากแอปพลิเคชันหรือไม่?")
-                    .setPositiveButton("ใช่", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("ไม่", null)
+                    .setTitle(getString(R.string.exit_confirmation_title))
+                    .setMessage(getString(R.string.exit_confirmation_message))
+                    .setPositiveButton(getString(R.string.yes), (dialog, which) -> finish())
+                    .setNegativeButton(getString(R.string.no), null)
                     .show();
         } else {
             super.onBackPressed();
@@ -328,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean hasUnsavedChanges() {
         // ตรวจสอบว่ามีการเปลี่ยนแปลงที่ยังไม่ได้บันทึกหรือไม่
-        SharedPreferences prefs = getSharedPreferences("AppState", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.app_state_prefs), MODE_PRIVATE);
         return prefs.getBoolean("hasUnsavedChanges", false);
     }
 
@@ -600,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cal.add(Calendar.DAY_OF_MONTH, 1); // เพิ่มวันทีละ 1 วัน
         }
 
-        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "รายรับ");
+        BarDataSet incomeDataSet = new BarDataSet(incomeEntries, getString(R.string.chart_income));
         incomeDataSet.setColor(Color.GREEN);
         incomeDataSet.setDrawValues(true);
         incomeDataSet.setValueFormatter(new ValueFormatter() {
@@ -612,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, "รายจ่าย");
+        BarDataSet expenseDataSet = new BarDataSet(expenseEntries, getString(R.string.chart_expense));
         expenseDataSet.setColor(Color.RED);
         expenseDataSet.setDrawValues(true);
         expenseDataSet.setValueFormatter(new ValueFormatter() {
@@ -774,7 +769,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             db.delete(TABLE_NAME, null, null);
 
             // อีเซ็ตการแสดงผลข้อมูล
-            remainAmount.setText("0฿");
+            remainAmount.setText(getString(R.string.currency_zero));
             remainAmount.setTextColor(getColor(R.color.white));
 
             // รีเซ็ต RecyclerViews
@@ -792,9 +787,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             updateCategoryData();
             getRemainMoney();
 
-            Toast.makeText(this, "รีเซ็ตข้อมูลสำเร็จ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_success), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.reset_error), Toast.LENGTH_SHORT).show();
             Log.e("MainActivity", "Error resetting data: " + e.getMessage());
         }
     }
