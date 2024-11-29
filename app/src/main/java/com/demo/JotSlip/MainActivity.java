@@ -1,19 +1,17 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 import static android.provider.BaseColumns._ID;
-import static com.example.finalproject.Constants.CATEGORY;
-import static com.example.finalproject.Constants.DATE;
-import static com.example.finalproject.Constants.DESCRIPTION;
-import static com.example.finalproject.Constants.IMAGE;
-import static com.example.finalproject.Constants.MONEY;
-import static com.example.finalproject.Constants.RECEIVER;
-import static com.example.finalproject.Constants.TABLE_NAME;
-import static com.example.finalproject.Constants.TIME;
-import static com.example.finalproject.Constants.TYPE;
+import static com.demo.JotSlip.Constants.CATEGORY;
+import static com.demo.JotSlip.Constants.DATE;
+import static com.demo.JotSlip.Constants.DESCRIPTION;
+import static com.demo.JotSlip.Constants.IMAGE;
+import static com.demo.JotSlip.Constants.MONEY;
+import static com.demo.JotSlip.Constants.RECEIVER;
+import static com.demo.JotSlip.Constants.TABLE_NAME;
+import static com.demo.JotSlip.Constants.TIME;
+import static com.demo.JotSlip.Constants.TYPE;
 
-import android.view.ViewGroup;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -42,7 +40,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -54,7 +51,6 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

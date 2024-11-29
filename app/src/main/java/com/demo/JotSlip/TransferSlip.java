@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 public class TransferSlip {
     private long id;

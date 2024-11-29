@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 import android.util.Log;
 
@@ -7,12 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.time.Year;
 import java.util.TreeMap;
 
 public class SlipParser {

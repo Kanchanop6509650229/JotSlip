@@ -1,7 +1,7 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 import static android.provider.BaseColumns._ID;
-import static com.example.finalproject.Constants.*;
+import static com.demo.JotSlip.Constants.*;
 
 import android.Manifest;
 import android.app.ActivityOptions;
@@ -60,8 +60,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
