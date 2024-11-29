@@ -1,7 +1,6 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 import static android.provider.BaseColumns._ID;
-import static android.provider.MediaStore.MediaColumns.TITLE;
-import static com.example.finalproject.Constants.*;
+import static com.demo.JotSlip.Constants.*;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

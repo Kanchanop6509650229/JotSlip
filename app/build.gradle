@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.finalproject'
+    namespace 'com.demo.JotSlip'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.finalproject"
+        applicationId "com.demo.JotSlip"
         minSdk 31
         targetSdk 34
         versionCode 1

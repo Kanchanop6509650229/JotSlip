@@ -1,15 +1,15 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
-import static com.example.finalproject.Constants.CATEGORY;
-import static com.example.finalproject.Constants.DATE;
-import static com.example.finalproject.Constants.DESCRIPTION;
-import static com.example.finalproject.Constants.IMAGE;
-import static com.example.finalproject.Constants.MONEY;
-import static com.example.finalproject.Constants.RECEIVER;
-import static com.example.finalproject.Constants.TABLE_NAME;
-import static com.example.finalproject.Constants.TIME;
-import static com.example.finalproject.Constants.TYPE;
-import static com.example.finalproject.Constants._ID;
+import static com.demo.JotSlip.Constants.CATEGORY;
+import static com.demo.JotSlip.Constants.DATE;
+import static com.demo.JotSlip.Constants.DESCRIPTION;
+import static com.demo.JotSlip.Constants.IMAGE;
+import static com.demo.JotSlip.Constants.MONEY;
+import static com.demo.JotSlip.Constants.RECEIVER;
+import static com.demo.JotSlip.Constants.TABLE_NAME;
+import static com.demo.JotSlip.Constants.TIME;
+import static com.demo.JotSlip.Constants.TYPE;
+import static com.demo.JotSlip.Constants._ID;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -35,7 +35,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ImageView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -196,9 +195,9 @@ public class SlipInfoActivity extends AppCompatActivity {
         } else {
             // แสดงข้อความเมื่อลบไม่สำเร็จ
             new AlertDialog.Builder(this)
-                    .setTitle("ข้อผิดพลาด")
-                    .setMessage("ไม่สามารถลบรายการได้")
-                    .setPositiveButton("ตกลง", null)
+                    .setTitle(getString(R.string.error_title))
+                    .setMessage(getString(R.string.error_delete_failed))
+                    .setPositiveButton(getString(R.string.ok), null)
                     .show();
         }
     }
@@ -228,7 +227,11 @@ public class SlipInfoActivity extends AppCompatActivity {
             radioGroup.check(type == 1 ? R.id.radio_income : R.id.radio_outcome);
 
             moneyText.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(MONEY))));
-            typeText.setText(cursor.getString(cursor.getColumnIndex(CATEGORY)));
+
+            // Get category key and convert to localized text
+            String categoryKey = cursor.getString(cursor.getColumnIndex(CATEGORY));
+            typeText.setText(getString(CategoryConstants.getDisplayStringResource(categoryKey)));
+
             descriptionText.setText(cursor.getString(cursor.getColumnIndex(DESCRIPTION)));
             dateText.setText(cursor.getString(cursor.getColumnIndex(DATE)));
             timeText.setText(cursor.getString(cursor.getColumnIndex(TIME)));

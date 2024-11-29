@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,7 +6,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import com.github.mikephil.charting.charts.BarChart;
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 

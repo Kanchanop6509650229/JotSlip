@@ -1,4 +1,4 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 import org.junit.Test;
 

@@ -1,15 +1,15 @@
-package com.example.finalproject;
+package com.demo.JotSlip;
 
 import static android.provider.BaseColumns._ID;
-import static com.example.finalproject.Constants.CATEGORY;
-import static com.example.finalproject.Constants.DATE;
-import static com.example.finalproject.Constants.DESCRIPTION;
-import static com.example.finalproject.Constants.IMAGE;
-import static com.example.finalproject.Constants.MONEY;
-import static com.example.finalproject.Constants.RECEIVER;
-import static com.example.finalproject.Constants.TABLE_NAME;
-import static com.example.finalproject.Constants.TIME;
-import static com.example.finalproject.Constants.TYPE;
+import static com.demo.JotSlip.Constants.CATEGORY;
+import static com.demo.JotSlip.Constants.DATE;
+import static com.demo.JotSlip.Constants.DESCRIPTION;
+import static com.demo.JotSlip.Constants.IMAGE;
+import static com.demo.JotSlip.Constants.MONEY;
+import static com.demo.JotSlip.Constants.RECEIVER;
+import static com.demo.JotSlip.Constants.TABLE_NAME;
+import static com.demo.JotSlip.Constants.TIME;
+import static com.demo.JotSlip.Constants.TYPE;
 
 import android.Manifest;
 import android.app.ActivityOptions;
@@ -59,18 +59,14 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
