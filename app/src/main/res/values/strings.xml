@@ -108,7 +108,6 @@
     <string name="save_image_error">เกิดข้อผิดพลาดในการบันทึกรูปภาพ</string>
     <string name="no_data_this_month">ไม่มีข้อมูลในเดือนนี้</string>
     <string-array name="months_array">
-        <item></item>
         <item>มกราคม</item>
         <item>กุมภาพันธ์</item>
         <item>มีนาคม</item>

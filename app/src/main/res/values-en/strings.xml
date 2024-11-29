@@ -110,7 +110,6 @@
     <string name="save_image_error">Error saving image</string>
     <string name="no_data_this_month">No data for this month</string>
     <string-array name="months_array">
-        <item></item>
         <item>January</item>
         <item>February</item>
         <item>March</item>
