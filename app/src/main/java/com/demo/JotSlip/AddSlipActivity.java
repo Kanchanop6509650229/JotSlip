@@ -28,6 +28,7 @@ import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -776,7 +777,39 @@ public class AddSlipActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // Handle the back button press
+            if (hasUnsavedChanges()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.unsaved_changes_title))
+                        .setMessage(getString(R.string.unsaved_changes_message))
+                        .setPositiveButton(getString(R.string.exit), (dialog, which) -> {
+                            clearDraftData();
+                            finish();
+                        })
+                        .setNegativeButton(getString(R.string.cancel_text), null)
+                        .show();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
+        if (hasUnsavedChanges()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.unsaved_changes_title))
+                    .setMessage(getString(R.string.unsaved_changes_message))
+                    .setPositiveButton(getString(R.string.exit), (dialog, which) -> {
+                        clearDraftData();
+                        finish();
+                    })
+                    .setNegativeButton(getString(R.string.cancel_text), null)
+                    .show();
+            return true;
+        }
         finish();
         return true;
     }

@@ -30,7 +30,8 @@
             android:theme="@style/Theme.AppCompat.Light"
             android:name=".AddSlipActivity"
             android:screenOrientation="portrait"
-            android:exported="false"/>
+            android:exported="false"
+            android:windowIsFloating="false"/>
         <activity
             android:theme="@style/Theme.AppCompat.Light"
             android:name=".SlipInfoActivity"
