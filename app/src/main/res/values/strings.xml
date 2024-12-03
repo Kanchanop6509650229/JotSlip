@@ -69,7 +69,6 @@
     <string name="settings_title">การตั้งค่า</string>
     <string name="reset_confirm_title">ยืนยันการรีเซ็ตข้อมูล</string>
     <string name="reset_confirm_message">คุณต้องการลบข้อมูลทั้งหมดหรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้</string>
-    <string name="confirm">ยืนยัน</string>
     <string name="cancel_text">ยกเลิก</string>
     <string name="reset_data_success">รีเซ็ตข้อมูลสำเร็จ</string>
     <string name="reset_data_error">เกิดข้อผิดพลาดในการรีเซ็ตข้อมูล</string>

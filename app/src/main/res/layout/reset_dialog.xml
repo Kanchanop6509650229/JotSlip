@@ -52,11 +52,11 @@
                     android:id="@+id/btnConfirm"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/confirm"
-                    android:textSize="@dimen/text_size"
-                    android:textColor="@color/white"
+                    android:background="?attr/selectableItemBackground"
                     android:paddingVertical="@dimen/padding_medium"
-                    android:background="?attr/selectableItemBackground"/>
+                    android:text="@string/submit"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size" />
 
             </androidx.cardview.widget.CardView>
 
