@@ -57,33 +57,33 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         int iconResId = getCategoryIcon(slip.getCategory());
         holder.categoryIcon.setImageResource(iconResId);
 
-        // Set category name
+        // Set category name using localized string
         String categoryKey = slip.getCategory();
         holder.categoryName.setText(holder.itemView.getContext().getString(
                 CategoryConstants.getDisplayStringResource(categoryKey)
         ));
 
         if (isFromMainActivity) {
-            // แยกวันที่และเวลาจาก dateTime
+            // Parse date for main activity display
             String[] dateTimeParts = slip.getDateTime().split(" ");
             if (dateTimeParts.length > 0) {
                 String[] dateParts = dateTimeParts[0].split("/");
                 if (dateParts.length == 3) {
-                    // Get month names from resources
+                    // Get month names from resources safely
                     String[] thaiMonths = holder.itemView.getContext().getResources().getStringArray(R.array.months_array);
+                    int monthIndex = Integer.parseInt(dateParts[1]) - 1; // Convert to 0-based index
 
-                    String day = dateParts[0];
-                    int monthIndex = Integer.parseInt(dateParts[1]);
-                    String month = thaiMonths[monthIndex];
-                    String year = dateParts[2];
-
-                    holder.transactionNote.setText(String.format(
-                            holder.itemView.getContext().getString(R.string.date_format_string),
-                            day, month, year));
+                    // Ensure monthIndex is within bounds
+                    if (monthIndex >= 0 && monthIndex < thaiMonths.length) {
+                        String month = thaiMonths[monthIndex];
+                        holder.transactionNote.setText(String.format(
+                                holder.itemView.getContext().getString(R.string.date_format_string),
+                                dateParts[0], month, dateParts[2]));
+                    }
                 }
             }
         } else {
-            // แสดง description ตามปกติ
+            // Show description for non-main activity views
             String description = slip.getDescription();
             if (description != null && !description.isEmpty()) {
                 holder.transactionNote.setText(description);
@@ -95,10 +95,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         // Set amount with proper formatting and color based on type
         String amount;
         Context context = holder.itemView.getContext();
-        if (slip.getType() == 1) { // รายรับ
+        if (slip.getType() == 1) { // Income
             amount = String.format(context.getString(R.string.amount_format_positive), slip.getAmount());
             holder.transactionAmount.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
-        } else { // รายจ่าย
+        } else { // Expense
             amount = String.format(context.getString(R.string.amount_format_negative), slip.getAmount());
             holder.transactionAmount.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         }
